@@ -24,9 +24,11 @@ def grid_over_amps(basis, flux, raw_x, raw_y, truth, fs, amps, true_a,
                    plot=False):
 
     K2P, rawP, K2a, rawa = [], [], [], []
-    print len(amps)
     for i, a in enumerate(amps):
-        print i
+
+        tf = 1./truth
+        print "amplitude = ", a
+        print "frequency = ", tf
 
         # add lcs together
         fx = flux * a
@@ -40,18 +42,23 @@ def grid_over_amps(basis, flux, raw_x, raw_y, truth, fs, amps, true_a,
         # calculate K2pgram
         _K2pgram = K2pgram(raw_x, y, fs, AT, ATA)
         l = _K2pgram==max(_K2pgram)
-        if truth-.1*truth < fs[l][0] and fs[l][0] < truth+.1*truth:
-            K2P.append(fs[l][0])
-            K2a.append(a*true_a)
+        print "recovered frequency", fs[l][0]
+        if tf-.1*tf < fs[l][0] and fs[l][0] < tf+.1*tf:
+            K2P.append(truth)
+            K2a.append(a)
+            print "success!", len(K2P), "\n"
 
         # calculate periodogram of raw light curve
         y = np.array([_y.astype("float64") for _y in y])
         raw_x = np.array([_raw_x.astype("float64") for _raw_x in raw_x])
-        pgram = sps.lombscargle(raw_x, y, 2*np.pi*fs)
+#         pgram = sps.lombscargle(raw_x, y, 2*np.pi*fs)
+        model = LombScargle().fit(raw_x, y, np.ones_like(y)*1e-5)
+        period = 1. / fs
+        pgram = model.periodogram(period)
         l = pgram==max(pgram)
         if truth-.1*truth < fs[l][0] and fs[l][0] < truth+.1*truth:
-            rawP.append(fs[l][0])
-            rawa.append(a*true_a)
+            rawP.append(truth)
+            rawa.append(a)
 
         if plot == True:
             plt.clf()
@@ -61,7 +68,7 @@ def grid_over_amps(basis, flux, raw_x, raw_y, truth, fs, amps, true_a,
             plt.subplot(3, 1, 2)
             plt.plot(raw_x, y, "k.")
             plt.subplot(3, 1, 3)
-            plt.axvline(truth, color=".7", linestyle="--")
+            plt.axvline(1./truth, color=".7", linestyle="--")
             plt.plot(fs, _K2pgram/max(_K2pgram), color=cols.blue,
                      label="$\mathrm{K2pgram$}")
             plt.plot(fs, pgram/max(pgram), color=cols.pink,
@@ -89,22 +96,49 @@ if __name__ == "__main__":
     with h5py.File("data/c1.h5", "r") as f:
         basis = f["basis"][:150, l]
 
-    # load truths
-    name, true_p, true_a = np.genfromtxt("truth.txt").T
+    # load injections and truths
+    sine = True
+    if sine == True:
+        fnames = glob.glob("injections/sine/*_lc.txt")
+        name, true_p, true_a = np.genfromtxt("truth.txt").T
+    else:
+        fnames = glob.glob("injections/*_lc.txt")
+        name, true_p, true_a = np.genfromtxt("truth.txt").T
 
-    # load injections
-    fnames = glob.glob("injections/*_lc.txt")
-
-    fs = np.arange(.08, .3, .001)
-    for i, fname in enumerate(fnames):
-        amps = np.arange(.0001, .01, .0001)
-        print true_p[i], true_a[i]
+    fs = np.arange(1./70, 1.1, .001)
+    K2_amps, K2_Ps, raw_amps, raw_Ps = [], [], [], []
+    for i, fname in enumerate(fnames[:3]):
+        print fname
+        print true_p[i]
+        amps = np.arange(.0001, .001, .0002)
         time, flux = np.genfromtxt(fname).T
         K2a, K2P, rawa, rawP = grid_over_amps(basis, flux, raw_x, raw_y,
-                                              true_p[i], fs, amps, true_a[i],
-                                              plot=True)
-        print K2a
-        abins = np.linspace(min(amps), max(amps), 10)
-#         print np.digitize(K2a, abins)
-        print np.histogram(K2a)
-        assert 0
+                                              true_p[i], fs, amps, true_a[i])
+
+        K2_amps.append(K2a)
+        raw_amps.append(rawa)
+        K2_Ps.append(K2P)
+        raw_Ps.append(rawP)
+    K2_amps = np.array([j for i in K2_amps for j in i])
+    K2_Ps = np.array([j for i in K2_Ps for j in i])
+    raw_amps = np.array([j for i in raw_amps for j in i])
+    raw_Ps = np.array([j for i in raw_Ps for j in i])
+
+    K2_hist, xedges, yedges = np.histogram2d(K2_amps, K2_Ps)
+    raw_hist, xedges, yedges = np.histogram2d(raw_amps, raw_Ps)
+
+    plt.clf()
+    fig = plt.figure()
+#             figsize=(7, 2))
+    ax = fig.add_subplot(111)
+    my_xedges = np.linspace(min(K2_amps), max(K2_amps), len(xedges))
+    labels = my_xedges
+    ax.set_xticklabels(labels)
+    im = plt.imshow(K2_hist, interpolation='nearest', origin='low',
+                    extent=[xedges[0], xedges[-1], yedges[0], yedges[-1]],
+                    cmap="Blues")
+#     ax = fig.add_subplot(122)
+#     X, Y = np.meshgrid(xedges, yedges)
+#     ax.pcolormesh(X, Y, K2_hist)
+#     ax.set_aspect('equal')
+    plt.savefig("hist")
