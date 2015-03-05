@@ -65,63 +65,68 @@ def find_modes(fname, eid, raw=False):
 
 # plot the target_pixel_file
 def plot_tpf(fname, eid):
-        tpf = fitsio.read(fname)
-        img = tpf["FLUX"][-1]
-        plt.clf()
-        plt.imshow(img.T, cmap="gray", interpolation="nearest");
-        plt.savefig("astero/%stpf" % eid)
+    tpf = fitsio.read(fname)
+    img = tpf["FLUX"][-1]
+    plt.clf()
+    plt.imshow(img.T, cmap="gray", interpolation="nearest");
+    plt.savefig("astero/%stpf" % eid)
 
 def plot_vbg(fname, eid):
-        # plot andrew's lc
-        x_vbg, y_vbg, _ = np.genfromtxt("data/ep%s.csv" % eid,
-                                        delimiter=",").T
-        x_vbg *= 24*3600
-        y_vbg = y_vbg/np.median(y_vbg) - 1
-        model = LombScargle().fit(x_vbg, y_vbg, np.ones_like(y_vbg)*1e-5)
-        period = 1. / fs
-        pgram = model.periodogram(period)
-        plt.clf()
-        plt.plot(fs, pgram, "k")
-        plt.xlabel("$\mathrm{Frequency~(}\mu \mathrm{Hz)}$")
-        plt.ylabel("$\mathrm{Power}$")
-        plt.savefig("astero/vbg_%spgram" % eid)
-
-def delta_nu(fs, s2n, eid, nsections=100):
-    print s2n
-    l = s2n > 0
-    fs, s2n = fs[l], s2n[l]
-    df = fs[1] - fs[0]
-    fps = len(fs)/nsections  # frequencies per section
-    acor = np.zeros((fps, nsections))
-    for i in range(nsections):
-        acor[:, i] = emcee.autocorr.function(s2n[i*fps:(i+1)*fps])
-        lags = np.arange(len(acor[:, i]))*df
-#         plt.clf()
-#         plt.plot(lags, acor[:, i], "k")
-#         plt.show()
-#     fig, ax1 = plt.subplots(211)
-    fig, ax = plt.subplots()
-    ax.imshow(acor, cmap="gray", interpolation="nearest", aspect="auto")
-    ax.set_yticklabels(range(len(lags))*lags)
-    plt.savefig("astero/%s_dnu" % eid)
+    # plot andrew's lc
+    x_vbg, y_vbg, _ = np.genfromtxt("data/ep%s.csv" % eid,
+                                    delimiter=",").T
+    x_vbg *= 24*3600
+    y_vbg = y_vbg/np.median(y_vbg) - 1
+    model = LombScargle().fit(x_vbg, y_vbg, np.ones_like(y_vbg)*1e-5)
+    period = 1. / fs
+    pgram = model.periodogram(period)
     plt.clf()
-    return acor, lags
+    plt.plot(fs, pgram, "k")
+    plt.xlabel("$\mathrm{Frequency~(}\mu \mathrm{Hz)}$")
+    plt.ylabel("$\mathrm{Power}$")
+    plt.savefig("astero/vbg_%spgram" % eid)
 
-# find delta nu
-def delta_nu_wrap(eid, nsections=100):
-    fs, s2n = np.genfromtxt("%sastero_pgram.txt" % eid).T
-    acor, lags = delta_nu(fs, s2n, eid, nsections=nsections)
+def delta_nu(fs, s2n, eid, width=.1, sub=1000, tint=1000):
+    df = (fs[1] - fs[0]) * 1e6  # frequency lag in uHz
+    fps = width * len(fs)  # frequencies per section
+    pos = np.arange(len(fs)-fps)[::sub]  # the position of each section
+    acor = np.zeros((fps, len(pos)))
+    for i in range(len(pos)):
+        acor[:, i] = emcee.autocorr.function(s2n[i*sub:fps+i*sub])
+    lags = np.arange(fps)*df
+    plt.clf()
+    plt.subplot(3, 1, 1)
+    plt.plot(fs, s2n, "k")
+    plt.subplot(3, 1, 2)
+    plt.imshow(acor, cmap="gray_r", interpolation="nearest", aspect="auto")
+#     fig, ax = plt.subplots()
+#     ax.imshow(acor, cmap="gray_r", interpolation="nearest", aspect="auto")
+#     ticks = np.arange(len(lags))[::tint]
+#     ax.set_yticks(ticks)
+#     ax.set_yticklabels(ticks*df)
+    plt.subplot(3, 1, 3)
+    collapsed_acf = np.sum(acor, axis=1)
+    print np.shape(lags), np.shape(collapsed_acf)
+    if len(lags) == len(collapsed_acf):
+        plt.plot(lags, collapsed_acf, "k")
+    else:
+        plt.plot(lags[:-1], collapsed_acf, "k")
+#     plt.ylim(-5, 10)
+#     plt.ylim(-5, 10)
+    plt.savefig("astero/%s_dnu" % eid)
+    return acor, lags
 
 if __name__ == "__main__":
 
-    # Giant stars
-#     poster_child = "201372313"
+    poster_child = "201372313"
 #     find_modes("data/astero/ktwo201372313-c01_lpd-lc.fits", poster_child)
-#     delta_nu_wrap(poster_child)
+    fs, s2n = np.genfromtxt("%sastero_pgram.txt" % poster_child).T
+    print len(fs)
+    delta_nu(fs, s2n, poster_child, width=.1, sub=1, tint=100)
 
-    eid = "6442183"
-    fs, fft = np.genfromtxt("6442183pgram.txt").T
-    delta_nu(fs, fft, eid)
+#     eid = "6442183"
+#     fs, fft = np.genfromtxt("6442183pgram.txt").T
+#     delta_nu(fs, fft, eid, width=.1, sub=1000, tint=1000)
 
 #     fnames = glob.glob("data/astero/*lc.fits")
 
