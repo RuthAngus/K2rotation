@@ -11,30 +11,17 @@ from gatspy.periodic import LombScargle
 from params import plot_params
 reb = plot_params()
 import fitsio
+import glob
+import emcee
 
 def peak_detect(x, y):
     peaks = np.array([i for i in range(1, len(x)-1) if y[i-1] < y[i] and
                      y[i+1] < y[i]])
     return x[peaks], y[peaks]
 
-# Giant stars
-epicids = ["201372313", "201157462", "201690697", "201171432", "201919748"]
-
-for eid in epicids[-1:]:
-
-    # plot the target_pixel_file
-    try:
-        tpf = fitsio.read("data/ktwo%s-c01_lpd-targ.fits.gz" % eid)
-        img = tpf["FLUX"][-1]
-        plt.clf()
-        plt.imshow(img.T, cmap="gray", interpolation="nearest");
-        plt.savefig("%stpf" % eid)
-    except:
-        "File not found"
-        print "no target pixel file"
-
-    data = fitsio.read("data/ktwo%s-c01_lpd-lc.fits" % eid)
-    aps = fitsio.read("data/ktwo%s-c01_lpd-lc.fits" % eid, 2)
+def find_modes(fname, eid, raw=False):
+    data = fitsio.read(fname)
+    aps = fitsio.read(fname, 2)
     y = data["flux"][:, np.argmin(aps["cdpp6"])]
     x = data["time"]
     q = data["quality"]
@@ -43,6 +30,15 @@ for eid in epicids[-1:]:
     y /= np.median(y)
     y -= 1
     x *= 24*3600  # convert to seconds
+
+    # plot raw data
+    if raw == True:
+        plt.clf()
+        model = LombScargle().fit(x, y, np.ones_like(y)*1e-5)
+        period = 1. / fs
+        raw_pgram = model.periodogram(period)
+        plt.plot(fs, raw_pgram, "k")
+        plt.savefig("astero/raw_%spgram" % eid)
 
     # load basis
     with h5py.File("data/c1.h5", "r") as f:
@@ -56,16 +52,27 @@ for eid in epicids[-1:]:
     print len(fs)
     amps2, s2n = K2pgram(x, y, fs, AT, ATA)
 
-    # plot raw data
+    # plot our pgram
     plt.clf()
-    model = LombScargle().fit(x, y, np.ones_like(y)*1e-5)
-    period = 1. / fs
-    raw_pgram = model.periodogram(period)
-    plt.plot(fs, raw_pgram, "k")
-    plt.savefig("raw_%spgram" % eid)
+    fs *= 1e6
+    plt.plot(fs, s2n, "k")
+    plt.xlabel("$\mathrm{Frequency~(}\mu \mathrm{Hz)}$")
+    plt.ylabel("$\mathrm{Power}$")
+    plt.savefig("astero/%sastero_pgram" % eid)
 
-    # plot andrew's lc
-    try:
+    # save pgram
+    np.savetxt("%sastero_pgram.txt" % eid, np.transpose((fs, s2n)))
+
+# plot the target_pixel_file
+def plot_tpf(fname, eid):
+        tpf = fitsio.read(fname)
+        img = tpf["FLUX"][-1]
+        plt.clf()
+        plt.imshow(img.T, cmap="gray", interpolation="nearest");
+        plt.savefig("astero/%stpf" % eid)
+
+def plot_vbg(fname, eid):
+        # plot andrew's lc
         x_vbg, y_vbg, _ = np.genfromtxt("data/ep%s.csv" % eid,
                                         delimiter=",").T
         x_vbg *= 24*3600
@@ -74,32 +81,52 @@ for eid in epicids[-1:]:
         period = 1. / fs
         pgram = model.periodogram(period)
         plt.clf()
-    #     plt.subplot(2, 1, 1)
-    #     plt.plot(x_vbg, y_vbg, "k.")
-    #     plt.subplot(2, 1, 2)
         plt.plot(fs, pgram, "k")
         plt.xlabel("$\mathrm{Frequency~(}\mu \mathrm{Hz)}$")
         plt.ylabel("$\mathrm{Power}$")
-        plt.savefig("vbg_%spgram" % eid)
-    except:
-        print "No vbg"
+        plt.savefig("astero/vbg_%spgram" % eid)
 
-    # plot our pgram
+def delta_nu(fs, s2n, eid, nsections=100):
+    print s2n
+    l = s2n > 0
+    fs, s2n = fs[l], s2n[l]
+    df = fs[1] - fs[0]
+    fps = len(fs)/nsections  # frequencies per section
+    acor = np.zeros((fps, nsections))
+    for i in range(nsections):
+        acor[:, i] = emcee.autocorr.function(s2n[i*fps:(i+1)*fps])
+        lags = np.arange(len(acor[:, i]))*df
+#         plt.clf()
+#         plt.plot(lags, acor[:, i], "k")
+#         plt.show()
+#     fig, ax1 = plt.subplots(211)
+    fig, ax = plt.subplots()
+    ax.imshow(acor, cmap="gray", interpolation="nearest", aspect="auto")
+    ax.set_yticklabels(range(len(lags))*lags)
+    plt.savefig("astero/%s_dnu" % eid)
     plt.clf()
-    fs *= 1e6
-    plt.plot(fs, s2n, "k")
-    plt.xlabel("$\mathrm{Frequency~(}\mu \mathrm{Hz)}$")
-    plt.ylabel("$\mathrm{Power}$")
-    plt.savefig("%sastero_pgram" % eid)
+    return acor, lags
 
-#     # calculate the best model
-#     x -= x[0]
-#     x /= 24*3600
-#     a, trends = eval_freq(x, y, 5.89511413, AT, ATA, compute_trends=True)
-#     trends = trends - np.median(trends)
-#     plt.clf()
-#     plt.plot(x, trends, "r")
-#     plt.plot(x, y, "k.", markersize=1.5)
-#     plt.plot(x, y-trends+.01, "b.", markersize=1)
-#     plt.savefig("%s_best" % eid)
-#     print eid
+# find delta nu
+def delta_nu_wrap(eid, nsections=100):
+    fs, s2n = np.genfromtxt("%sastero_pgram.txt" % eid).T
+    acor, lags = delta_nu(fs, s2n, eid, nsections=nsections)
+
+if __name__ == "__main__":
+
+    # Giant stars
+#     poster_child = "201372313"
+#     find_modes("data/astero/ktwo201372313-c01_lpd-lc.fits", poster_child)
+#     delta_nu_wrap(poster_child)
+
+    eid = "6442183"
+    fs, fft = np.genfromtxt("6442183pgram.txt").T
+    delta_nu(fs, fft, eid)
+
+#     fnames = glob.glob("data/astero/*lc.fits")
+
+#     for fname in fnames:
+#         eid = fname[16:25]
+#         print eid
+#         find_modes(fname, str(int(eid)))
+#         delta_nu(str(int(eid)))
