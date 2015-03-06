@@ -12,7 +12,7 @@ def K2pgram(x, y, fs, AT, ATA):
     s2n = np.zeros_like(fs)
     for i, f in enumerate(fs):
         amps2[i], s2n[i], w = eval_freq(x, y, f, AT, ATA)
-    return amps2, s2n
+    return amps2, s2n, w
 
 # calculate periodogram by just updating sin and cos parts of the  matrices
 def eval_freq(x, y, f, AT, ATA, compute_trends=False):
