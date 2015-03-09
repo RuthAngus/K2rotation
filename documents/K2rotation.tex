@@ -136,14 +136,38 @@ light curves.
 FM15 used 150 of these eigen light curves with a transit model in order to
 search for exoplanet candidates without the need for a `detrending' step.
 The likelihood of the data, conditioned on their eigen-light-curve-plus-transit
-model was calculated over a fine grid of periods and transit depths.
-36 new exoplanet candidates were discovered with this method.
-We use exactly the same technique to find periodic signals in {\it K2} data.
-Instead of a transit model, we use a sum of sine and cosine functions.
+model was calculated over a fine grid of periods and transit depths, resulting
+in the detection of 36 new exoplanet candidates.
+We use exactly the same technique to find periodic signals in {\it K2} data,
+where, instead of a transit model, we use a sum of sine and cosine functions.
 
 \section{Application to asteroseismology}
 
-We selected n long cadence targets from the GO1059 proposal: "Galactic
+An example Lomb-Scargle periodogram\footnote{All Lomb-Scargle periodograms
+produced in this project were calculated using the gatspy Python module:
+https://github.com/astroML/gatspy/tree/master/gatspy/periodic}
+of the raw {\it K2 photometry} for EPIC 201211472 is shown in figure
+\ref{fig:raw}.
+The peaks at 47 $\mu$Hz and its harmonics are produced by the regular $\sim$
+6 hour thruster fires that repoint the spacecraft.
+These peaks are also present in periodograms of the \citet{Vanderburg2014}
+light curves.
+The presence of systematic signals at these timescales are problematic for
+asteroseismic analysis.
+It is possible to remove these signals by `prewhitening' the data, i.e.
+removing a sine wave at that frequency from the data, however no such
+procedure is necessary for our method.
+
+\begin{figure*}
+\begin{center}
+\includegraphics[width=6in, clip=true]{raw_201211472.pdf}
+\caption{Lomb-scargle periodogram of the raw {\it K2 photometry for
+	EPIC 201211472.}
+\label{fig:raw}
+\end{center}
+\end{figure*}
+
+We selected long cadence targets from the GO1059 proposal: "Galactic
 Archaeology on a grand scale" (PI: Stello, D.) in order to test our method.
 Figures \ref{fig:1} to \ref{fig6} show example power spectra of 6 targets for
 which we detect pulsations.
@@ -182,6 +206,8 @@ which we detect pulsations.
     \caption{Power spectra of 6 long cadence {\it K2} giants with pulsations.
 \label{fig:astero_examples}}
 \end{figure}
+
+These periodograms do not show the
 
 \subsection{Flicker}
 
