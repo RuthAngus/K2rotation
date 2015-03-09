@@ -37,7 +37,9 @@ pgram = model.periodogram(ps)
 
 plt.clf()
 plt.subplot(3, 1, 1)
-plt.plot(x, y, "k")
+l = x < 2016
+plt.plot(x[l], y[l], "k")
+plt.plot(x[~l], y[~l], "k")
 plt.xlabel("$\mathrm{BJD-2454833~(days)}$")
 plt.ylabel("$\mathrm{Normalized~Flux}$")
 plt.xlim(min(x), max(x))

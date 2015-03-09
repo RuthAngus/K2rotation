@@ -1,13 +1,17 @@
 import numpy as np
 
 # loop over eval_freq to compute a periodogram
-def K2pgram(x, y, fs, AT, ATA):
+def K2pgram(x, y, basis, fs):
     """
     # `K2pgram`
 
     Calls eval_freq on x and y for each frequency in fs
     Returns the sum of squared amplitudes and the signal to noise
     """
+    # construct arrays
+    AT = np.concatenate((basis, np.ones((3, len(y)))), axis=0)
+    ATA = np.dot(AT, AT.T)
+
     amps2 = np.zeros_like(fs)
     s2n = np.zeros_like(fs)
     for i, f in enumerate(fs):

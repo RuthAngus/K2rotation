@@ -50,21 +50,48 @@ def campaign0():
 #     eid = "202126997"
 #     eid = "202086286"
     width = .22
-#     find_modes("/Users/angusr/Downloads/ktwo%s-c00_lpd-lc.fits" % eid, eid)
+    find_modes("/Users/angusr/Downloads/ktwo%s-c00_lpd-lc.fits" % eid, eid,
+               nbasis=150)
     fs, s2n = np.genfromtxt("astero/%sastero_pgram.txt" % eid).T
     dnu, peak_height = delta_nu(fs, s2n, eid, width, sub=1)
     print dnu, peak_height
 
 def campaign1():
-    fnames = glob.glob("data/astero/*lc.fits")
+    fnames = glob.glob("data/c1/*lc.fits")
     for fname in fnames:
-        eid = fname[16:25]
+        eid = fname[12:21]
         print eid
         find_modes(fname, str(int(eid)))
-        fs, s2n = np.genfromtxt("astero/%sastero_pgram.txt" % str(int(eid))).T
+        fs, s2n = np.genfromtxt("astero/%sastero_pgram.txt"
+                                % str(int(eid))).T
         width = .22
         dnu, peak_height = delta_nu(fs, s2n, eid, width, sub=1)
         print dnu, peak_height
+
+def campaign1_vbg():
+    fnames = glob.glob("data/c1/*lc.fits")
+    for fname in fnames:
+        eid = fname[12:21]
+        print eid
+        fname = "/Users/angusr/data/K2/c1lcsr4"
+        # load data
+        x, y, _ = np.genfromtxt("%s/ep%s.csv" % (fname, str(int(eid))),
+                                delimiter=",").T
+        y /= np.median(y)
+        y -= 1
+        x *= 24*3600  # convert to seconds
+        # load basis
+        with h5py.File("data/c1.h5", "r") as f:
+            basis = f["basis"][:150]
+        fs = np.arange(10, 300, 4e-2) * 1e-6
+        ps = 1./fs
+        model = LombScargle().fit(x, y, np.ones_like(y)*1e-5)
+        s2n = model.periodogram(ps)
+        # save pgram
+        plt.clf()
+        plt.plot(fs, s2n, "k")
+        plt.savefig("astero/%svbg_pgram" % eid)
+        np.savetxt("astero/%svbg_pgram.txt" % eid, np.transpose((fs, s2n)))
 
 def kepler_poster_child():
     eid = "6442183"
@@ -80,5 +107,5 @@ if __name__ == "__main__":
 #     delta_nu(fs, s2n, poster_child, width=.1, sub=1, tint=100)
 
 #     kepler_poster_child()
-    campaign0()
-#     campaign1()
+#     campaign0()
+    campaign1_vbg()

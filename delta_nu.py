@@ -32,7 +32,7 @@ def peak_detect(x, y):
     l = y[peaks] == max(y[peaks])
     return x[peaks], y[peaks], x[peaks][l], y[peaks][l]
 
-def find_modes(fname, eid, campaign=1, raw=False):
+def find_modes(fname, eid, nbasis=150, campaign=1, raw=False):
     data = fitsio.read(fname)
     aps = fitsio.read(fname, 2)
     y = data["flux"][:, np.argmin(aps["cdpp6"])]
@@ -57,13 +57,9 @@ def find_modes(fname, eid, campaign=1, raw=False):
     with h5py.File("data/c%s.h5" % campaign, "r") as f:
         basis = f["basis"][:150, l]
 
-    # construct arrays
-    AT = np.concatenate((basis, np.ones((3, len(y)))), axis=0)
-    ATA = np.dot(AT, AT.T)
-
     fs = np.arange(10, 300, 4e-2) * 1e-6
     print len(fs)
-    amps2, s2n = K2pgram(x, y, fs, AT, ATA)
+    amps2, s2n, w = K2pgram(x, y, basis, fs)
 
     # plot our pgram
     plt.clf()
@@ -91,6 +87,7 @@ def delta_nu(fs, s2n, eid, dnu, sub=1, smooth=False):
     plt.subplot(3, 1, 1)
     plt.plot(fs, s2n, "k")
     plt.xlim(min(fs), max(fs))
+    plt.ylim(0, max(s2n[fs > 10]))
     plt.xlabel("$\mathrm{Frequency~(}\mu \mathrm{Hz)}$")
     plt.ylabel("$\mathrm{Power}$")
     plt.yticks(visible=False)
@@ -114,10 +111,9 @@ def delta_nu(fs, s2n, eid, dnu, sub=1, smooth=False):
     plt.xlim(1, max(lags))
     plt.xlabel("$\Delta \\nu~\mathrm{(}\mu\mathrm{Hz)}$")
     plt.ylabel("$\mathrm{Correlation}$")
-    plt.yticks(visible=False)
 
     # cut off first part of ACF
-    l = lags > 3
+    l = lags > 6
     lags, collapsed_acf = lags[l], collapsed_acf[l]
 
     # smooth acf

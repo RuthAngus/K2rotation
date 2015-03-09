@@ -6,7 +6,7 @@
 \usepackage{graphicx, subfigure}
 \usepackage{color}
 
-\title{Detecting periodic signals in K2 data}
+\title{Systematics-insensitive periodic signal search with K2}
 
 \begin{document}
 
@@ -161,7 +161,7 @@ procedure is necessary for our method.
 \begin{figure*}
 \begin{center}
 \includegraphics[width=6in, clip=true]{raw_201211472.pdf}
-\caption{Lomb-scargle periodogram of the raw {\it K2 photometry for
+\caption{Lomb-scargle periodogram of the raw {\it K2} photometry for
 	EPIC 201211472.}
 \label{fig:raw}
 \end{center}
@@ -169,7 +169,17 @@ procedure is necessary for our method.
 
 We selected long cadence targets from the GO1059 proposal: "Galactic
 Archaeology on a grand scale" (PI: Stello, D.) in order to test our method.
-Figures \ref{fig:1} to \ref{fig6} show example power spectra of 6 targets for
+Periodograms of the raw data were produced by performing a linear least
+squares fit to the data with 150 eigen light curves and a single sine and
+cosine function at a range of frequencies.
+We searched for a the power excess in these periodograms using the method
+described in \citet{Huber2009}; autocorrelation functions are calculated for
+sections of the power spectrum in order to search for regions of increased
+correlation.
+The increased correlation arises from the even frequency spacing of acoustic
+modes, and the frequency of maximum correlation at the location of the power
+excess corresponds to the large frequecy separation, $\Delta\nu$.
+Figures \ref{fig:1} to \ref{fig:6} show example power spectra of 6 targets for
 which we detect pulsations.
 
 \begin{figure}
@@ -207,15 +217,31 @@ which we detect pulsations.
 \label{fig:astero_examples}}
 \end{figure}
 
-These periodograms do not show the
+% These periodograms do not show the
 
 \subsection{Flicker}
+Photometric variability in dwarf stars on timescales less than 8 hours has been
+linked with surface gravity, g \citep{Bastien2013}.
+The metrics used to quantify photometric variability include finding the range
+in intensity, counting the number of zero crossings and calculating the
+root-mean-square (RMS) of the light curve.
+Although related to periodic analysis these are all operations performed on the
+a detrended light curve, they are not inferred from a periodogram
 
 \section{Application to stellar rotation}
 The top panel of figure \ref{fig:rotation_poster_child} shows the light curve
 of an active, rotating star, EP201317002.
 This light curve has been detrended using the method of
 \citet{Vanderburg2014}.
+The middle and bottom panels show an ACF and Lomb-Scargle periodogram of the
+detrended light curve.
+The highest peaks in both the ACF and periodogram are located at around 10
+days.
+Figure \ref{fig:K2_rotation_poster_child} shows the raw light curve of the same
+target with a periodogram calculated by modeling the data as a linear
+combination of eigen light curves and a sine and cosine function at a range of
+frequencies.
+Each method measures a rotation period of around 10 days for this target.
 
 \begin{figure*}
 \begin{center}
@@ -226,6 +252,28 @@ light curve. The autocorrelation function method measures a rotation period of
 8.77 days for this star. {\it Bottom}: The Lomb-Scargle periodogram of the
 light curve. The highest peak in the periodogram is centred at 10.52 days.}
 \label{fig:rotation_poster_child}
+\end{center}
+\end{figure*}
+
+\begin{figure*}
+\begin{center}
+\includegraphics[width=6in, clip=true]{K2_rotation_201317002.pdf}
+\caption{{\it Top}: Raw light curve of EP201317002. {\it Bottom}: A
+periodogram produced by modelling the data using the top 150 eigen light curves
+plus a sine and cosine function at a range of frequencies. The highest peak in
+the periodogram is centred at 10.34 days.}
+\label{fig:K2_rotation_poster_child}
+\end{center}
+\end{figure*}
+
+Figure \ref{fig:top5} shows the 5 eigen light curves with the highest weights
+for this star.
+
+\begin{figure*}
+\begin{center}
+\includegraphics[width=6in, clip=true]{201317002_top5.pdf}
+\caption{The 5 highest-weighted eigen light curves for EPIC 201317002.}
+\label{fig:top5}
 \end{center}
 \end{figure*}
 
