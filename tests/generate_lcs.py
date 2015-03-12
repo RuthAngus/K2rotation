@@ -37,31 +37,18 @@ def inject_sine_wave(raw_x, periods, flag):
 if __name__ == "__main__":
 
     fnames = [201310650, 201311700, 201311941]
+    fname = fnames[-1]
 
-    for fname in fnames:
-        print fname
-        # load K2 light curve
-        data = fitsio.read("../data/c1/ktwo%s-c01_lpd-lc.fits" % fname)
-        aps = fitsio.read("../data/c1/ktwo%s-c01_lpd-lc.fits" % fname, 2)
-        raw_y = data["flux"][:, np.argmin(aps["cdpp6"])]
-        raw_x = data["time"]
-        q = data["quality"]
-        l = np.isfinite(raw_y) * np.isfinite(raw_x) * (q==0)
-        raw_y, raw_x = raw_y[l], raw_x[l]
-        raw_y /= np.median(raw_y)
-        raw_y -= 1
-
-        # load basis
-        with h5py.File("../data/c1.h5", "r") as f:
-            basis = f["basis"][:150, l]
-
-        # look at the K2pgram
-        periods = np.linspace(1., 70., 1000)  # rotation and astero
-        fs = 1./periods
-        amp2s, s2n, w = K2pgram(raw_x, raw_y, basis, fs)
-        plt.clf()
-        plt.plot(1./fs, s2n)
-        plt.show()
+    # load K2 light curve
+    data = fitsio.read("../data/c1/ktwo%s-c01_lpd-lc.fits" % fname)
+    aps = fitsio.read("../data/c1/ktwo%s-c01_lpd-lc.fits" % fname, 2)
+    raw_y = data["flux"][:, np.argmin(aps["cdpp6"])]
+    raw_x = data["time"]
+    q = data["quality"]
+    l = np.isfinite(raw_y) * np.isfinite(raw_x) * (q==0)
+    raw_y, raw_x = raw_y[l], raw_x[l]
+    raw_y /= np.median(raw_y)
+    raw_y -= 1
 
     periods = np.arange(1., 70., .5)  # rotation periods
 #     f1 = 10. * 1e-6 * 24 * 3600
