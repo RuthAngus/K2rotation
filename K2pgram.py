@@ -47,7 +47,7 @@ def eval_freq(x, y, f, AT, ATA, compute_trends=False):
 
     if compute_trends:
         trends = np.dot(w[:-2], AT[:-2])
-        return np.sum(w[-2:]**2), trends
+        return np.sum(w[-2:]**2), s2n, trends
     return np.sum(w[-2:]**2), s2n, w
 
 # loop over eval_freq to compute a periodogram

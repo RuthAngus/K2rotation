@@ -37,15 +37,22 @@ def read_data(epid, nbases):
         basis = f["basis"][:nbases, l]
     return x, y, basis
 
-def bases_FFT(x, y, fs, basis):
+# create file containing highest amplitude frequency for all elcs
+def bases_FFT(eid, nbases):
+    x, y, basis = read_data(eid, nbases)
+    fs = np.linspace(1e-6, .7, 1000)
     ps = 1./fs
     plt.clf()
     cols = np.linspace(.1, .99, len(basis))
+    freqs = []
     for i in range(len(basis)):
-        model = LombScargle().fit(x, basis[i], np.ones_like(y)*1e-5)
+        model = LombScargle().fit(x, basis[i], np.ones_like(x)*1e-5)
         pgram = model.periodogram(ps)
         plt.plot(fs, pgram, color="%s" % cols[i])
+        freqs.append(fs[pgram==max(pgram)][0])
     plt.savefig("all_bases")
+    freqs = np.array(freqs)
+    np.savetxt("elc_freqs.txt", np.transpose((np.arange(nbases), freqs)))
 
 def K2pgram2(x, y, fs, basis):
     # construct arrays
@@ -97,7 +104,7 @@ def plot_best(x, y, fs, AT, ATA, mx):
 def K2_poster_child_plot(x, y, fs, s2n, epid):
 
     # find highest peak
-    mx, my = max_peak_detect(fs, amp2s)
+    mx, my = max_peak_detect(fs, s2n)
     print my
 
     x2, y2, _ = np.genfromtxt("/Users/angusr/data/K2/c1lcsr4/ep%s.csv" % epid,
@@ -121,6 +128,43 @@ def K2_poster_child_plot(x, y, fs, s2n, epid):
                 label="$P_{rot}=%.2f ~\mathrm{days}$" % (1./mx))
     plt.legend()
     plt.savefig("../documents/K2_rotation_%s.pdf" % epid)
+    return mx
+
+def K2_conditioned_plot(fs, epid):
+
+    x, y, basis = read_data(epid, 150)
+    amps2, s2n, w = K2pgram(x, y, basis, fs)
+
+    # find highest peak
+    mx, my = max_peak_detect(fs, s2n)
+
+    # construct arrays
+    AT = np.concatenate((basis, np.ones((3, len(y)))), axis=0)
+    ATA = np.dot(AT, AT.T)
+    _, trends = eval_freq(x, y, mx, AT, ATA, compute_trends=True)
+
+    plt.clf()
+    plt.subplot(2, 1, 1)
+    l = x < 2016
+    plt.plot(x[l], y[l], "k")
+    plt.plot(x[l], y[l]-trends[l])
+    plt.plot(x[~l], y[~l], "k")
+    plt.plot(x[~l], y[~l]-trends[~l])
+    plt.xlim(min(x), max(x))
+    plt.xlabel("$\mathrm{BJD-2454833~(days)}$")
+    plt.ylabel("$\mathrm{Normalized~Flux}$")
+
+    plt.subplot(2, 1, 2)
+    plt.plot(fs, s2n, "k")
+    plt.xlabel("$\mathrm{Frequency~(days}^{-1}\mathrm{)}$")
+    plt.ylabel("$\mathrm{Power}$")
+    plt.ylim(0, my)
+    plt.subplots_adjust(hspace=.4)
+    plt.axvline(mx, color=".5", linestyle="--",
+                label="$P_{rot}=%.2f ~\mathrm{days}$" % (1./mx))
+    plt.legend()
+    plt.savefig("K2_%s" % epid)
+    return mx
 
 # plot the top 5 components
 def top_5(x, basis, w):
@@ -185,5 +229,5 @@ if __name__ == "__main__":
         np.savetxt("%spgram.txt" % epid, np.transpose((fs, s2n)))
     amp2s, s2n, w  = K2pgram(x, y, basis, fs)
 
-#     K2_poster_child_plot(x, y, fs, amp2s, epid)
-    top_5(x, basis, w)
+    K2_poster_child_plot(x, y, fs, amp2s, epid)
+#     top_5(x, basis, w)

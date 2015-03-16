@@ -6,6 +6,7 @@ from mklc import mklc
 import fitsio
 import h5py
 from K2pgram import K2pgram
+from injections import fap
 
 def inject_star_spots(raw_x, periods):
     amps = []
@@ -50,8 +51,9 @@ if __name__ == "__main__":
     raw_y /= np.median(raw_y)
     raw_y -= 1
 
-    periods = np.arange(1., 70., .5)  # rotation periods
-#     f1 = 10. * 1e-6 * 24 * 3600
-#     f2 = 300. * 1e-6 * 24 * 3600
-#     periods = np.linspace(1./f1, 1./f2, 150)  # asteroseismology
+    # load basis
+    with h5py.File("../data/c1.h5", "r") as f:
+        basis = f["basis"][:150, l]
+
+    periods = np.exp(np.linspace(np.log(1./24), np.log(30), 100))
     inject_sine_wave(raw_x, periods, "r")

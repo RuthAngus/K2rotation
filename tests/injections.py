@@ -6,7 +6,7 @@ from mklc import mklc
 import scipy.signal as sps
 import fitsio
 import h5py
-from K2pgram import K2pgram
+from K2pgram import K2pgram, eval_freq
 from colours import plot_colours
 cols = plot_colours()
 from gatspy.periodic import LombScargle
@@ -20,15 +20,55 @@ plotpar = {'axes.labelsize': 10,
            'text.usetex': True}
 plt.rcParams.update(plotpar)
 
+# calculate the false alarm probability
+def fap(x, y, basis, fs, N, plot=False, sig=False):
+    amp2s, s2n, _ = K2pgram(x, y, basis, fs)  # 1st pgram
+    if sig: power = s2n
+    else: power = amp2s
+    mf, ms2n = peak_detect(fs, power)  # find peak
+    AT = np.concatenate((basis, np.ones((3, len(y)))), axis=0)
+    ATA = np.dot(AT, AT.T)
+    # compute trends
+    _, _, trends = eval_freq(x, y, mf, AT, ATA, compute_trends=True)
+    if plot:
+        plt.clf()
+        plt.plot(1./fs, power, "k")
+    peak_heights = []
+    for n in range(N):
+        detrended_y = y - trends  # remove trends
+        detrended_y = np.random.choice(detrended_y, len(y))  # shuffle
+        # add trends back in
+        amp2s, s2n, _ = K2pgram(x, detrended_y + trends, basis, fs)
+        if sig: power = s2n
+        else: power = amp2s
+        mx, my = peak_detect(fs, power)
+        peak_heights.append(my)
+        if plot:
+            plt.plot(1./fs, power, alpha=.2)
+    fap95 = np.percentile(peak_heights, 95)
+    fap90 = np.percentile(peak_heights, 90)
+    fap85 = np.percentile(peak_heights, 85)
+    fap50 = np.percentile(peak_heights, 50)
+    if plot:
+        plt.axhline(fap95, color=".5")
+        plt.savefig("fap")
+    print fap95, fap90, fap85, fap50
+    return fap95, fap90, fap85, fap50
+
 def peak_detect(x, y):
     peaks = np.array([i for i in range(1, len(x)-1) if y[i-1] < y[i] and
                      y[i+1] < y[i]])
     l = y[peaks] == max(y[peaks])
-    return x[peaks][l][0], y[peaks][l][0]
+    mx, my = x[peaks][l][0], y[peaks][l][0]
+    return mx, my
 
 # grid over amplitudes (the K2 pgram step takes the time)
-def grid_over_amps(basis, flux, raw_x, raw_y, truth, fs, amps, true_a,
-                   flag, plot=True):
+def grid_over_amps(basis, flux, raw_x, raw_y, truth, fs, amps, true_a, fap,
+                   flag, plot=True, raw=False):
+
+    # find the threshold level
+    _, initial_pgram, _ = K2pgram(raw_x, raw_y, basis, fs)
+    mx, threshold = peak_detect(fs, initial_pgram)
 
     K2P, rawP, K2a, rawa = [], [], [], []
     for i, a in enumerate(amps):
@@ -45,47 +85,50 @@ def grid_over_amps(basis, flux, raw_x, raw_y, truth, fs, amps, true_a,
 
         # calculate K2pgram
         amp2s, s2n, w = K2pgram(raw_x, y, basis, fs)
-        best_f, best_amp2s = peak_detect(fs, amp2s)
+        pgram = s2n
+        best_f, best_pgram = peak_detect(fs, pgram)  # find peaks
         print "recovered frequency", best_f
-        s = 0
-        if tf-.1*tf < best_f and best_f < tf+.1*tf:
+        s = 0  # success indicator
+        if tf-.1*tf < best_f and best_f < tf+.1*tf and best_pgram > threshold:
             K2P.append(truth)
             K2a.append(a)
             print "success!", "\n"
             s = 1
-            K2_period = fs[l][0]
 
         # calculate periodogram of raw light curve
         y = np.array([_y.astype("float64") for _y in y])
         raw_x = np.array([_raw_x.astype("float64") for _raw_x in raw_x])
         model = LombScargle().fit(raw_x, y, np.ones_like(y)*1e-5)
         period = 1. / fs
-        pgram = model.periodogram(period)
-        best_f, best_pgram = peak_detect(fs, pgram)
-        if tf-.1*tf < best_f and best_f < tf+.1*tf:
+        pg = model.periodogram(period)
+        best_f2, best_pg2 = peak_detect(fs, pg)
+        if tf-.1*tf < best_f2 and best_f2 < tf+.1*tf:
             rawP.append(truth)
             rawa.append(a)
 
-        if plot == True:
+        if plot:
             plt.clf()
             plt.subplot(2, 1, 1)
             plt.plot(raw_x, y, "k.")
             plt.plot(raw_x, fx, color=cols.green)
             plt.subplot(2, 1, 2)
-            plt.axvline(1./truth, color=".7", linestyle="--")
+            plt.axvline(1./tf, color=".7", linestyle="--")
+            plt.axhline(threshold, color=".7")
             if s == 1:
-                plt.axvline(K2_period, color=cols.orange, linestyle="--")
-            plt.plot(fs, amp2s/max(amp2s), color=cols.blue,
-                     label="$\mathrm{K2pgram$}")
-            plt.plot(fs, pgram/max(pgram), color=cols.pink,
-                     label="$\mathrm{raw pgram}$")
+                plt.axvline(1./best_f, color="k")
+            if flag == "r":
+                plt.plot(1./fs, pgram, color=cols.blue,
+                         label="$\mathrm{K2pgram$}")
+            else:
+                plt.plot(1./fs, pgram, color=cols.blue,
+                         label="$\mathrm{K2pgram$}")
             plt.savefig("../injections/sine/%s_%s_result_%s"
-                        % (str(int(truth)), i, flag))
-            raw_input('enter')
+                        % (str(int(truth)).zfill(2), i, flag))
     return np.array(K2a), np.array(K2P), np.array(rawa), np.array(rawP)
 
 # add simulated to real light curves and grid over periods
-def grid_over_periods(basis, raw_x, raw_y, true_p, fs, true_a, fnames, flag):
+def grid_over_periods(basis, raw_x, raw_y, true_p, fs, true_a, fap, fnames,
+                      flag):
     K2_amps, K2_Ps, raw_amps, raw_Ps = [], [], [], []
     for i, fname in enumerate(fnames):
         print fname
@@ -93,7 +136,7 @@ def grid_over_periods(basis, raw_x, raw_y, true_p, fs, true_a, fnames, flag):
         time, flux = np.genfromtxt(fname).T
         K2a, K2P, rawa, rawP = grid_over_amps(basis, flux, raw_x, raw_y,
                                               true_p[i], fs, amps, true_a[i],
-                                              flag)
+                                              fap, flag)
         K2_amps.append(K2a)
         raw_amps.append(rawa)
         K2_Ps.append(K2P)
@@ -167,12 +210,14 @@ def make_histogram_plot(flag, nbins=10):
     ax.set_ylabel("$\mathrm{Amplitude}$")
     ax.set_xlabel("$\mathrm{Period~(days)}$")
 #     plt.plot(raw_Ps, raw_amps, "r.")
+    plt.colorbar()
     plt.savefig("../injections/sine/both_hist_%s" % flag)
     plt.close(fig)
 
 if __name__ == "__main__":
 
-    fname = 201295312
+#     fname = 201295312
+    fname = 201311941
 
     # load K2 light curve
     data = fitsio.read("../data/c1/ktwo%s-c01_lpd-lc.fits" % fname)
@@ -191,8 +236,8 @@ if __name__ == "__main__":
 
     # load injections and truths
     sine = True
-    flag = "a"
-    if sine == True:
+    flag = "r"  # r for rotation or a for asteroseismology
+    if sine:
         fnames = glob.glob("../injections/sine/????_lc_%s.txt" % flag)
         name, true_p = np.genfromtxt("../injections/sine/truth_%s.txt"
                                      % flag).T
@@ -202,16 +247,18 @@ if __name__ == "__main__":
         name, true_p, true_a = np.genfromtxt("truth.txt").T
 
     if flag == "r":
-        fs = np.arange(1./70, 1.1, .001)
+        fs = np.arange(1./30, 1.1, .001)
     else:
         f1 = 10. * 1e-6 * 24 * 3600
         f2 = 300. * 1e-6 * 24 * 3600
         fs = np.linspace(f1, f2, 1000)
 
-    amps = np.arange(.0001, .003, .0001)
+    amps = np.arange(.0001, .001, .0001)
 
+    fap = 2.40516004879e-06  # amp2s 95% fap
     # calculate the 2d histogram of completeness over period and amplitude
-    K2_amps, K2_Ps, raw_amps, raw_Ps = grid_over_periods(basis, raw_x,
-                                                         raw_y, true_p, fs,
-                                                          true_a, fnames, flag)
+#     K2_amps, K2_Ps, raw_amps, raw_Ps = grid_over_periods(basis, raw_x,
+#                                                          raw_y, true_p, fs,
+#                                                          true_a, fap, fnames,
+#                                                          flag)
     make_histogram_plot(flag)

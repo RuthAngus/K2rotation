@@ -113,7 +113,7 @@ astronomy as its ancestor was.
 
 The method implemented in this paper is an extention of the planet-search
 algorithm developed by \citet{Foreman-Mackey2015} (hereafter FM15).
-All the stars observed by {\it Kepler} move on the CCD in the same way and
+All targets observed by {\it Kepler} move on the CCD in the same way and
 therefore the systematics affecting each individual star's light curve have
 shared properties.
 The FM12 method utilizes the fact that pointing-induced systematics are shared
@@ -132,14 +132,44 @@ Following the procedure of \citet{Vanderburg2014}, the aperture producing the
 light curve with the lowest CDPP with a 6 hour window \citet{Christiansen2012}
 was selected.
 PCA was then performed on the full set of targets in order to produce `eigen
-light curves.
+light curves'.
 FM15 used 150 of these eigen light curves with a transit model in order to
 search for exoplanet candidates without the need for a `detrending' step.
 The likelihood of the data, conditioned on their eigen-light-curve-plus-transit
 model was calculated over a fine grid of periods and transit depths, resulting
 in the detection of 36 new exoplanet candidates.
 We use exactly the same technique to find periodic signals in {\it K2} data,
-where, instead of a transit model, we use a sum of sine and cosine functions.
+however, instead of a transit model, we use a sum of sine and cosine functions.
+The model is linear, therefore the likelihood function conditioned on
+a specific frequency can be calculated and the systematics model marginalized
+over analytically.
+
+Following the notation in FM15, our model for the $k$th star can be written
+\begin{equation}
+	\mathbf{f_k} = \mathbf{A}\mathbf{w_k} + \mathrm{noise},
+\end{equation}
+where $\mathbf{f_k}$ is the vector of $N$ flux values,
+\begin{equation}
+	\mathbf{f_k} = (f_{k,1}, f_{k,2}, f_{k,3}, ..., f_{k,N})^T
+\end{equation}
+at times
+\begin{equation}
+	\mathbf{t_k} = (t_1, t_2, t_3, ..., t_N)^T.
+\end{equation}
+$\mathbf{A}$ is the design matrix:
+\begin{eqnarray}
+	\mathbf{A} &=& \left (\begin{array}{ccccccc}
+	x_{1,1} & x_{2,1} & \cdots & x_{150,1} & 1 & \sin(2\pi\nu t_1) & \cos(2\pi\nu t_1) \\
+	x_{1,2} & x_{2,2} & \cdots & x_{150,2} & 1 & \sin(2\pi\nu t_2) & \cos(2\pi\nu t_2\\
+    && \vdots &&&\\
+	x_{1,N} & x_{2,N} & \cdots & x_{150,N} & 1 & \sin(2\pi\nu t_N) & \cos(2\pi\nu t_N)
+\end{array}\right )
+\end{eqnarray}
+where the $x_{ij}$s are the eigen light curves, with $i$ denoting the eigen
+light curve number and $j$ the time index.
+The maximum likelihood solution for the weight vector, $\mathbf{w}$ is
+\begin{equation}
+	\mathbf{w_k}^* \gets (\mathbf{A}^T\mathbf{A})^{-1}\mathbf{A}^T\mathbf{f_k} \end{equation}
 
 \section{Application to asteroseismology}
 
@@ -148,12 +178,13 @@ produced in this project were calculated using the gatspy Python module:
 https://github.com/astroML/gatspy/tree/master/gatspy/periodic}
 of the raw {\it K2 photometry} for EPIC 201211472 is shown in figure
 \ref{fig:raw}.
-The peaks at 47 $\mu$Hz and its harmonics are produced by the regular $\sim$
-6 hour thruster fires that repoint the spacecraft.
+Peaks appearing at 47 $\mu$Hz and its harmonics are produced by the regular
+$\sim$ 6 hour thruster fires that repoint the spacecraft.
 These peaks are also present in periodograms of the \citet{Vanderburg2014}
-light curves.
+detrended light curves.
 The presence of systematic signals at these timescales are problematic for
-asteroseismic analysis.
+asteroseismic analysis since they lie in the region of frequency space
+populated by giant asteroseismic modes.
 It is possible to remove these signals by `prewhitening' the data, i.e.
 removing a sine wave at that frequency from the data, however no such
 procedure is necessary for our method.
@@ -172,15 +203,15 @@ Archaeology on a grand scale" (PI: Stello, D.) in order to test our method.
 Periodograms of the raw data were produced by performing a linear least
 squares fit to the data with 150 eigen light curves and a single sine and
 cosine function at a range of frequencies.
-We searched for a the power excess in these periodograms using the method
-described in \citet{Huber2009}; autocorrelation functions are calculated for
-sections of the power spectrum in order to search for regions of increased
-correlation.
+In order to identify acoustic modes we searched for a power excess in these
+periodograms using the method described in \citet{Huber2009}; autocorrelation
+functions are calculated for sections of the power spectrum in order to search
+for regions of increased correlation.
 The increased correlation arises from the even frequency spacing of acoustic
 modes, and the frequency of maximum correlation at the location of the power
 excess corresponds to the large frequecy separation, $\Delta\nu$.
 Figures \ref{fig:1} to \ref{fig:6} show example power spectra of 6 targets for
-which we detect pulsations.
+which we detect pulsations using this method.
 
 \begin{figure}
 \begin{center}
@@ -208,25 +239,43 @@ which we detect pulsations.
             \label{fig:6}
 	    \includegraphics[width=3in]{201195647.pdf}
         }
-% 	\subfigure[]{
-%             \label{fig:7}
-% 	    \includegraphics[width=3in]{201272670.pdf}
-%         }
     \end{center}
     \caption{Power spectra of 6 long cadence {\it K2} giants with pulsations.
 \label{fig:astero_examples}}
 \end{figure}
 
-% These periodograms do not show the
+Our method does not perfectly model the systematics for every star.
+Of the power spectra generated for each of the n stars in GO1049, n of them
+showed power at 47$\mu$Hz.
+Examples of power spectra containing residual systematic features are shown in
+figure ?.
 
-\subsection{Flicker}
-Photometric variability in dwarf stars on timescales less than 8 hours has been
-linked with surface gravity, g \citep{Bastien2013}.
-The metrics used to quantify photometric variability include finding the range
-in intensity, counting the number of zero crossings and calculating the
-root-mean-square (RMS) of the light curve.
-Although related to periodic analysis these are all operations performed on the
-a detrended light curve, they are not inferred from a periodogram
+We applied our analysis to 3 red giants and 3 $\delta$ Scuti stars
+identified by Lund {\it et al.} (in prep), in campaign 0.
+Since campaign 0 was shorter, $\sim$ 25 days, our method is not as successful
+at modelling the systematics as for campaign 1.
+For this reason the 47$\mu$Hz peaks caused by the regular 6 hour thruster
+firings appear, with relatively high amplitudes for 2 of the 6 targets and with
+moderate amplitudes for another 2 of the 6.
+Two of the most sucessful periodograms, for targets EPIC 202086286 and EPIC
+202068435 are shown in figure \ref{fig:c0}.
+
+\begin{figure}
+\begin{center}
+	\subfigure[]{
+            \label{fig:c01}
+	    \includegraphics[width=3in]{202086286.pdf}
+        }
+	\subfigure[]{
+            \label{fig:c02}
+	    \includegraphics[width=3in]{202068435.pdf}
+        }
+    \end{center}
+    \caption{Power spectra of 2 long cadence {\it K2} giants with
+	    pulsations from campaign 0. These targets were identified as
+	    pulsating giants by Lund {\it et al.} (in prep).
+\label{fig:c0}}
+\end{figure}
 
 \section{Application to stellar rotation}
 The top panel of figure \ref{fig:rotation_poster_child} shows the light curve
@@ -292,6 +341,59 @@ detecting the highest peak.
 We say that a period was successfully measured if the recovered period lies
 within 10\% of the `truth'.extracted from the periodogram by
 detecting the highest peak.
+
+\section{Discussion}
+
+\subsection{Other applications}
+Figures \ref{fig:RRLyrae} and \ref{fig:EB}
+show the periodograms of an RR Lyra star and an eclipsing binary, selected
+from Guest observing programs GO.. and GO..
+respectively.
+The top panels of these two figures show the {\it K2} light curves of these
+objects, conditioned on the highest amplitude sinusoidal signal in the
+periodograms.
+
+\begin{figure*}
+\begin{center}
+\includegraphics[width=6in, clip=true]{RR_201339783.pdf}
+\caption{{\it Top:} The light curve of EPIC 201339783, conditioned on the
+	highest amplitude sinusoidal signal found in the periodogram.
+	{\it Bottom:} The systematic-insensitive periodogram of this target.}
+\label{fig:RRLyrae}
+\end{center}
+\end{figure*}
+
+Photometric variability in dwarf stars on timescales less than 8 hours, often
+known as flicker, has been linked with surface gravity, g
+\citep[][]{Bastien2013, Kipping}.
+The metrics used to quantify photometric variability include finding the range
+in intensity, counting the number of zero crossings and calculating the
+root-mean-square (RMS) of the light curve.
+Although related to periodic analysis these are all operations performed on the
+a detrended light curve, they are not inferred from a periodogram.
+However, it may be possible to derive a property of the periodogram that scales
+with the density or surface gravity of a star, for example, the mean excess
+power at frequencies near those relevent to granulation timescales.
+
+\section{Conclusions}
+We have demonstrated that modelling {\it K2} photometry as a linear combination
+of 150 PCA components plus a sinusoid can produce beautiful periodograms
+without the need for detrending.
+This method is highly successful for campaign 1 targets where the large number
+of targets, observed for n days ensures that most of the systematics are
+captured in the eigen light curves.
+We anticipate that it will be equally effective for the up-and-coming
+campaigns.
+The method is not as successful for campaign 0, due to the shorter
+observational baseline.
+
+This method is extremely successful in the high frequency regime, particularly
+in the region of frequency space relevent to the study of asteroseismic
+oscillations in giant stars.
+It is not well optimised for measuring stellar rotation periods, due to the
+fact that many eigen light curves are dominated by periodic variation on
+timescales relevent to stellar rotation periods.
+This method works well for periods between $\sim$ 1 hour and $\sim$ 1 day.
 
 \bibliographystyle{plainnat}
 \bibliography{K2rotation}
