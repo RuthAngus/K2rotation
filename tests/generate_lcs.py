@@ -1,7 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import glob
-import pyfits
 from mklc import mklc
 import fitsio
 import h5py
