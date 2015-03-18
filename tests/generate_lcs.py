@@ -55,5 +55,7 @@ if __name__ == "__main__":
     with h5py.File("../data/c1.h5", "r") as f:
         basis = f["basis"][:150, l]
 
-    periods = np.exp(np.linspace(np.log(1./24), np.log(30), 100))
+    periods = np.exp(np.linspace(np.log(.5), np.log(30), 500))
     inject_sine_wave(raw_x, periods, "r")
+    periods = np.exp(np.linspace(np.log(1./24), np.log(2), 500))
+    inject_sine_wave(raw_x, periods, "a")
