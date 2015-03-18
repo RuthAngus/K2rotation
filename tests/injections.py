@@ -257,7 +257,7 @@ if __name__ == "__main__":
 
     fap = 2.40516004879e-06  # amp2s 95% fap
     # calculate the 2d histogram of completeness over period and amplitude
-     K2_amps, K2_Ps, raw_amps, raw_Ps = grid_over_periods(basis, raw_x,
+    K2_amps, K2_Ps, raw_amps, raw_Ps = grid_over_periods(basis, raw_x,
                                                          raw_y, true_p, fs,
                                                          true_a, fap, fnames,
                                                          flag)
