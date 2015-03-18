@@ -7,8 +7,6 @@ import scipy.signal as sps
 import fitsio
 import h5py
 from K2pgram import K2pgram, eval_freq
-from colours import plot_colours
-cols = plot_colours()
 from gatspy.periodic import LombScargle
 import glob
 
@@ -234,8 +232,8 @@ if __name__ == "__main__":
     # load injections and truths
     sine = True
 
-    flag = "r"  # r for rotation or a for asteroseismology
-#     flag = "a"  # r for rotation or a for asteroseismology
+#     flag = "r"  # r for rotation or a for asteroseismology
+    flag = "a"  # r for rotation or a for asteroseismology
     if sine:
         fnames = glob.glob("../injections/sine/????_lc_%s.txt" % flag)
         name, true_p = np.genfromtxt("../injections/sine/truth_%s.txt"
