@@ -41,6 +41,29 @@ def plot_vbg(fname, eid):
     plt.ylabel("$\mathrm{Power}$")
     plt.savefig("astero/vbg_%spgram" % eid)
 
+def plot_raw(fname, eid):
+    # read the data
+    data = fitsio.read("../data/c1/ktwo%s-c01_lpd-lc.fits" % epid)
+    aps = fitsio.read("../data/c1/ktwo%s-c01_lpd-lc.fits" % epid, 2)
+    y = data["flux"][:, np.argmin(aps["cdpp6"])]
+    x = data["time"]
+    q = data["quality"]
+    l = np.isfinite(y) * np.isfinite(x) * (q==0)
+    y, x = y[l], x[l]
+    y /= np.median(y)
+    y -= 1
+    x *= 24*3600
+    model = LombScargle().fit(x, y, np.ones_like(y)*1e-5)
+    fs = np.linspace(1, 280, 1000) * 1e-6
+    period = 1./fs
+    pgram = model.periodogram(period)
+    plt.clf()
+    plt.plot(fs*1e6, pgram, "k")
+    plt.xlabel("$\\nu\mathrm{(}\mu \mathrm{Hz)}$")
+    plt.ylabel("$\mathrm{Power}$")
+    plt.title("$\mathrm{EPIC~%s}$" % eid)
+    plt.savefig("documents/raw_%s" % eid)
+
 def campaign0():
     # campaign 0
     eids = ["202064472", "202067981", "202068435", "202065298", "202126997",
@@ -118,4 +141,5 @@ if __name__ == "__main__":
 #     kepler_poster_child()
 #     campaign0()
 #     campaign1_vbg()
-    vbg(0)
+#     vbg(0)
+    plot_raw("201211472")

@@ -3,15 +3,16 @@ import matplotlib.pyplot as plt
 from gatspy.periodic import LombScargle
 import fitsio
 
-plotpar = {'axes.labelsize': 20,
-           'text.fontsize': 35,
-           'legend.fontsize': 20,
-           'xtick.labelsize': 15,
-           'ytick.labelsize': 15,
+plotpar = {'axes.labelsize': 15,
+           'text.fontsize': 15,
+           'legend.fontsize': 15,
+           'xtick.labelsize': 10,
+           'ytick.labelsize': 10,
            'text.usetex': True}
 plt.rcParams.update(plotpar)
 
-eid = "201211472"
+# eid = "201545182"
+eid = "201183188"
 fname = "../data/c1/ktwo%s-c01_lpd-lc.fits" % eid
 
 # load raw data
@@ -29,27 +30,36 @@ x *= 24*3600  # convert to seconds
 fs = np.arange(.1, 300, 4e-2) * 1e-6  # astero
 
 # plot raw data
-plt.clf()
+fig = plt.figure()
+ax = fig.add_subplot(111)
+ax1 = fig.add_subplot(211)
 model = LombScargle().fit(x, y, np.ones_like(y)*1e-5)
 period = 1. / fs
 raw_pgram = model.periodogram(period)
-plt.plot(fs*1e6, raw_pgram, "k")
-plt.xlabel("$\\nu\mathrm{~(}\mu\mathrm{Hz)}$")
-plt.ylabel("$\mathrm{Power}$")
-plt.xlim(10, 280)
-plt.ylim(0, .015)
-plt.savefig("../documents/raw_%s.pdf" % eid)
+ax1.plot(fs*1e6, raw_pgram, "k")
+ax.set_title("$\mathrm{EPIC~%s}$" % eid)
+ax1.set_xlim(10, 280)
+ax1.set_ylim(0, .015)
+
+ax.spines['top'].set_color('none')
+ax.spines['bottom'].set_color('none')
+ax.spines['left'].set_color('none')
+ax.spines['right'].set_color('none')
+ax.tick_params(labelcolor='w', top='off', bottom='off', left='off',
+               right='off')
 
 # load andrew's lcs
-x, y, _ = np.genfromtxt("../data/c1/ep201211472.csv", delimiter=",").T
+ax2 = fig.add_subplot(212)
+x, y, _ = np.genfromtxt("../data/c1/ep%s.csv" % eid, delimiter=",").T
 x *= 24*3600
 model = LombScargle().fit(x, y, np.ones_like(y)*1e-5)
 ps = 1. / fs
 pgram = model.periodogram(ps)
-plt.clf()
-plt.plot(fs*1e6, pgram, "k")
-plt.xlabel("$\\nu\mathrm{~(}\mu\mathrm{Hz)}$")
-plt.ylabel("$\mathrm{Power}$")
-plt.xlim(10, 280)
-plt.ylim(0, .015)
-plt.savefig("vbg_%s.pdf" % eid)
+ax2.plot(fs*1e6, pgram, "k")
+ax.set_xlabel("$\\nu\mathrm{~(}\mu\mathrm{Hz)}$")
+ax2.set_xlim(10, 280)
+ax2.set_ylim(0, .015)
+fig.subplots_adjust(hspace=0)
+fig.text(0.06, 0.5, "$\mathrm{Power}$", ha="center", va="center",
+         rotation="vertical")
+plt.savefig("../documents/rawvbg_%s.pdf" % eid)
