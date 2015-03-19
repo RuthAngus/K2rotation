@@ -8,6 +8,7 @@
 
 \title{Systematics-insensitive periodic signal search with K2}
 
+\begin{document}
 % \author[R.~Angus \emph{et al.}]{%
 %     Ruth~Angus,$^1$\thanks{ruth.angus@astro.ox.ac.uk}
 %     Daniel Foreman-Mackey,$^2$\thanks{danfm@nyu.edu}
@@ -15,9 +16,15 @@
 %     $^2$Centre for Cosmology and Particle Physics, New York University, New
 %     York, NY, USA}
 
-\begin{document}
+\author{Ruth Angus$^1$, Daniel Foreman-Mackey,$^2$, John A. Johnson$^3$ {\it et
+al.}}
+\affil{$^1$Subdepartment of Astrophysics, University of Oxford, OX1 3RH, UK}
+\affil{$^2$Center for Cosmology and Particle Physics, New York University,
+NY, USA}
+\affil{$^3$Harvard-Smithsonian Center for Astrophysics, 60 Garden St.,
+Cambridge, MA, USA}
 
-\date{Draft version 2015 24th of February}
+\date{Draft version 2015 19th of March}
 \maketitle
 
 % Aims
@@ -222,13 +229,13 @@ and $j$ the time index. The maximum likelihood solution for the weight vector,
 $\mathbf{w}$ is
 \begin{equation}
 	\mathbf{w_k}^* \gets (\mathbf{A}^T\mathbf{A})^{-1}\mathbf{A}^T\mathbf{f_k} \end{equation}
-and the sum of the last two elements of $\mathbf{w}_k$, squared provides the
+and the sum of the last two elements of $\mathbf{w}_k$, squared, provides the
 power of the signal at a given frequency.
 This operation is performed over a grid of frequencies to produce a power
 spectrum.
-We then calculate the signal-to-noise ratio (S/N) at each frequency by
-comparing the power at each frequency to a robust estimate of the variance in
-power across all frequencies.
+We then calculate the signal-to-noise ratio (S/N) frequency by comparing the
+power at each frequency to a robust estimate of the variance in power across
+all frequencies.
 In practise, we use the S/N, rather than power to produce a
 periodogram\footnote{The code used in this project can be found at
 https://github.com/RuthAngus/K2rotation.}.
@@ -515,7 +522,7 @@ very low amplitudes.}
 
 \begin{figure*}
 \begin{center}
-\includegraphics[width=4in, clip=true]{RR_201339783.pdf}
+\includegraphics[width=6in, clip=true]{RR_201339783.pdf}
 \caption{{\it Top:} The light curve of RR Lyrae star, EPIC 201339783,
 	conditioned on the highest amplitude sinusoidal signal found in the
 	SIP. {\it Bottom:} The systematic-insensitive periodogram of
@@ -526,7 +533,7 @@ very low amplitudes.}
 
 \begin{figure*}
 \begin{center}
-\includegraphics[width=4in, clip=true]{EB_201473612.pdf}
+\includegraphics[width=6in, clip=true]{EB_201473612.pdf}
 \caption{{\it Top:} The light curve of eclipsing binary, EPIC 201473612,
 	conditioned on the highest amplitude sinusoidal signal found in the
 	SIP. {\it Bottom:} The systematic-insensitive periodogram of
@@ -538,7 +545,7 @@ very low amplitudes.}
 
 \begin{figure*}
 \begin{center}
-\includegraphics[width=4in, clip=true]{planet_201637175.pdf}
+\includegraphics[width=6in, clip=true]{planet_201637175.pdf}
 \caption{{\it Top:} The light curve of exoplanet candidate, EPIC 201637175,
 	conditioned on the highest amplitude sinusoidal signal found in the
 	periodogram. {\it Bottom:} The systematic-insensitive periodogram of
