@@ -91,3 +91,8 @@ def p_child_plot(x, y, eid):
     plt.savefig("vbg_%s" % eid)
 #     plt.savefig("../documents/rotation_poster_child.pdf")
     return acfx, px
+
+if __name__ == "__main__":
+    eid = "201317002"
+    x, y, _ = np.genfromtxt("../data/c1/ep%s.csv" % eid, delimiter=",").T
+    p_child_plot(x, y, eid)

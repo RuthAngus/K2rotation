@@ -233,7 +233,35 @@ In practise, we use the S/N, rather than power to produce a
 periodogram\footnote{The code used in this project can be found at
 https://github.com/RuthAngus/K2rotation.}.
 
-\section{Application to asteroseismology}
+\subsection{Injections}
+
+In order to test the sensitivity and completeness of the SIP method,
+we injected sinusoids into real {\it K2} light curves.
+EPIC 201311941 was identified as a quiet star with no significant periodic
+variability at any frequency.
+10,000 sinusoids with periods between 1 to 50 days and amplitudes ranging from
+1 to 1000 parts-per-million (ppm) (linearly in log-space) were injected into
+the raw campaign 1 light curve of EPIC 201311941.
+The highest peak in the resulting periodogram of each light curve was recorded.
+If the period of the highest peak lay within 10\% of the true period, this was
+considered a successful detection.
+This procedure was repeated for periods ranging from 1 hour to 2 days in order
+test the recovery of signals at frequencies relevent to asteroseismology.
+The resulting completeness maps are shown in figures \ref{fig:K2_hist_r} and
+\ref{fig:K2_hist_a}.
+The SIP is uniformly sensitive across all frequencies relevant to giant
+asteroseismology.
+Using the SIP we are able to recover signals with amplitudes of a few ppm.
+One caveat of this test, however, is that a single sine wave with a constant
+amplitude over the full 80 day baseline of campaign 1 may not necessarily be
+a realistic model of acoustic modes in giant stars and is certainly not
+representative of stellar variability.
+Real signals, therefore are likely to be less easy to detect.
+Figure \ref{fig:K2_hist_a} shows the lower sensitivity of the SIP for periods
+greater than $\sim$ 2 days.
+
+\section{Results and discussion}
+\subsection{Application to asteroseismology}
 
 An example Lomb-Scargle periodogram\footnote{All Lomb-Scargle periodograms
 produced in this project were calculated using the gatspy Python module:
@@ -286,7 +314,7 @@ moderate amplitudes for another 2 of the 6.
 The two most sucessful SIPs, for targets EPIC 202086286 and EPIC
 202068435 are shown in figure \ref{fig:c0}.
 
-\section{Application to stellar rotation}
+\subsection{Application to stellar rotation}
 The top panel of figure \ref{fig:rotation_poster_child} shows the light curve
 of an active, rotating star, EP201317002.
 This light curve has been detrended using the method of
@@ -309,35 +337,6 @@ In fact, many of the ELCs have dominant sinusoidal variation, with periods
 of a few days (the cause of this is still unclear).
 For this reason the SIP method is not as well suited to stellar rotation as it
 is to asteroseismology, which is concerned with much higher frequency signals.
-
-\subsection{Injections}
-
-In order to test the sensitivity and completeness of the SIP method,
-we injected sinusoids into real {\it K2} light curves.
-EPIC 201311941 was identified as a quiet star with no significant periodic
-variability at any frequency.
-10,000 sinusoids with periods between 1 to 50 days and amplitudes ranging from
-1 to 1000 parts-per-million (ppm) (linearly in log-space) were injected into
-the raw campaign 1 light curve of EPIC 201311941.
-20 different amplitudes were tested, so 20,000 injections were performed in
-total.
-The highest peak in the resulting periodogram of each light curve was recorded.
-If the period of the highest peak lay within 10\% of the true period, this was
-considered a successful detection.
-This procedure was repeated for periods ranging from 1 hour to 2 days in order
-test the recovery of signals at frequencies relevent to asteroseismology.
-The resulting completeness maps are shown in figures \ref{fig:K2_hist_r} and
-\ref{fig:K2_hist_a}.
-The SIP is uniformly sensitive across all frequencies relevant to giant
-asteroseismology.
-Using the SIP we are able to recover signals with amplitudes of a few ppm.
-One caveat of this test, however, is that a single sine wave with a constant
-amplitude over the full 80 day baseline of campaign 1 may not necessarily be
-a realistic model of acoustic modes in giant stars and is certainly not
-representative of stellar variability.
-Real signals, therefore are likely to be less easy to detect.
-Figure \ref{fig:K2_hist_a} shows the lower sensitivity of the SIP for periods
-greater than $\sim$ 2 days.
 
 \subsection{Further examples}
 Figures \ref{fig:RRLyrae} and \ref{fig:EB} show the conditioned light curves
@@ -366,9 +365,9 @@ with the density or surface gravity of a star, for example, the mean excess
 power at frequencies near those relevent to granulation timescales.
 
 \section{Conclusions}
-We have demonstrated that modelling {\it K2} photometry as a linear combination
-of 150 PCA components plus a sinusoid can produce beautiful periodograms
-without the need for detrending.
+We demonstrate that modelling campaign 1 {\it K2} photometry as a linear
+combination of 150 PCA components plus a sinusoid can produce beautiful
+periodograms without the need for detrending.
 We find that the 47 $\mu$Hz signal, generated by the space craft thruster
 fires is not present in the vast majority of systematics-insensitive
 periodograms for more than 4000 targets
@@ -393,9 +392,12 @@ periodic variations on the same timescales as the rotation periods.
 \begin{figure*}
 \begin{center}
 \includegraphics[width=6in, clip=true]{rawvbg_201183188.pdf}
-\caption{Lomb-scargle periodogram of the raw {\it K2} (Top) and detrended
-	 (bottom) photometry for EPIC 201183188. The light curve was
- 	 detrended using the method of \citet{Vanderburg2014}.}
+\caption{Lomb-scargle periodogram of the raw (Top) and detrended
+	 (bottom) {\it K2} photometry for EPIC 201183188. The light curve was
+ 	 detrended using the method of \citet{Vanderburg2014}. The peak at
+	 $\sim$ 47 $\mu$Hz and its harmonics produced by the regular spacecraft
+	 thruster fires are still present in periodogram of the detrended
+	 data.}
 \label{fig:raw}
 \end{center}
 \end{figure*}
@@ -453,11 +455,12 @@ periodic variations on the same timescales as the rotation periods.
 \begin{figure*}
 \begin{center}
 \includegraphics[width=6in, clip=true]{rotation_poster_child.pdf}
-\caption{{\it Top}: Light curve of EP201317002, detrended using the method
+\caption{{\it Top}: Light curve of EPIC 201317002, detrended using the method
 of \citet{Vanderburg2014}. {\it Middle}: Autocorrelation function of the
-light curve. The autocorrelation function method measures a rotation period of
-8.77 days for this star. {\it Bottom}: The Lomb-Scargle periodogram of the
-light curve. The highest peak in the periodogram is centred at 10.52 days.}
+detrended light curve. The autocorrelation function method measures a rotation
+period of 8.77 days for this star. {\it Bottom}: The Lomb-Scargle periodogram
+of the detrended light curve. The highest peak in the periodogram is centred at
+10.52 days.}
 \label{fig:rotation_poster_child}
 \end{center}
 \end{figure*}
@@ -465,7 +468,7 @@ light curve. The highest peak in the periodogram is centred at 10.52 days.}
 \begin{figure*}
 \begin{center}
 \includegraphics[width=6in, clip=true]{K2_rotation_201317002.pdf}
-\caption{{\it Top}: Raw light curve of EP201317002. {\it Bottom}: A
+\caption{{\it Top}: Raw light curve of EPIC 201317002. {\it Bottom}: A
 periodogram produced by modelling the data using the top 150 ELCs
 plus a sine and cosine function at a range of frequencies. The highest peak in
 the periodogram is centred at 10.34 days.}
@@ -476,8 +479,12 @@ the periodogram is centred at 10.34 days.}
 \begin{figure*}
 \begin{center}
 \includegraphics[width=6in, clip=true]{201317002_top5.pdf}
-\caption{The 5 highest-weighted ELCs for EPIC 201317002,
-illustrating the problem with measuring rotation periods.}
+\caption{The 5 highest-weighted ELCs for EPIC 201317002. At least 3 of these
+	ELCs show sinusoidal variability with a $\sim$ 10 day period.
+	The light curve of EPIC 201317002 is therefore easily described by the
+	ELCs alone, without the additional sinusoid model.
+	This illustrates the difficulty in measuring rotation periods using the
+	SIP method.}
 \label{fig:top5}
 \end{center}
 \end{figure*}
@@ -485,11 +492,11 @@ illustrating the problem with measuring rotation periods.}
 \begin{figure*}
 \begin{center}
 \includegraphics[width=6in, clip=true]{K2_hist_r.pdf}
-\caption{Completeness of sinusoidsal signal recovery. 20,000 Sinusoidal signals
+\caption{Completeness of sinusoidsal signal recovery. 10,000 Sinusoidal signals
 with a range of periods and amplitudes were injected into the raw light curve
 of the non-variable star EPIC 201311941. In the range of periods relevent to
-stellar rotation ($\sim$ 0.5 - 60 days), we are most complete at the shortest
-periods.}
+stellar rotation ($\sim$ 1 - 60 days), we are most complete at the shortest
+periods, however the SIP is not well suited to measuring long periods.}
 \label{fig:K2_hist_r}
 \end{center}
 \end{figure*}
@@ -497,7 +504,7 @@ periods.}
 \begin{figure*}
 \begin{center}
 \includegraphics[width=6in, clip=true]{K2_hist_a.pdf}
-\caption{Completeness of sinusoidsal signal recovery. 20,000 Sinusoidal signals
+\caption{Completeness of sinusoidsal signal recovery. 10,000 Sinusoidal signals
 with a range of periods and amplitudes were injected into the raw light curve
 of the non-variable star EPIC 201311941. In the range of periods relevent to
 asteroseismology ($\sim$ 1 - 48 hours), we are uniformily complete down to
@@ -511,8 +518,8 @@ very low amplitudes.}
 \includegraphics[width=4in, clip=true]{RR_201339783.pdf}
 \caption{{\it Top:} The light curve of RR Lyrae star, EPIC 201339783,
 	conditioned on the highest amplitude sinusoidal signal found in the
-	periodogram. {\it Bottom:} The systematic-insensitive periodogram of
-	this target.}
+	SIP. {\it Bottom:} The systematic-insensitive periodogram of
+	this light curve. This target was selected from GO1018.}
 \label{fig:RRLyrae}
 \end{center}
 \end{figure*}
@@ -522,8 +529,9 @@ very low amplitudes.}
 \includegraphics[width=4in, clip=true]{EB_201473612.pdf}
 \caption{{\it Top:} The light curve of eclipsing binary, EPIC 201473612,
 	conditioned on the highest amplitude sinusoidal signal found in the
-	periodogram. {\it Bottom:} The systematic-insensitive periodogram of
-	this target.}
+	SIP. {\it Bottom:} The systematic-insensitive periodogram of
+	this light curve. This target was selected from the catalogue of EBs
+	and variable stars of \citet{Armstrong2015}.}
 \label{fig:EB}
 \end{center}
 \end{figure*}
