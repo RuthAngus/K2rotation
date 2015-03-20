@@ -58,7 +58,6 @@ def find_modes(fname, eid, nbasis=150, campaign=1, raw=False):
         basis = f["basis"][:150, l]
 
     fs = np.arange(10, 300, 4e-2) * 1e-6
-    print len(fs)
     amps2, s2n, w = K2pgram(x, y, basis, fs)
 
     # plot our pgram
@@ -72,12 +71,13 @@ def find_modes(fname, eid, nbasis=150, campaign=1, raw=False):
     # save pgram
     np.savetxt("astero/%sastero_pgram.txt" % eid, np.transpose((fs, s2n)))
 
-def find_delta_nu(fs, s2n, eid, dnu, sub=1, smooth=False):
+def find_delta_nu(fs, s2n, eid, width, sub=1, truths=None, smooth=False):
 
-    fps = dnu * len(fs)
+    if truths:
+        dnu, nm = truths
+    fps = width * len(fs)
     df = (fs[1] - fs[0])  # frequency lag in uHz
     pos = np.arange(len(fs)-fps)[::sub]  # the position of each section
-    print len(pos)
     acor = np.zeros((fps, len(pos)))
     for i in range(len(pos)):
         acor[:, i] = emcee.autocorr.function(s2n[i*sub:fps+(i*sub)])
@@ -85,8 +85,9 @@ def find_delta_nu(fs, s2n, eid, dnu, sub=1, smooth=False):
 
     plt.clf()
     plt.subplot(3, 1, 1)
-    plt.plot(fs, s2n, "k")
-    plt.xlim(min(fs), max(fs))
+    plt.axvline(nm, color="r", linestyle="--")
+    plt.plot(fs*1e6, s2n, "k")
+    plt.xlim(min(fs*1e6), max(fs*1e6))
 #     plt.ylim(0, max(s2n[fs > 10]))
     plt.xlabel("$\mathrm{Frequency~(}\mu \mathrm{Hz)}$")
     plt.ylabel("$\mathrm{Power}$")
@@ -101,31 +102,37 @@ def find_delta_nu(fs, s2n, eid, dnu, sub=1, smooth=False):
     plt.ylabel("$\Delta \\nu$")
     plt.xlabel("$\\nu_{max}~\mathrm{location}$")
 
-    plt.subplot(3, 1, 3)
     collapsed_acf = np.sum(acor, axis=1)
+
+    # cut of first part of the acf (dnu won't be smaller than 8)
+    l = lags*1e6 > 8
+    lags, collapsed_acf = lags[l], collapsed_acf[l]
+
+    plt.subplot(3, 1, 3)
     if len(lags) != len(collapsed_acf):
         lags = lags[:-1]
-    plt.plot(lags, collapsed_acf, "k")
-#     plt.xlim(1, max(lags))
+    plt.ylim(min(collapsed_acf), max(collapsed_acf))
     plt.xlabel("$\Delta \\nu~\mathrm{(}\mu\mathrm{Hz)}$")
     plt.ylabel("$\mathrm{Correlation}$")
 
-    # cut off first part of ACF
-#     l = lags > 6
-#     lags, collapsed_acf = lags[l], collapsed_acf[l]
-
     # smooth acf
     if smooth == True:
+        print "smoothing acf"
+        print lags, collapsed_acf
+        print len(lags), len(collapsed_acf)
+        assert 0
         smoothx, smoothy = smoothing(lags, collapsed_acf)
-        plt.plot(smoothx, smoothy)
         x_peaks, y_peaks, mx, my = peak_detect(smoothx, smoothy)
+        plt.plot(smoothx*1e6, smoothy)
     else:
         x_peaks, y_peaks, mx, my = peak_detect(lags, collapsed_acf)
+        plt.plot(lags*1e6, collapsed_acf, "k")
 
-    plt.axvline(mx, color="k", alpha=.3, linestyle="--",
-                label="$%s~\mu\mathrm{Hz}$" % mx[0])
+    plt.axvline(mx*1e6, color="k", alpha=.3, linestyle="--",
+                label="$%.2f~\mu\mathrm{Hz}$" % (mx[0]*1e6))
+    plt.axvline(dnu, color="r", linestyle="--")
     plt.legend()
 #     plt.ylim(min(collapsed_acf), my)
-    plt.ylim(-100, 200)
+#     plt.ylim(-100, 200)
     plt.savefig("astero/%s_dnu" % eid)
     return mx[0], my[0], lags, pos, collapsed_acf, np.sum(acor, axis=0)
