@@ -7,10 +7,10 @@ import fitsio
 from colours import plot_colours
 cols = plot_colours()
 
-plotpar = {'axes.labelsize': 12,
-           'legend.fontsize': 10,
-           'xtick.labelsize': 12,
-           'ytick.labelsize': 12,
+plotpar = {'axes.labelsize': 18,
+           'legend.fontsize': 18,
+           'xtick.labelsize': 18,
+           'ytick.labelsize': 18,
            'text.usetex': True}
 plt.rcParams.update(plotpar)
 

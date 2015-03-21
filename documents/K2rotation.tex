@@ -1,4 +1,4 @@
-\documentclass[useAMS, usenatbib]{aastex}
+\documentclass[useAMS, usenatbib, preprint, 12pt]{aastex}
 \usepackage{cite,natbib}
 \usepackage{epsfig}
 \usepackage{cases}
@@ -9,23 +9,24 @@
 \title{Systematics-insensitive periodic signal search with K2}
 
 \begin{document}
-% \author[R.~Angus \emph{et al.}]{%
-%     Ruth~Angus,$^1$\thanks{ruth.angus@astro.ox.ac.uk}
-%     Daniel Foreman-Mackey,$^2$\thanks{danfm@nyu.edu}
-%     $^1$Department of Physics, University of Oxford, UK \\
-%     $^2$Centre for Cosmology and Particle Physics, New York University, New
-%     York, NY, USA}
 
-\author{Ruth Angus$^1$, Daniel Foreman-Mackey,$^2$, John A. Johnson$^3$ {\it et
-al.}}
-\affil{$^1$Subdepartment of Astrophysics, University of Oxford, OX1 3RH, UK}
-\affil{$^2$Center for Cosmology and Particle Physics, New York University,
-NY, USA}
-\affil{$^3$Harvard-Smithsonian Center for Astrophysics, 60 Garden St.,
+\newcommand{\oxford}{1}
+\newcommand{\nyu}{2}
+\newcommand{\cfa}{3}
+
+\author{%
+   Ruth Angus\altaffilmark{\oxford},
+   Daniel Foreman-Mackey\altaffilmark{\nyu},
+   John A. Johnson\altaffilmark{\cfa},
+   {\it et al.}
+}
+
+\altaffiltext{\oxford}{Subdepartment of Astrophysics, University of Oxford, OX1 3RH, UK}
+\altaffiltext{\nyu}{Center for Cosmology and Particle Physics, New York University, NY, USA}
+\altaffiltext{\cfa}{Harvard-Smithsonian Center for Astrophysics, 60 Garden St.,
 Cambridge, MA, USA}
 
-\date{Draft version 2015 19th of March}
-\maketitle
+\begin{abstract}
 
 % Aims
 From pulsating stars to transiting exoplanets, the search for periodic signals
@@ -54,6 +55,8 @@ This method performs well for signals with periods from 1 hour up to 2 days,
 however it is not optimized for periods much greater than 5 days.
 This is due to the fact that some common trends between stars vary on
 timescales similar to rotation periods.
+
+\end{abstract}
 
 \section{Introduction}
 \label{Introduction}
@@ -167,7 +170,7 @@ data is essential if it is to be as revolutionary in time-domain
 astronomy as the original {\it Kepler} mission was.
 
 \section{Method}
-\label{Method}
+\label{sec:Method}
 
 The method implemented in this paper is an extention of the planet-search
 algorithm developed by \citet{Foreman-Mackey2015} (hereafter FM15).

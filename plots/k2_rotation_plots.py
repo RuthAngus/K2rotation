@@ -12,14 +12,6 @@ from rotation_poster_child import max_peak_detect
 import h5py
 from gatspy.periodic import LombScargle
 
-plotpar = {'axes.labelsize': 12,
-           'text.fontsize': 10,
-           'legend.fontsize': 10,
-           'xtick.labelsize': 8,
-           'ytick.labelsize': 8,
-           'text.usetex': True}
-plt.rcParams.update(plotpar)
-
 def read_data(epid, nbases):
     # read the data
     data = fitsio.read("../data/c1/ktwo%s-c01_lpd-lc.fits" % epid)
@@ -203,12 +195,20 @@ def top_5(x, basis, w):
     print l
     plt.plot(x, basis[l, :], "k")
     plt.yticks(visible=False)
-    plt.xlabel("$\mathrm{BJD-2456000}$")
+    plt.xlabel("$\mathrm{BJD-2454833}$")
     plt.subplots_adjust(hspace=0)
     plt.xlim(x[0], x[-1])
     plt.savefig("../documents/%s_top5.pdf" % epid)
 
 if __name__ == "__main__":
+
+    plotpar = {'axes.labelsize': 18,
+               'text.fontsize': 18,
+               'legend.fontsize': 18,
+               'xtick.labelsize': 18,
+               'ytick.labelsize': 18,
+               'text.usetex': True}
+    plt.rcParams.update(plotpar)
 
     epid = "201317002"
     # epid = "201372313"
@@ -230,4 +230,4 @@ if __name__ == "__main__":
     amp2s, s2n, w  = K2pgram(x, y, basis, fs)
 
     K2_poster_child_plot(x, y, fs, amp2s, epid)
-#     top_5(x, basis, w)
+    top_5(x, basis, w)

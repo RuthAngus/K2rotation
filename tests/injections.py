@@ -10,11 +10,11 @@ from K2pgram import K2pgram, eval_freq
 from gatspy.periodic import LombScargle
 import glob
 
-plotpar = {'axes.labelsize': 10,
-           'text.fontsize': 10,
-           'legend.fontsize': 10,
-           'xtick.labelsize': 8,
-           'ytick.labelsize': 8,
+plotpar = {'axes.labelsize': 20,
+           'text.fontsize': 20,
+           'legend.fontsize': 20,
+           'xtick.labelsize': 20,
+           'ytick.labelsize': 20,
            'text.usetex': True}
 plt.rcParams.update(plotpar)
 
@@ -171,7 +171,7 @@ def histo(amps, Ps, namps, npers, fname):
     cax = ax.pcolormesh(X, Y, K2_hist.T/float(max_n_per_bin)*100, cmap="Blues")
     ax.set_ylabel("$\mathrm{Amplitude~(\%)}$")
     ax.set_xlabel("$\ln\mathrm{Period~(days)}$")
-    plt.colorbar(cax)
+    plt.colorbar(cax, label="$\mathrm{Completeness~(\%)}$")
 #     plt.plot(Ps, amps, "k.")
     plt.savefig("../injections/sine/%s_hist_%s.pdf" % (fname, flag))
     plt.close(fig)
@@ -204,7 +204,7 @@ def make_histogram_plot(flag, namps=19, npers=1000):
     cax = ax.pcolormesh(X, Y, b, cmap="Blues")
     ax.set_ylabel("$\mathrm{Amplitude~(\%)}$")
     ax.set_xlabel("$\ln\mathrm{(Period)~(days)}$")
-    plt.colorbar(cax, label="$\mathrm{Completeness (\%)}$")
+    plt.colorbar(cax, label="$\mathrm{Completeness~(\%)}$")
 #     plt.plot(raw_Ps, raw_amps, "k.")
     plt.savefig("../injections/sine/both_hist_%s" % flag)
     plt.close(fig)
@@ -255,8 +255,9 @@ if __name__ == "__main__":
 
     fap = 2.40516004879e-06  # amp2s 95% fap
     # calculate the 2d histogram of completeness over period and amplitude
-    K2_amps, K2_Ps, raw_amps, raw_Ps = grid_over_periods(basis, raw_x,
-                                                         raw_y, true_p, fs,
-                                                         true_a, fap, fnames,
-                                                         flag)
-#     make_histogram_plot(flag)
+#     K2_amps, K2_Ps, raw_amps, raw_Ps = grid_over_periods(basis, raw_x,
+#                                                          raw_y, true_p, fs,
+#                                                          true_a, fap, fnames,
+#                                                          flag)
+    make_histogram_plot("r")
+    make_histogram_plot("a")

@@ -3,11 +3,11 @@ import matplotlib.pyplot as plt
 from gatspy.periodic import LombScargle
 import fitsio
 
-plotpar = {'axes.labelsize': 15,
-           'text.fontsize': 15,
-           'legend.fontsize': 15,
-           'xtick.labelsize': 10,
-           'ytick.labelsize': 10,
+plotpar = {'axes.labelsize': 18,
+           'text.fontsize': 18,
+           'legend.fontsize': 18,
+           'xtick.labelsize': 18,
+           'ytick.labelsize': 18,
            'text.usetex': True}
 plt.rcParams.update(plotpar)
 
@@ -60,6 +60,6 @@ ax.set_xlabel("$\\nu\mathrm{~(}\mu\mathrm{Hz)}$")
 ax2.set_xlim(10, 280)
 ax2.set_ylim(0, .015)
 fig.subplots_adjust(hspace=0)
-fig.text(0.06, 0.5, "$\mathrm{Power}$", ha="center", va="center",
+fig.text(0.04, 0.5, "$\mathrm{Power}$", ha="center", va="center",
          rotation="vertical")
 plt.savefig("../documents/rawvbg_%s.pdf" % eid)

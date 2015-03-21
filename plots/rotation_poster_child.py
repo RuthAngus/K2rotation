@@ -6,14 +6,6 @@ import emcee
 from gatspy.periodic import LombScargle
 import scipy.signal as sps
 
-plotpar = {'axes.labelsize': 12,
-           'text.fontsize': 10,
-           'legend.fontsize': 10,
-           'xtick.labelsize': 8,
-           'ytick.labelsize': 8,
-           'text.usetex': True}
-plt.rcParams.update(plotpar)
-
 def acf_peak_detect(x, y):
     x, y = x[50:], y[50:]
     peaks = np.array([i for i in range(1, len(x)-1) if y[i-1] < y[i] and
@@ -88,11 +80,20 @@ def p_child_plot(x, y, eid):
     plt.axvline(mx, color=".5", linestyle="--", label="$P_{rot}=%.2f$" % px)
     plt.legend()
     plt.subplots_adjust(hspace=.4)
-    plt.savefig("vbg_%s" % eid)
-#     plt.savefig("../documents/rotation_poster_child.pdf")
+#     plt.savefig("vbg_%s" % eid)
+    plt.savefig("../documents/rotation_poster_child.pdf")
     return acfx, px
 
 if __name__ == "__main__":
+
+    plotpar = {'axes.labelsize': 15,
+               'text.fontsize': 15,
+               'legend.fontsize': 15,
+               'xtick.labelsize': 15,
+               'ytick.labelsize': 15,
+               'text.usetex': True}
+    plt.rcParams.update(plotpar)
+
     eid = "201317002"
     x, y, _ = np.genfromtxt("../data/c1/ep%s.csv" % eid, delimiter=",").T
     p_child_plot(x, y, eid)
