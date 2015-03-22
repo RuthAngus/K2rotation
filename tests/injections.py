@@ -190,8 +190,8 @@ def make_histogram_plot(flag, namps=19, npers=1000):
         K2_amps, K2_Ps = K2_amps[l], K2_Ps[l]
         l = raw_Ps > np.exp(1)
         raw_amps, raw_Ps = raw_amps[l], raw_Ps[l]
-    print len(K2_amps), len(K2_Ps)
-    assert 0
+
+    K2_amps = np.log(K2_amps)
 
     K2_hist, xedges, yedges = histo(K2_amps, K2_Ps, namps, npers, "K2")
     raw_hist, _, _ = histo(raw_amps, raw_Ps, namps, npers, "raw")
