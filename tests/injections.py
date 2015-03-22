@@ -159,7 +159,7 @@ def histo(amps, Ps, namps, npers, fname):
     Ps = np.log(Ps)
 #     my_yedges = np.linspace(min(amps), max(amps), nbins)
     print amps
-    amps = np.log(amps)
+    amps = np.exp(amps)
     print amps
     my_yedges = np.linspace(min(amps), max(amps), nbins)
     my_xedges = np.linspace(min(Ps), max(Ps), nbins)
