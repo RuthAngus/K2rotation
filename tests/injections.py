@@ -252,14 +252,14 @@ if __name__ == "__main__":
     elif flag == "a":
         fs = np.linspace(1./4., 26., 1000)
 
-#     amps = np.arange(.0, .001, .00005)
-    amps = np.exp(np.linspace(np.log(1e-6), np.log(1e-3), 20))
+    amps = np.arange(.0, .001, .00005)
+#     amps = np.exp(np.linspace(np.log(1e-6), np.log(1e-3), 20))
 
     fap = 2.40516004879e-06  # amp2s 95% fap
     # calculate the 2d histogram of completeness over period and amplitude
-#     K2_amps, K2_Ps, raw_amps, raw_Ps = grid_over_periods(basis, raw_x,
-#                                                          raw_y, true_p, fs,
-#                                                          true_a, fap, fnames,
-#                                                          flag)
-    make_histogram_plot("r")
-    make_histogram_plot("a")
+    K2_amps, K2_Ps, raw_amps, raw_Ps = grid_over_periods(basis, raw_x,
+                                                         raw_y, true_p, fs,
+                                                         true_a, fap, fnames,
+                                                         flag)
+#     make_histogram_plot("r")
+#     make_histogram_plot("a")
