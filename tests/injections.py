@@ -157,6 +157,8 @@ def histo(amps, Ps, namps, npers, fname):
     nbins = namps
     max_n_per_bin = int(npers/namps)
     Ps = np.log(Ps)
+#     my_yedges = np.linspace(min(amps), max(amps), nbins)
+    amps = np.log(amps)
     my_yedges = np.linspace(min(amps), max(amps), nbins)
     my_xedges = np.linspace(min(Ps), max(Ps), nbins)
     K2_hist, xedges, yedges = np.histogram2d(Ps, amps, bins=nbins,
