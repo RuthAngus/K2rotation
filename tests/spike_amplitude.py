@@ -47,14 +47,13 @@ def find_spikes(fnames):
 
 # calculate the periodogram of each vbg light curve and save to file
 def find_spikes_vbg(fnames):
-    for fname in fnames:
-        eid = fname
-        print eid
+    for i, fname in enumerate(fnames):
+        eid = fname[13:22]
+        print eid, "of", len(fnames)
         assert 0
         x, y, _ = np.genfromtxt("../data/c1/ep%s.csv" % eid, delimiter=",").T
         x *= 24*3600
         y /= np.median(y)
-        basis = load_K2_data(eid)
         fs = np.arange(40, 55, 1e-1) * 1e-6
         ps = 1./fs
         model = LombScargle().fit(x, y, np.ones_like(y)*1e-5)
@@ -64,6 +63,14 @@ def find_spikes_vbg(fnames):
         data[:, 0] = fs
         data[:, 1] = pg
         f.close()
+
+#         plt.clf()
+#         plt.subplot(2, 1, 1)
+#         plt.plot(x, y, "k")
+#         plt.subplot(2, 1, 2)
+#         plt.plot(fs, pg, "k")
+#         plt.savefig("test")
+#         assert 0
 
 # calculate the amplitude at 47uHz
 def find_value(fnames):
@@ -204,10 +211,9 @@ if __name__ == "__main__":
 
     client = kplr.API()
 #     fnames = glob.glob("../../old_K2rotation/data/c1/*.fits") # SIP
-    fnames = glob.glob("../data/c1/*.csv")  # vbg
+    fnames = glob.glob("../data/c1/*.fits") # SIP
 
-    load_kepmags(fnames)
-#     find_spikes(fnames)
+    find_spikes_vbg(fnames)
 #     assemble(fnames)
 
 #     with h5py.File("kepmag_spike.h5", "r") as f:
