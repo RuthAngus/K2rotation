@@ -48,9 +48,8 @@ def find_spikes(fnames):
 # calculate the periodogram of each vbg light curve and save to file
 def find_spikes_vbg(fnames):
     for i, fname in enumerate(fnames):
-        eid = fname[13:22]
-        print eid, "of", len(fnames)
-        assert 0
+        eid = fname[15:24]
+        print eid, i, "of", len(fnames)
         x, y, _ = np.genfromtxt("../data/c1/ep%s.csv" % eid, delimiter=",").T
         x *= 24*3600
         y /= np.median(y)
@@ -95,27 +94,28 @@ def find_value(fnames):
 
 # calculate the positions and heights of periodogram peaks,
 # load the kepmags and save to file
-def assemble(fnames, vbg):
+def assemble(fnames, vbg=False):
     mxs, mys = [], []
     for i, fname in enumerate(fnames):
-        if vbg:
-            eid = fname[15:24]
-            print eid
-            assert 0
-        else:
-            eid = fname[15:24]
+        eid = fname[15:24]
         print eid, i, "of", len(fnames)
         if vbg:
             with h5py.File("spikes/spike_%s_vbg.h5" % eid, "r") as f:
                 fs = f["pgram"][:, 0]
                 pg = f["pgram"][:, 1]
         else:
-            with h5py.File("spikes/spike_%s.h5" % eid, "r") as f:
-                fs = f["pgram"][:, 0]
-                pg = f["pgram"][:, 1]
-        mx, my = peak_detect(fs, pg)
-        mxs.append(mx)
-        mys.append(my)
+            try:
+                with h5py.File("spikes/spike_%s.h5" % eid, "r") as f:
+                    fs = f["pgram"][:, 0]
+                    pg = f["pgram"][:, 1]
+            except:
+                IOError
+        try:
+            mx, my = peak_detect(fs, pg)
+            mxs.append(mx)
+            mys.append(my)
+        except:
+            IndexError  # some nan problems causing these errors
     if vbg:
         f = h5py.File("kepmag_spike_vbg.h5", "w")
     else:
@@ -153,7 +153,7 @@ def make_plot(fnames, s2ns):
         kepmags = f["spikes"][:, 1]
     l = mys
 
-def experimental(mxs, mys):
+def experimental(mxs, mys, vbg=False):
 
     l = (mxs < 48*1e-6) * (46 * 1e-6 < mxs)
     l2 = (mxs < 46*1e-6) * (44 * 1e-6 < mxs)
@@ -162,12 +162,14 @@ def experimental(mxs, mys):
     l5 = (mxs < 42*1e-6) * (40 * 1e-6 < mxs)
     l6 = (mxs < 52*1e-6) * (50 * 1e-6 < mxs)
     l7 = (mxs < 54*1e-6) * (52 * 1e-6 < mxs)
+
     plt.clf()
     plt.subplot(3, 1, 1)
-    plt.hist(mxs, 50)
-    plt.hist(mxs[l], 6)
-    plt.hist(mxs[l2], 6)
-    plt.hist(mxs[l3], 6)
+    plt.hist(mxs, 50, color=".5")
+#     plt.hist(mxs[l], 6)
+#     plt.hist(mxs[l2], 6)
+#     plt.hist(mxs[l3], 6)
+    plt.axhspan(44e-6, 46e-6, facecolor="b", alpha=.5)
     plt.subplot(3, 1, 2)
     plt.hist(np.log(mys[l]), 50, color="g", normed=True)
     plt.hist(np.log(mys[l2]), 50, color="r", normed=True)
@@ -204,8 +206,10 @@ def experimental(mxs, mys):
     print sst.ks_2samp(h5[0], h4[0])
     print sst.ks_2samp(h6[0], h5[0])
     print sst.ks_2samp(h7[0], h6[0])
-    plt.show()
-
+    if vbg:
+        plt.savefig("test_vbg")
+    else:
+        plt.savefig("test")
 
 if __name__ == "__main__":
 
@@ -213,12 +217,21 @@ if __name__ == "__main__":
 #     fnames = glob.glob("../../old_K2rotation/data/c1/*.fits") # SIP
     fnames = glob.glob("../data/c1/*.fits") # SIP
 
-    find_spikes_vbg(fnames)
+#     find_spikes_vbg(fnames)
+#     find_spikes(fnames)
 #     assemble(fnames)
 
-#     with h5py.File("kepmag_spike.h5", "r") as f:
-#         mxs = f["spikes"][:, 0]
-#         mys = f["spikes"][:, 1]
+    with h5py.File("kepmag_spike_vbg.h5", "r") as f:
+        mxs = f["spikes"][:, 0]
+        mys = f["spikes"][:, 1]
+
+    experimental(mxs, mys, vbg=True)
+
+    with h5py.File("kepmag_spike.h5", "r") as f:
+        mxs = f["spikes"][:, 0]
+        mys = f["spikes"][:, 1]
+
+    experimental(mxs, mys)
 
 #     eids, s2ns = find_value(fnames)
 #     s2ns = find_value(fnames)
