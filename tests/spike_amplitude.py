@@ -153,65 +153,78 @@ def make_plot(fnames, s2ns):
         kepmags = f["spikes"][:, 1]
     l = mys
 
-def experimental(mxs, mys, vbg=False):
-
-    l = (mxs < 48*1e-6) * (46 * 1e-6 < mxs)
-    l2 = (mxs < 46*1e-6) * (44 * 1e-6 < mxs)
-    l3 = (mxs < 50*1e-6) * (48 * 1e-6 < mxs)
-    l4 = (mxs < 44*1e-6) * (42 * 1e-6 < mxs)
-    l5 = (mxs < 42*1e-6) * (40 * 1e-6 < mxs)
-    l6 = (mxs < 52*1e-6) * (50 * 1e-6 < mxs)
-    l7 = (mxs < 54*1e-6) * (52 * 1e-6 < mxs)
-
+def experimental(mxs, mys):
+    mxs *= 1e6
+    s1, s2, s3, s4 = 45, 46.5, 48, 49.5
+    l1 = (mxs < s2) * (s1 < mxs)
+    l2 = (mxs < s3) * (s2 < mxs)
+    l3 = (mxs < s4) * (s3 < mxs)
+    nbins = 50
     plt.clf()
-    plt.subplot(3, 1, 1)
-    plt.hist(mxs, 50, color=".5")
-#     plt.hist(mxs[l], 6)
-#     plt.hist(mxs[l2], 6)
-#     plt.hist(mxs[l3], 6)
-    plt.axhspan(44e-6, 46e-6, facecolor="b", alpha=.5)
-    plt.subplot(3, 1, 2)
-    plt.hist(np.log(mys[l]), 50, color="g", normed=True)
-    plt.hist(np.log(mys[l2]), 50, color="r", normed=True)
-    plt.hist(np.log(mys[l3]), 50, color="c", normed=True)
+    plt.subplot(2, 1, 1)
+    plt.axvspan(s1, s2, facecolor="b", alpha=.5, edgecolor="w")
+    plt.axvspan(s2, s3, facecolor="m", alpha=.5, edgecolor="w")
+    plt.axvspan(s3, s4, facecolor="c", alpha=.5, edgecolor="w")
+    plt.hist(mxs, nbins, color=".3", edgecolor=".3", rwidth=.7)
+    nbins=50
+    plt.xlim(40, 54)
+    plt.xlabel("$\\nu~\mathrm{(}\mu\mathrm{Hz)}$")
+    plt.ylabel("$\mathrm{N}_{\mathrm{peaks}}$")
+    plt.subplot(2, 1, 2)
+    plt.hist(np.log(mys[l1]), nbins, histtype="stepfilled", color="b",
+             alpha=.5)
+    plt.hist(np.log(mys[l2]), nbins, histtype="stepfilled", color="m",
+             alpha=.5)
+    plt.hist(np.log(mys[l3]), nbins, histtype="stepfilled", color="c",
+             alpha=.5)
+    plt.ylabel("$\mathrm{N}_{\mathrm{peaks}}$")
+    plt.xlabel("$\mathrm{\ln(Maximum~peak~height~(S/N)})$")
+    plt.subplots_adjust(hspace=.3)
+    plt.savefig("test")
 
-    plt.subplot(3, 1, 3)
-    h1 = np.histogram(np.log(mys[l]), 50, normed=True)
-    h2 = np.histogram(np.log(mys[l2]), 50, normed=True)
-    h3 = np.histogram(np.log(mys[l3]), 50, normed=True)
-    h4 = np.histogram(np.log(mys[l4]), 50, normed=True)
-    h5 = np.histogram(np.log(mys[l5]), 50, normed=True)
-    h6 = np.histogram(np.log(mys[l6]), 50, normed=True)
-    h7 = np.histogram(np.log(mys[l7]), 50, normed=True)
-
-#     h1 = np.histogram(np.log(mys[l]), 50)
-#     h2 = np.histogram(np.log(mys[l2]), 50)
-#     h3 = np.histogram(np.log(mys[l3]), 50)
-#     h4 = np.histogram(np.log(mys[l4]), 50)
-#     h5 = np.histogram(np.log(mys[l5]), 50)
-#     h6 = np.histogram(np.log(mys[l6]), 50)
-#     h7 = np.histogram(np.log(mys[l7]), 50)
-    plt.plot(h1[1][1:], np.cumsum(h1[0]), "g")
-    plt.plot(h2[1][1:], np.cumsum(h2[0]))
-    plt.plot(h3[1][1:], np.cumsum(h3[0]))
-    plt.plot(h4[1][1:], np.cumsum(h4[0]))
-    plt.plot(h5[1][1:], np.cumsum(h5[0]))
-    plt.plot(h6[1][1:], np.cumsum(h6[0]))
-    plt.plot(h7[1][1:], np.cumsum(h7[0]))
-    print sst.ks_2samp(h1[0], h2[0])
-    print sst.ks_2samp(h1[0], h3[0])
-    print sst.ks_2samp(h2[0], h3[0])
-
-    print sst.ks_2samp(h4[0], h3[0])
-    print sst.ks_2samp(h5[0], h4[0])
-    print sst.ks_2samp(h6[0], h5[0])
-    print sst.ks_2samp(h7[0], h6[0])
-    if vbg:
-        plt.savefig("test_vbg")
-    else:
-        plt.savefig("test")
+def experimental_vbg(mxs, mys):
+    mxs *= 1e6
+    s1, s2, s3, s4 = 45, 46.5, 48, 49.5
+    l1 = (mxs < s2) * (s1 < mxs)
+    l2 = (mxs < s3) * (s2 < mxs)
+    l3 = (mxs < s4) * (s3 < mxs)
+    nbins = 50
+    plt.clf()
+    plt.subplot(2, 1, 1)
+    plt.axvspan(s1, s2, facecolor="b", alpha=.5, edgecolor="w")
+    plt.axvspan(s2, s3, facecolor="m", alpha=.5, edgecolor="w")
+    plt.axvspan(s3, s4, facecolor="c", alpha=.5, edgecolor="w")
+    plt.hist(mxs, nbins, color=".3", edgecolor=".3", rwidth=.7)
+    plt.xlabel("$\\nu~\mathrm{(}\mu\mathrm{Hz)}$")
+    plt.ylabel("$\mathrm{N}_{\mathrm{peaks}}$")
+    plt.xlim(40, 54)
+    plt.yscale("log")
+    plt.ylim(10e-1, 10e4)
+    plt.ylabel("$\ln(\mathrm{N}_{\mathrm{peaks}})$")
+    plt.subplot(2, 1, 2)
+    plt.hist(np.log(mys[l1]), nbins, histtype="stepfilled", color="b",
+             alpha=.5)
+    plt.hist(np.log(mys[l2]), nbins, histtype="stepfilled", color="m",
+             alpha=.5)
+    plt.hist(np.log(mys[l3]), nbins, histtype="stepfilled", color="c",
+             alpha=.5)
+    plt.ylabel("$\mathrm{N}_{\mathrm{peaks}}$")
+    plt.xlabel("$\mathrm{\ln(Maximum~peak~height~(S/N)})$")
+    plt.yscale("log")
+    plt.ylabel("$\ln(\mathrm{N}_{\mathrm{peaks}})$")
+    plt.xlabel("$\ln(\mathrm{Maximum~peak~height~(Power)})$")
+    plt.subplots_adjust(hspace=.3)
+    plt.savefig("test_vbg")
 
 if __name__ == "__main__":
+
+    plotpar = {'axes.labelsize': 15,
+                'text.fontsize': 15,
+                'legend.fontsize': 15,
+                'xtick.labelsize': 15,
+                'ytick.labelsize': 15,
+                'text.usetex': True}
+    plt.rcParams.update(plotpar)
 
     client = kplr.API()
 #     fnames = glob.glob("../../old_K2rotation/data/c1/*.fits") # SIP
@@ -225,7 +238,7 @@ if __name__ == "__main__":
         mxs = f["spikes"][:, 0]
         mys = f["spikes"][:, 1]
 
-    experimental(mxs, mys, vbg=True)
+    experimental_vbg(mxs, mys)
 
     with h5py.File("kepmag_spike.h5", "r") as f:
         mxs = f["spikes"][:, 0]
