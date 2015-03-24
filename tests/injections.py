@@ -9,6 +9,7 @@ import h5py
 from K2pgram import K2pgram, eval_freq
 from gatspy.periodic import LombScargle
 import glob
+import sys
 
 plotpar = {'axes.labelsize': 20,
            'text.fontsize': 20,
@@ -50,7 +51,7 @@ def fap(x, y, basis, fs, N, plot=False, sig=False):
     if plot:
         plt.axhline(fap95, color=".5")
         plt.savefig("fap")
-    print fap95, fap90, fap85, fap50
+#     print fap95, fap90, fap85, fap50
     return fap95, fap90, fap85, fap50
 
 def peak_detect(x, y):
@@ -109,18 +110,20 @@ def grid_over_amps(basis, flux, raw_x, raw_y, truth, fs, amps, true_a, fap,
             plt.clf()
             plt.subplot(2, 1, 1)
             plt.plot(raw_x, y, "k.")
-            plt.plot(raw_x, fx, color=cols.green)
+            plt.plot(raw_x, fx, color="g")
             plt.subplot(2, 1, 2)
             plt.axvline(1./tf, color=".7", linestyle="--")
             plt.axhline(threshold, color=".7")
             # plt.axhline(1.57445766955e-05, color="r")  # fap line
-            c = cols.blue
+            c = "b"
             if s == 1:
-                c = cols.pink
+                c = "m"
             plt.plot(1./fs, pgram, color=c,
                      label="$\mathrm{K2pgram$}")
             plt.savefig("../injections/sine/%s_%s_result_%s"
                         % (str(n).zfill(2), str(i).zfill(2), flag))
+            print "%s_%s_result_%s" % (str(n).zfill(2), str(i).zfill(2), flag)
+            raw_input('enter')
     return np.array(K2a), np.array(K2P), np.array(rawa), np.array(rawP)
 
 # add simulated to real light curves and grid over periods
@@ -143,7 +146,8 @@ def grid_over_periods(basis, raw_x, raw_y, true_p, fs, true_a, fap, fnames,
     raw_amps = np.array([j for i in raw_amps for j in i])
     raw_Ps = np.array([j for i in raw_Ps for j in i])
 
-    f = h5py.File("../injections/sine/histogram_%s.h5" % flag, "w")
+    f = h5py.File("../injections/sine/histogram_%s_%s_%s.h5" % (start, stop,
+                  flag), "w")
     K2data = f.create_dataset("K2", (len(K2_amps), 2))
     K2data[:, 0] = K2_amps
     K2data[:, 1] = K2_Ps
@@ -152,68 +156,6 @@ def grid_over_periods(basis, raw_x, raw_y, true_p, fs, true_a, fap, fnames,
     rawdata[:, 1] = raw_Ps
     f.close()
     return K2_amps, K2_Ps, raw_amps, raw_Ps
-
-def histo(amps, Ps, namps, npers, fname):
-    nbins = namps
-    max_n_per_bin = int(npers/namps)
-    Ps = np.log(Ps)
-#     my_yedges = np.linspace(min(amps), max(amps), nbins)
-    print amps
-    amps = np.exp(amps)
-    print amps
-    my_yedges = np.linspace(min(amps), max(amps), nbins)
-    my_xedges = np.linspace(min(Ps), max(Ps), nbins)
-    K2_hist, xedges, yedges = np.histogram2d(Ps, amps, bins=nbins,
-                                             range=[[min(my_xedges),
-                                                    max(my_xedges)],
-                                                    [min(my_yedges),
-                                                     max(my_yedges)]])
-
-    fig = plt.figure()
-    ax = fig.add_subplot(111)
-    X, Y = np.meshgrid(xedges, yedges)
-    cax = ax.pcolormesh(X, Y, K2_hist.T/float(max_n_per_bin)*100, cmap="Blues")
-    ax.set_ylabel("$\mathrm{Amplitude~(\%)}$")
-    ax.set_xlabel("$\ln\mathrm{Period~(days)}$")
-    plt.colorbar(cax, label="$\mathrm{Completeness~(\%)}$")
-#     plt.plot(Ps, amps, "k.")
-    plt.savefig("../injections/sine/%s_hist_%s.pdf" % (fname, flag))
-    plt.close(fig)
-    print K2_hist.T
-    return K2_hist, xedges, yedges
-
-def make_histogram_plot(flag, namps=19, npers=1000):
-    with h5py.File("../injections/sine/histogram_%s.h5" % flag, "r") as f:
-        K2_amps = f["K2"][:, 0] * 100  # convert to %
-        K2_Ps = f["K2"][:, 1]
-        raw_amps = f["raw"][:, 0] * 100  # convert to %
-        raw_Ps = f["raw"][:, 1]
-
-    if flag == "r":  # cut off short p_rots
-        l = K2_Ps > np.exp(0.5)
-        K2_amps, K2_Ps = K2_amps[l], K2_Ps[l]
-        l = raw_Ps > np.exp(1)
-        raw_amps, raw_Ps = raw_amps[l], raw_Ps[l]
-
-    K2_amps = np.log(K2_amps)
-
-    K2_hist, xedges, yedges = histo(K2_amps, K2_Ps, namps, npers, "K2")
-    raw_hist, _, _ = histo(raw_amps, raw_Ps, namps, npers, "raw")
-
-    fig = plt.figure()
-    ax = fig.add_subplot(111)
-    X, Y = np.meshgrid(xedges, yedges)
-    b = K2_hist.T-raw_hist.T
-    l = b < 0
-    b[l] = 0
-    print b
-    cax = ax.pcolormesh(X, Y, b, cmap="Blues")
-    ax.set_ylabel("$\mathrm{Amplitude~(\%)}$")
-    ax.set_xlabel("$\ln\mathrm{(Period)~(days)}$")
-    plt.colorbar(cax, label="$\mathrm{Completeness~(\%)}$")
-#     plt.plot(raw_Ps, raw_amps, "k.")
-    plt.savefig("../injections/sine/both_hist_%s" % flag)
-    plt.close(fig)
 
 if __name__ == "__main__":
 
@@ -238,10 +180,10 @@ if __name__ == "__main__":
     # load injections and truths
     sine = True
 
-#     flag = "r"  # r for rotation or a for asteroseismology
-    flag = "a"  # r for rotation or a for asteroseismology
+    flag = str(sys.argv[1])  # r for rotation or a for asteroseismology
     if sine:
         fnames = glob.glob("../injections/sine/????_lc_%s.txt" % flag)
+        fnames = np.sort(fnames)
         name, true_p = np.genfromtxt("../injections/sine/truth_%s.txt"
                                      % flag).T
         true_a = np.ones_like(true_p)
@@ -250,20 +192,24 @@ if __name__ == "__main__":
         name, true_p, true_a = np.genfromtxt("truth.txt").T
 
     if flag == "r":
-#         ps = np.linspace(.4, 30., 1000)
         ps = np.linspace(1., 50., 1000)
         fs = 1./ps
     elif flag == "a":
-        fs = np.linspace(1./4., 26., 1000)
+        fs = np.linspace(2./4., 26., 1000)
 
-    amps = np.arange(.0, .001, .00005)
-#     amps = np.exp(np.linspace(np.log(1e-6), np.log(1e-3), 20))
+#     amps = np.arange(.0, .001, .00005)  # 0 to 1000 ppm in steps of 50 ppm
+    # 10 to 1000 ppm in 20 logarithmic steps
+    amps = np.exp(np.linspace(np.log(1e-5), np.log(1e-3), 20))
 
-    fap = 2.40516004879e-06  # amp2s 95% fap
-    # calculate the 2d histogram of completeness over period and amplitude
-#     K2_amps, K2_Ps, raw_amps, raw_Ps = grid_over_periods(basis, raw_x,
-#                                                          raw_y, true_p, fs,
-#                                                          true_a, fap, fnames,
-#                                                          flag)
-    make_histogram_plot("r")
-    make_histogram_plot("a")
+    # for parallelisation, provide the starting and stopping indices
+    start = int(sys.argv[2])
+    stop = int(sys.argv[3])
+    fnames = fnames[start:stop]
+    true_p = true_p[start:stop]
+    true_a = true_a[start:stop]
+
+#     # calculate the 2d histogram of completeness over period and amplitude
+    K2_amps, K2_Ps, raw_amps, raw_Ps = grid_over_periods(basis, raw_x,
+                                                         raw_y, true_p, fs,
+                                                         true_a, fap, fnames,
+                                                         flag)
