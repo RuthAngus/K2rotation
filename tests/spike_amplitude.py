@@ -182,7 +182,7 @@ def experimental(mxs, mys):
     plt.ylabel("$\mathrm{N}_{\mathrm{peaks}}$")
     plt.xlabel("$\mathrm{\ln(Maximum~peak~height~(S/N)})$")
     plt.subplots_adjust(hspace=.3)
-    plt.savefig("sip_hist")
+    plt.savefig("sip_hist.pdf")
 
 def experimental_vbg(mxs, mys):
     mxs *= 1e6
@@ -216,7 +216,7 @@ def experimental_vbg(mxs, mys):
     plt.ylabel("$\ln(\mathrm{N}_{\mathrm{peaks}})$")
     plt.xlabel("$\ln(\mathrm{Maximum~peak~height~(Power)})$")
     plt.subplots_adjust(hspace=.3)
-    plt.savefig("vbg_hist")
+    plt.savefig("vbg_hist.pdf")
 
 def histhist(mxs, mys):
     mxs *= 1e6
@@ -323,15 +323,13 @@ if __name__ == "__main__":
     with h5py.File("kepmag_spike_vbg.h5", "r") as f:
         mxs = f["spikes"][:, 0]
         mys = f["spikes"][:, 1]
-#     experimental_vbg(mxs, mys)
-    histhist_vbg(mxs, mys)
+    experimental_vbg(mxs, mys)
 
-#     with h5py.File("kepmag_spike.h5", "r") as f:
-#         mxs = f["spikes"][:, 0]
-#         mys = f["spikes"][:, 1]
-#     experimental(mxs, mys)
+    with h5py.File("kepmag_spike.h5", "r") as f:
+        mxs = f["spikes"][:, 0]
+        mys = f["spikes"][:, 1]
+    experimental(mxs, mys)
 
-#     histhist(mxs, mys)
 
 #     eids, s2ns = find_value(fnames)
 #     s2ns = find_value(fnames)
