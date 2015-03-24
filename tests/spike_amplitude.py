@@ -12,6 +12,7 @@ import kplr
 import scipy.stats as sst
 from matplotlib.ticker import NullFormatter
 from gatspy.periodic import LombScargle
+from mpl_toolkits.axes_grid1 import ImageGrid
 
 # using kplr, find the kepler magnitude of each target
 # and save to file
@@ -32,6 +33,7 @@ def load_kepmags(fnames):
     return eids, kepmags
 
 # calculate the periodogram of each target and save to file
+# takes a list of globbed file names
 def find_spikes(fnames):
     for fname in fnames:
         eid = fname[15:24]
@@ -180,7 +182,7 @@ def experimental(mxs, mys):
     plt.ylabel("$\mathrm{N}_{\mathrm{peaks}}$")
     plt.xlabel("$\mathrm{\ln(Maximum~peak~height~(S/N)})$")
     plt.subplots_adjust(hspace=.3)
-    plt.savefig("test")
+    plt.savefig("sip_hist")
 
 def experimental_vbg(mxs, mys):
     mxs *= 1e6
@@ -214,7 +216,90 @@ def experimental_vbg(mxs, mys):
     plt.ylabel("$\ln(\mathrm{N}_{\mathrm{peaks}})$")
     plt.xlabel("$\ln(\mathrm{Maximum~peak~height~(Power)})$")
     plt.subplots_adjust(hspace=.3)
-    plt.savefig("test_vbg")
+    plt.savefig("vbg_hist")
+
+def histhist(mxs, mys):
+    mxs *= 1e6
+    s1, s2, s3, s4 = 45, 46.5, 48, 49.5
+    l1 = (mxs < s2) * (s1 < mxs)
+    l2 = (mxs < s3) * (s2 < mxs)
+    l3 = (mxs < s4) * (s3 < mxs)
+
+    nbins = 20
+    xhist = np.histogram(mxs, nbins)
+    bins = xhist[1]
+    inds = np.digitize(mxs, bins)
+    l = inds == 1
+
+    ax1 = plt.subplot2grid((2, nbins), (0, 0), colspan=nbins)
+    plt.axvspan(s1, s2, facecolor="b", alpha=.5, edgecolor="w")
+    plt.axvspan(s2, s3, facecolor="m", alpha=.5, edgecolor="w")
+    plt.axvspan(s3, s4, facecolor="c", alpha=.5, edgecolor="w")
+    plt.hist(mxs, nbins, color=".3", edgecolor=".3", rwidth=.7)
+    plt.xlim(40, 54)
+    plt.xlabel("$\\nu~\mathrm{(}\mu\mathrm{Hz)}$")
+    plt.ylabel("$\mathrm{N}_{\mathrm{peaks}}$")
+
+    plt.hist(mys[l], 20, orientation="horizontal", color=".3", edgecolor=".3",
+             rwidth=.7)
+    ax2 = plt.subplot2grid((2, nbins), (1, 0), colspan=1)
+    plt.setp(plt.gca(), xticklabels=[], xticks=[])
+    plt.ylim(-14, -6)
+    for i in range(2, nbins+1):
+        l = inds == i
+        if len(mys[l]):
+            plt.hist(np.log(mys[l]), 20, orientation="horizontal", color=".3",
+                     edgecolor="w")
+        ax2 = plt.subplot2grid((2, nbins), (1, (i-1)), colspan=1)
+        plt.setp(plt.gca(), xticklabels=[], yticklabels=[], xticks=[],
+                 yticks=[])
+        plt.ylim(-14, -6)
+    plt.subplots_adjust(wspace=0)
+    plt.subplots_adjust(hspace=.3)
+    plt.savefig("test")
+
+def histhist_vbg(mxs, mys):
+    mxs *= 1e6
+    s1, s2, s3, s4 = 45, 46.5, 48, 49.5
+    l1 = (mxs < s2) * (s1 < mxs)
+    l2 = (mxs < s3) * (s2 < mxs)
+    l3 = (mxs < s4) * (s3 < mxs)
+
+    nbins = 10
+    xhist = np.histogram(mxs, nbins)
+    bins = xhist[1]
+    inds = np.digitize(mxs, bins)
+    l = inds == 1
+
+    ax1 = plt.subplot2grid((2, nbins), (0, 0), colspan=nbins)
+    plt.axvspan(s1, s2, facecolor="b", alpha=.5, edgecolor="w")
+    plt.axvspan(s2, s3, facecolor="m", alpha=.5, edgecolor="w")
+    plt.axvspan(s3, s4, facecolor="c", alpha=.5, edgecolor="w")
+    plt.hist(mxs, nbins, color=".3", edgecolor=".3", rwidth=.7)
+    plt.xlim(40, 54)
+    plt.xlabel("$\\nu~\mathrm{(}\mu\mathrm{Hz)}$")
+    plt.ylabel("$\mathrm{N}_{\mathrm{peaks}}$")
+
+    plt.hist(mys[l], 20, orientation="horizontal", color=".3", edgecolor=".3",
+             rwidth=.7)
+    ax2 = plt.subplot2grid((2, nbins), (1, 0), colspan=1)
+    plt.setp(plt.gca(), xticklabels=[], xticks=[])
+    plt.ylim(-10, -2)
+#     plt.xlim(0, 4000)
+    for i in range(1, nbins):
+        l = inds == i
+        if len(mys[l]) > 1:
+            plt.hist(np.log(mys[l]), 20, orientation="horizontal", color=".3",
+                     edgecolor="w")
+        print i
+        ax2 = plt.subplot2grid((2, nbins), (1, (i)), colspan=1)
+        plt.setp(plt.gca(), xticklabels=[], yticklabels=[], xticks=[],
+                 yticks=[])
+        plt.ylim(-10, -2)
+#         plt.xlim(0, 4000)
+    plt.subplots_adjust(wspace=0)
+    plt.subplots_adjust(hspace=.3)
+    plt.savefig("test")
 
 if __name__ == "__main__":
 
@@ -234,17 +319,19 @@ if __name__ == "__main__":
 #     find_spikes(fnames)
 #     assemble(fnames)
 
+    # making histogram plots
     with h5py.File("kepmag_spike_vbg.h5", "r") as f:
         mxs = f["spikes"][:, 0]
         mys = f["spikes"][:, 1]
+#     experimental_vbg(mxs, mys)
+    histhist_vbg(mxs, mys)
 
-    experimental_vbg(mxs, mys)
+#     with h5py.File("kepmag_spike.h5", "r") as f:
+#         mxs = f["spikes"][:, 0]
+#         mys = f["spikes"][:, 1]
+#     experimental(mxs, mys)
 
-    with h5py.File("kepmag_spike.h5", "r") as f:
-        mxs = f["spikes"][:, 0]
-        mys = f["spikes"][:, 1]
-
-    experimental(mxs, mys)
+#     histhist(mxs, mys)
 
 #     eids, s2ns = find_value(fnames)
 #     s2ns = find_value(fnames)
