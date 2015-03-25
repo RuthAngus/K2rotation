@@ -19,41 +19,6 @@ plotpar = {'axes.labelsize': 20,
            'text.usetex': True}
 plt.rcParams.update(plotpar)
 
-# calculate the false alarm probability
-def fap(x, y, basis, fs, N, plot=False, sig=False):
-    amp2s, s2n, _ = K2pgram(x, y, basis, fs)  # 1st pgram
-    if sig: power = s2n
-    else: power = amp2s
-    mf, ms2n = peak_detect(fs, power)  # find peak
-    AT = np.concatenate((basis, np.ones((3, len(y)))), axis=0)
-    ATA = np.dot(AT, AT.T)
-    # compute trends
-    _, _, trends = eval_freq(x, y, mf, AT, ATA, compute_trends=True)
-    if plot:
-        plt.clf()
-        plt.plot(1./fs, power, "k")
-    peak_heights = []
-    for n in range(N):
-        detrended_y = y - trends  # remove trends
-        detrended_y = np.random.choice(detrended_y, len(y))  # shuffle
-        # add trends back in
-        amp2s, s2n, _ = K2pgram(x, detrended_y + trends, basis, fs)
-        if sig: power = s2n
-        else: power = amp2s
-        mx, my = peak_detect(fs, power)
-        peak_heights.append(my)
-        if plot:
-            plt.plot(1./fs, power, alpha=.2)
-    fap95 = np.percentile(peak_heights, 95)
-    fap90 = np.percentile(peak_heights, 90)
-    fap85 = np.percentile(peak_heights, 85)
-    fap50 = np.percentile(peak_heights, 50)
-    if plot:
-        plt.axhline(fap95, color=".5")
-        plt.savefig("fap")
-#     print fap95, fap90, fap85, fap50
-    return fap95, fap90, fap85, fap50
-
 def peak_detect(x, y):
     peaks = np.array([i for i in range(1, len(x)-1) if y[i-1] < y[i] and
                      y[i+1] < y[i]])
@@ -62,8 +27,8 @@ def peak_detect(x, y):
     return mx, my
 
 # grid over amplitudes (the K2 pgram step takes the time)
-def grid_over_amps(basis, flux, raw_x, raw_y, truth, fs, amps, true_a, fap,
-                   flag, n, plot=False, raw=False):
+def grid_over_amps(basis, flux, raw_x, raw_y, truth, fs, amps, true_a,
+                   flag, n, plot=False, raw=False, random_amps=True):
 
     # find the threshold level
     _, initial_pgram, _ = K2pgram(raw_x, raw_y, basis, fs)
@@ -71,6 +36,8 @@ def grid_over_amps(basis, flux, raw_x, raw_y, truth, fs, amps, true_a, fap,
 
     K2P, rawP, K2a, rawa = [], [], [], []
     for i, a in enumerate(amps):
+        if random_amps:
+            a = np.exp(np.random.uniform(np.log(1e-5), np.log(1e-3)))
 
         tf = 1./truth
         print "period = ", truth
@@ -114,7 +81,6 @@ def grid_over_amps(basis, flux, raw_x, raw_y, truth, fs, amps, true_a, fap,
             plt.subplot(2, 1, 2)
             plt.axvline(1./tf, color=".7", linestyle="--")
             plt.axhline(threshold, color=".7")
-            # plt.axhline(1.57445766955e-05, color="r")  # fap line
             c = "b"
             if s == 1:
                 c = "m"
@@ -127,8 +93,7 @@ def grid_over_amps(basis, flux, raw_x, raw_y, truth, fs, amps, true_a, fap,
     return np.array(K2a), np.array(K2P), np.array(rawa), np.array(rawP)
 
 # add simulated to real light curves and grid over periods
-def grid_over_periods(basis, raw_x, raw_y, true_p, fs, true_a, fap, fnames,
-                      flag):
+def grid_over_periods(basis, raw_x, raw_y, true_p, fs, true_a, fnames, flag):
     K2_amps, K2_Ps, raw_amps, raw_Ps = [], [], [], []
     for i, fname in enumerate(fnames):
         print fname
@@ -136,7 +101,7 @@ def grid_over_periods(basis, raw_x, raw_y, true_p, fs, true_a, fap, fnames,
         time, flux = np.genfromtxt(fname).T
         K2a, K2P, rawa, rawP = grid_over_amps(basis, flux, raw_x, raw_y,
                                               true_p[i], fs, amps, true_a[i],
-                                              fap, flag, i)
+                                              flag, i)
         K2_amps.append(K2a)
         raw_amps.append(rawa)
         K2_Ps.append(K2P)
@@ -198,7 +163,7 @@ if __name__ == "__main__":
         fs = np.linspace(2./4., 26., 1000)
 
 #     amps = np.arange(.0, .001, .00005)  # 0 to 1000 ppm in steps of 50 ppm
-    # 10 to 1000 ppm in 20 logarithmic steps
+    # 10 to 1000 ppm, randomly drawn from a log-normal
     amps = np.exp(np.linspace(np.log(1e-5), np.log(1e-3), 20))
 
     # for parallelisation, provide the starting and stopping indices
@@ -208,8 +173,8 @@ if __name__ == "__main__":
     true_p = true_p[start:stop]
     true_a = true_a[start:stop]
 
-#     # calculate the 2d histogram of completeness over period and amplitude
+    # calculate the 2d histogram of completeness over period and amplitude
     K2_amps, K2_Ps, raw_amps, raw_Ps = grid_over_periods(basis, raw_x,
                                                          raw_y, true_p, fs,
-                                                         true_a, fap, fnames,
+                                                         true_a, fnames,
                                                          flag)

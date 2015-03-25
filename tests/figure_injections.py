@@ -92,6 +92,5 @@ def make_histogram_plot(flag, namps=11, npers=1000):
     plt.close(fig)
 
 if __name__ == "__main__":
-
     make_histogram_plot("r")
     make_histogram_plot("a")
