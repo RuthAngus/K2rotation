@@ -25,7 +25,6 @@ def inject_star_spots(raw_x, periods):
                periods, np.array(amps))))
 
 def inject_sine_wave(raw_x, periods, flag):
-    amps = []
     for i, p in enumerate(periods):
         print i, "of", len(periods), "period = ", p
         flux = np.sin(raw_x * (1./p)*2*np.pi)
