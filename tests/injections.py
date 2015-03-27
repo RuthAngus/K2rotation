@@ -35,6 +35,7 @@ def grid_over_amps(basis, flux, raw_x, raw_y, truth, fs, amps, true_a,
     mx, threshold = peak_detect(fs, initial_pgram)
 
     K2P, rawP, K2a, rawa = [], [], [], []
+    alla, allp = [], []
     for i, a in enumerate(amps):
         if random_amps:
             a = np.exp(np.random.uniform(np.log(1e-5), np.log(1e-3)))
@@ -56,6 +57,8 @@ def grid_over_amps(basis, flux, raw_x, raw_y, truth, fs, amps, true_a,
 #         print "recovered frequency", best_f
         print "recovered period", 1./best_f
         s = 0  # success indicator
+        alla.append(a)
+        allp.append(truth)
         if tf-.1*tf < best_f and best_f < tf+.1*tf and best_pgram > threshold:
             K2P.append(truth)
             K2a.append(a)
@@ -90,26 +93,33 @@ def grid_over_amps(basis, flux, raw_x, raw_y, truth, fs, amps, true_a,
                         % (str(n).zfill(2), str(i).zfill(2), flag))
             print "%s_%s_result_%s" % (str(n).zfill(2), str(i).zfill(2), flag)
             raw_input('enter')
-    return np.array(K2a), np.array(K2P), np.array(rawa), np.array(rawP)
+    return np.array(K2a), np.array(K2P), np.array(rawa), np.array(rawP), \
+            np.array(alla), np.array(allp)
 
 # add simulated to real light curves and grid over periods
 def grid_over_periods(basis, raw_x, raw_y, true_p, fs, true_a, fnames, flag):
     K2_amps, K2_Ps, raw_amps, raw_Ps = [], [], [], []
+    allas, allps = [], []
     for i, fname in enumerate(fnames):
         print fname
         print true_p[i]
         time, flux = np.genfromtxt(fname).T
-        K2a, K2P, rawa, rawP = grid_over_amps(basis, flux, raw_x, raw_y,
-                                              true_p[i], fs, amps, true_a[i],
-                                              flag, i)
+        K2a, K2P, rawa, rawP, alla, allp = grid_over_amps(basis, flux, raw_x,
+                                                          raw_y, true_p[i], fs,
+                                                          amps, true_a[i],
+                                                          flag, i)
         K2_amps.append(K2a)
         raw_amps.append(rawa)
         K2_Ps.append(K2P)
         raw_Ps.append(rawP)
+        allas.append(alla)
+        allps.append(allp)
     K2_amps = np.array([j for i in K2_amps for j in i])
     K2_Ps = np.array([j for i in K2_Ps for j in i])
     raw_amps = np.array([j for i in raw_amps for j in i])
     raw_Ps = np.array([j for i in raw_Ps for j in i])
+    allas = np.array([j for i in allas for j in i])
+    allps = np.array([j for i in allps for j in i])
 
     f = h5py.File("../injections/sine/histogram_%s_%s_%s.h5" % (start, stop,
                   flag), "w")
@@ -119,6 +129,12 @@ def grid_over_periods(basis, raw_x, raw_y, true_p, fs, true_a, fnames, flag):
     rawdata = f.create_dataset("raw", (len(raw_amps), 2))
     rawdata[:, 0] = raw_amps
     rawdata[:, 1] = raw_Ps
+    f.close()
+    f = h5py.File("../injections/sine/truths_%s_%s_%s.h5" % (start, stop,
+                  flag), "w")
+    K2data = f.create_dataset("K2", (len(allas), 2))
+    K2data[:, 0] = allas
+    K2data[:, 1] = allps
     f.close()
     return K2_amps, K2_Ps, raw_amps, raw_Ps
 

@@ -173,10 +173,10 @@ def experimental(mxs, mys):
     plt.xlabel("$\\nu~\mathrm{(}\mu\mathrm{Hz)}$")
     plt.ylabel("$\mathrm{N}_{\mathrm{peaks}}$")
     plt.subplot(2, 1, 2)
-    plt.hist(np.log(mys[l1]), nbins, histtype="stepfilled", color="b",
-             alpha=.5)
     plt.hist(np.log(mys[l2]), nbins, histtype="stepfilled", color="m",
              alpha=.5)
+    plt.hist(np.log(mys[l1]), nbins, histtype="stepfilled", color="#9966FF",
+             edgecolor=".3")
     plt.hist(np.log(mys[l3]), nbins, histtype="stepfilled", color="c",
              alpha=.5)
     plt.ylabel("$\mathrm{N}_{\mathrm{peaks}}$")
@@ -204,10 +204,10 @@ def experimental_vbg(mxs, mys):
     plt.ylim(10e-1, 10e4)
     plt.ylabel("$\ln(\mathrm{N}_{\mathrm{peaks}})$")
     plt.subplot(2, 1, 2)
-    plt.hist(np.log(mys[l1]), nbins, histtype="stepfilled", color="b",
-             alpha=.5)
     plt.hist(np.log(mys[l2]), nbins, histtype="stepfilled", color="m",
              alpha=.5)
+    plt.hist(np.log(mys[l1]), nbins, histtype="stepfilled", color="#9966FF",
+             edgecolor=".3")
     plt.hist(np.log(mys[l3]), nbins, histtype="stepfilled", color="c",
              alpha=.5)
     plt.ylabel("$\mathrm{N}_{\mathrm{peaks}}$")
@@ -329,7 +329,6 @@ if __name__ == "__main__":
         mxs = f["spikes"][:, 0]
         mys = f["spikes"][:, 1]
     experimental(mxs, mys)
-
 
 #     eids, s2ns = find_value(fnames)
 #     s2ns = find_value(fnames)
