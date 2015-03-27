@@ -10,7 +10,7 @@
 
 \begin{document}
 
-\newcommand{\article}{{\it article}}
+\newcommand{\article}{article}
 \newcommand{\nGO}{4923}
 \newcommand{\uHz}{$\mu$Hz}
 \newcommand{\oxford}{1}
@@ -85,10 +85,10 @@ light curves, despite the reduced pointing precision, is extremely
 important.
 Several methods for detrending {\it K2} light curves have already been
 developed.
-For example, \citet{Vanderburg2014} and \citet{Crossfield2015} use simple
-aperture photometry and correct the light curve of each star individually and
-\citet{Aigrain2015} use a Gaussian process to model the non-linear dependence
-of stellar flux on the roll angle of the telescope.
+For example, {Vanderburg2014} (hereafter V14) and \citet{Crossfield2015}
+use simple aperture photometry and correct the light curve of each star
+individually and \citet{Aigrain2015} use a Gaussian process to model the
+non-linear dependence of stellar flux on the roll angle of the telescope.
 Whilst these methods successfully remove most systematic trends and
 produce light curves suitable for exoplanet search and some stellar
 variability studies, the $\sim$ 6 hour thruster firing signal may still appear
@@ -139,14 +139,14 @@ photometry\footnote{The method used to extract this photometry is described in
 The large peaks at $\sim$ 47 $\mu$Hz and its harmonics are caused by the
 regular thruster fires of the spacecraft.
 The bottom panel shows the LS periodogram of this light curve, after
-it has been detrended using the method of \citet{Vanderburg2014}.
+it has been detrended using the method of V14.
 The large peaks are still present in the detrended light curve.
 These peaks lie in an important region of parameter space for giant star
 asteroseismology and could affect the stellar parameters measured for thousands
 of giants if not dealt with appropriately.
 
-Stellar rotation is another area of astronomy hugely benefitting from
-high-precision space photometry.
+Stellar rotation is another area of astronomy that has hugely benefitted from
+the era of high-precision space photometry.
 Active regions on the surface of rotating stars produce periodic variations
 in flux---stellar rotation periods can therefore be measured from
 {\it Kepler} light curves.
@@ -207,7 +207,7 @@ and 1.
 The position of each star was predicted using the world coordinate system and
 10 circular apertures placed around the star with radii varying from 1 to
 5 pixels in steps of 0.5 pixels.
-Following the procedure of \citet{Vanderburg2014}, the aperture producing the
+Following the procedure of V14, the aperture producing the
 light curve with the lowest CDPP within a 6 hour window
 \citep{Christiansen2012} was selected\footnote{The simple aperture photometry
 light curves for campaigns 0 and 1 are available at
@@ -294,11 +294,11 @@ to remove the signal at 47\uHz, corresponding to the periodic $\sim$6 hour
 thruster firings, we computed SIPs for \nGO\ targets from the GO1049
 proposal: ``Galactic Archaeology on a grand scale" (PI: Stello, D.).
 For each target, an SIP and a LS periodogram of its
-\citet{Vanderburg2014} light curve was calculated for frequencies between
+V14 light curve was calculated for frequencies between
 44 and 54 \uHz.
 Both the height and frequency of the highest peak in the SIP and the highest
 peak in the LS periodogram was recorded.
-A histogram of the frequencies of the highest peaks in the SIPs of all \nGO
+A histogram of the frequencies of the highest peaks in the SIPs of all \nGO\
 targets is shown in the top panel of figure \ref{fig:sip_hist}.
 The bottom panel shows the histograms of peak heights within the
 correspondingly colored ranges indicated in the top panel.
@@ -306,14 +306,14 @@ This figure shows that whilst there are a greater number of maximum peaks
 around 47 \uHz, the S/N of these peaks are comparable to those found just
 above and just below this frequency.
 Figure \ref{fig:vbg_hist} shows the equivalent results for the
-\citet{Vanderburg2014} light curves, however, in this case the bin heights are
+V14 light curves, however, in this case the bin heights are
 plotted on a logarithmic scale.
 There is a significant number of large peaks at $\sim$47 \uHz\ in the LS
 periodograms of the detrended light curves; the highest peak in the LS
 periodograms was almost always located at $\sim$ 47 \uHz.
 Furthermore, the distribution of peak power within the range 46.5-48 \uHz\ is
-skewed towards higher powers, i.e. a large fraction of the peaks at $\sim$ 47
-\uHz\ have a large power.
+skewed towards higher powers, i.e. a substantial fraction of the peaks at
+$\sim$ 47 \uHz\ have a large power.
 
 \subsection{Application to real light curves: asteroseismology}
 
@@ -324,8 +324,7 @@ K2 photometry} for giant star, EPIC 201211472 is shown in figure
 \ref{fig:raw}.
 Peaks appearing at 47 $\mu$Hz and its harmonics are produced by the regular
 $\sim$ 6 hour thruster fires that repoint the spacecraft.
-These peaks are also present in periodograms of the \citet{Vanderburg2014}
-detrended light curves.
+These peaks are also present in periodograms of the V14 detrended light curves.
 The presence of systematic signals at these timescales are problematic for
 asteroseismic analysis since they lie in a region of frequency space
 that is often populated by giant asteroseismic modes.
@@ -335,17 +334,11 @@ will artificially supress all signals, both systematic and astrophysical, at
 that frequency.
 The SIP method eliminates the necessity for any such procedure.
 
-We downloaded \nGO\ long cadence light curves selected from the GO1059
-proposal: ``Galactic Archaeology on a grand scale" (PI: Stello, D.) in order
-to search for high signal-to-noise asteroseismic modes in giant stars.
-% SIPs of the raw data were produced by calculating the S/N of the amplitudes of
-% single sine and cosine functions, plus 150 ELCs conditioned on the data at
-% a range of frequencies.
-In order to identify asteroseismic oscillation modes, we searched for a power
-excess in the SIPs using the method of \citet{Huber2009}:
-autocorrelation functions were calculated for sections of the power spectrum in
-order to search for regions of increased correlation and locate the frequency
-of maximum power.
+In order to search for high signal-to-noise asteroseismic modes in the giant
+star candidates of GO1059, we searched for a power excess in the SIPs using the
+method of \citet{Huber2009}: autocorrelation functions were calculated for
+sections of the power spectrum in order to search for regions of increased
+correlation and locate the frequency of maximum power.
 The increased correlation arises from the even frequency spacing of acoustic
 modes, and the frequency of maximum correlation at the location of the power
 excess corresponds to the large frequecy separation, $\Delta\nu$.
@@ -373,7 +366,7 @@ The two most sucessful SIPs, for targets EPIC 202086286 and EPIC
 The top panel of figure \ref{fig:rotation_poster_child} shows the light curve
 of an active, rotating star, EP201317002.
 This light curve has been detrended using the method of
-\citet{Vanderburg2014}.
+V14.
 The middle and bottom panels show an ACF and LS periodogram of the
 detrended light curve.
 % The highest peaks in both the ACF and periodogram are located at around 10
@@ -452,7 +445,7 @@ timescales as the rotation periods.
 \includegraphics[width=6in, clip=true]{rawvbg_201183188.pdf}
 \caption{LS periodogram of the raw (Top) and detrended
 	 (bottom) {\it K2} photometry for EPIC 201183188. The light curve was
- 	 detrended using the method of \citet{Vanderburg2014}. The peak at
+ 	 detrended using the method of V14. The peak at
 	 $\sim$ 47 $\mu$Hz and its harmonics produced by the regular spacecraft
 	 thruster fires are still present in periodogram of the detrended
 	 data.}
@@ -514,7 +507,7 @@ timescales as the rotation periods.
 \begin{center}
 \includegraphics[width=6in, clip=true]{rotation_poster_child.pdf}
 \caption{{\it Top}: Light curve of EPIC 201317002, detrended using the method
-of \citet{Vanderburg2014}. {\it Middle}: Autocorrelation function of the
+of V14. {\it Middle}: Autocorrelation function of the
 detrended light curve. The autocorrelation function method measures a rotation
 period of 8.77 days for this star. {\it Bottom}: The LS periodogram
 of the detrended light curve. The highest peak in the periodogram is centred at
@@ -575,14 +568,13 @@ very low amplitudes.}
 \begin{center}
 \includegraphics[width=6in, clip=true]{sip_hist.pdf}
 \caption{{\it Top:} Histogram of the frequencies of the highest peaks in the
-	SIPs of \nGO\ {\it K2}
-	targets within the range 44 - 54 $\mu$ Hz. {\it Bottom:} Histograms of
-	peak heights within the correspondingly colored ranges indicated in the
-	top panel.
-	Whilst there are more maximum peaks around 47 $\mu$ Hz (the frequency
-	corresponding to the 6 hour thruster fire) the amplitudes of these
-	maximum peaks are comparable to the maximum peak heights just above
-	and just below this frequency.}
+	SIPs of \nGO\ {\it K2} targets within the range 44 - 54 \uHz.
+	{\it Bottom:} Histograms of peak heights within the correspondingly
+	colored ranges indicated in the top panel.
+	Whilst there is a larger number maximum peaks around 47 \uHz\ (the
+	frequency corresponding to the 6 hour thruster fire) the amplitudes of
+	these maximum peaks are comparable to the maximum peak heights just
+	above and just below this frequency.}
 \label{fig:sip_hist}
 \end{center}
 \end{figure*}
@@ -591,16 +583,16 @@ very low amplitudes.}
 \begin{center}
 \includegraphics[width=6in, clip=true]{vbg_hist.pdf}
 \caption{{\it Top:} Histogram of the frequencies of the highest peaks in the
-	LS
-	periodograms of \nGO\ {\it K2} targets within the range 44 - 54 $\mu$Hz.
+	LS periodograms of \nGO\ {\it K2} targets within the range 44 - 54
+	\uHz.
 	{\it Bottom:} Histograms of peak heights within the correspondingly
 	colored ranges indicated in the top panel.
 	Note that the bin heights are on a logarithmic scale.
 	The frequency of maximum peak height was $\sim$ 47 \uHz\ in almost
 	every periodogram.
-	The distribution of maximum peak height within the range 46.5-48 \uHz\
-	is skewed towards higher powers, i.e. a large fraction of the peaks
-	at $\sim$ 47 \uHz\ have a large power.
+	Furthermore, the distribution of maximum peak height within the range
+	46.5-48 \uHz\ is skewed towards higher powers, i.e. a large fraction of
+	the peaks at $\sim$ 47 \uHz\ have a large power.
 }
 \label{fig:vbg_hist}
 \end{center}
