@@ -5,7 +5,6 @@ from mklc import mklc
 import fitsio
 import h5py
 from K2pgram import K2pgram
-from injections import fap
 
 def inject_star_spots(raw_x, periods):
     amps = []
@@ -54,6 +53,14 @@ if __name__ == "__main__":
         basis = f["basis"][:150, l]
 
     periods = np.exp(np.linspace(np.log(.5), np.log(30), 1000))
-    inject_sine_wave(raw_x, periods, "r")
+    plt.clf()
+    plt.plot(np.random.uniform(0, 1, len(periods)), periods, "k.")
+    plt.savefig("test")
+    assert 0
+    print np.log(.5), np.log(30)
+    print min(periods), max(periods)
+#     inject_sine_wave(raw_x, periods, "r")
     periods = np.exp(np.linspace(np.log(1./24), np.log(2), 1000))
-    inject_sine_wave(raw_x, periods, "a")
+    print np.log(1./24.), np.log(2)
+    print min(periods), max(periods)
+#     inject_sine_wave(raw_x, periods, "a")

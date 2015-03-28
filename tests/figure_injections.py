@@ -20,11 +20,11 @@ plotpar = {'axes.labelsize': 20,
 plt.rcParams.update(plotpar)
 
 def histo(amps, Ps, namps, npers, allas, allps, fname, flag):
-#     amps = np.log(amps)
+    amps *= 1e4  # convert to ppm
     print amps
     nbins = namps
     max_n_per_bin = int(npers/namps)
-    Ps = np.log(Ps)
+#     Ps = np.log(Ps)
     my_yedges = np.linspace(min(amps), max(amps), nbins)
     my_yedges = np.linspace(min(amps), max(amps), nbins)
     my_xedges = np.linspace(min(Ps), max(Ps), nbins)
@@ -33,32 +33,43 @@ def histo(amps, Ps, namps, npers, allas, allps, fname, flag):
                                                     max(my_xedges)],
                                                     [min(my_yedges),
                                                      max(my_yedges)]])
+    truth_hist, xedges, yedges = np.histogram2d(allps, allas, bins=nbins,
+                                             range=[[min(my_xedges),
+                                                    max(my_xedges)],
+                                                    [min(my_yedges),
+                                                     max(my_yedges)]])
 
     fig = plt.figure()
     ax = fig.add_subplot(111)
     X, Y = np.meshgrid(xedges, yedges)
-    cax = ax.pcolormesh(X, Y, K2_hist.T/float(max_n_per_bin)*100, cmap="Blues")
-    ax.set_ylabel("$\mathrm{Amplitude~(\%)}$")
+    color = K2_hist.T/truth_hist.T * 100
+    color[color==np.inf] = 0
+    print color
+    cax = ax.pcolormesh(X, Y, color, cmap="Blues")
+    ax.set_ylabel("$\mathrm{Amplitude~(ppm)}$")
     ax.set_xlabel("$\ln\mathrm{Period~(days)}$")
     plt.colorbar(cax, label="$\mathrm{Completeness~(\%)}$")
-    plt.plot(Ps, amps, "k.")
-    plt.plot(allps, allas, "k.")
+    plt.subplots_adjust(bottom=.1)
+#     plt.plot(Ps, amps, "k.")
+#     plt.plot(allps, allas, "r.", markersize=.5)
     plt.savefig("../injections/sine/%s_hist_%s.pdf" % (fname, flag))
     plt.close(fig)
 #     print K2_hist.T
     return K2_hist, xedges, yedges
 
 def make_histogram_plot(flag, namps=11, npers=1000):
+
     hist_names = glob.glob("../injections/sine/histogram_*_*_%s.h5" % flag)
-    truth_names = glob.glob("../injections/sine/truth_*_*_%s.h5" % flag)
+    truth_names = glob.glob("../injections/sine/truths_*_*_%s.h5" % flag)
 #     print hist_names
     with h5py.File(hist_names[0], "r") as f:
         K2_amps = f["K2"][:, 0] * 100  # convert to %
         K2_Ps = f["K2"][:, 1]
         raw_amps = f["raw"][:, 0] * 100  # convert to %
         raw_Ps = f["raw"][:, 1]
+    print min(K2_Ps), max(K2_Ps)
     for i in range(1, len(hist_names)):
-        with h5py.File(hist_names[0], "r") as f:
+        with h5py.File(hist_names[i], "r") as f:
             K2_amps = np.concatenate((K2_amps, f["K2"][:, 0] * 100))
             K2_Ps = np.concatenate((K2_Ps, f["K2"][:, 1]))
             raw_amps = np.concatenate((raw_amps, f["raw"][:, 0] * 100))
@@ -67,9 +78,10 @@ def make_histogram_plot(flag, namps=11, npers=1000):
         allas = f["K2"][:, 0] * 100  # convert to %
         allps = f["K2"][:, 1]
     for i in range(1, len(truth_names)):
-        with h5py.File(truth_names[0], "r") as f:
+        with h5py.File(truth_names[i], "r") as f:
             allas = np.concatenate((allas, f["K2"][:, 0] * 100))
             allps = np.concatenate((allps, f["K2"][:, 1]))
+    print min(allps), max(allps)
 
 #     if flag == "r":  # cut off short p_rots
 #         l = K2_Ps > np.exp(0.5)
