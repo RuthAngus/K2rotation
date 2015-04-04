@@ -36,7 +36,7 @@ ax1 = fig.add_subplot(211)
 model = LombScargle().fit(x, y, np.ones_like(y)*1e-5)
 period = 1. / fs
 raw_pgram = model.periodogram(period)
-ax1.plot(fs*1e6, raw_pgram, "k")
+ax1.plot(fs[::3]*1e6, raw_pgram[::3], "k")
 ax.set_title("$\mathrm{EPIC~%s}$" % eid)
 ax1.set_xlim(10, 280)
 ax1.set_ylim(0, .015)
@@ -55,7 +55,7 @@ x *= 24*3600
 model = LombScargle().fit(x, y, np.ones_like(y)*1e-5)
 ps = 1. / fs
 pgram = model.periodogram(ps)
-ax2.plot(fs*1e6, pgram, "k")
+ax2.plot(fs[::3]*1e6, pgram[::3], "k")
 ax.set_xlabel("$\\nu\mathrm{~(}\mu\mathrm{Hz)}$")
 ax2.set_xlim(10, 280)
 ax2.set_ylim(0, .015)

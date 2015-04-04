@@ -11,7 +11,7 @@ def astero_example_plots(names, vbg=False):
             fs, s2n = np.genfromtxt("../astero/%sastero_pgram.txt"
                                     % str(int(eid))).T
         plt.clf()
-        plt.plot(fs, s2n*10e4, "k")
+        plt.plot(fs[::3], s2n[::3]*10e4, "k")
 
         plt.xlim(min(fs), 280)
         plt.xlabel("$\\nu\mathrm{~(}\mu\mathrm{Hz)}$")
@@ -50,4 +50,5 @@ if __name__ == "__main__":
     # paper
     c0 = ["202068435", "202086286"]
 
-    astero_example_plots(c0)
+#     astero_example_plots(c0)
+    astero_example_plots(c1)

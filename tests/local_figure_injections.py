@@ -19,13 +19,14 @@ plotpar = {'axes.labelsize': 20,
            'text.usetex': True}
 plt.rcParams.update(plotpar)
 
-def histo(amps, Ps, namps, npers, fname, flag):
+def histo(amps, Ps, namps, npers, fname, flag, log=False):
     amps *= 1e4  # convert to ppm
     nbins = namps
     max_n_per_bin = int(npers/namps)
     Ps = np.log(Ps)
     my_yedges = np.log(np.linspace(min(amps), max(amps), nbins))
-    amps = np.log(amps)
+    if log:
+        amps = np.log(amps)
     my_yedges = np.linspace(min(amps), max(amps), nbins)
     my_xedges = np.linspace(min(Ps), max(Ps), nbins)
     K2_hist, xedges, yedges = np.histogram2d(Ps, amps, bins=nbins,
@@ -39,11 +40,14 @@ def histo(amps, Ps, namps, npers, fname, flag):
     X, Y = np.meshgrid(my_xedges, my_yedges)
     cax = ax.pcolormesh(X, Y, K2_hist.T/float(max_n_per_bin)*100, cmap="Blues",
                         vmin=0, vmax=100)
-    ax.set_ylabel("$\ln\mathrm{Amplitude~(ppm)}$")
+    if log:
+        ax.set_ylabel("$\ln\mathrm{Amplitude~(ppm)}$")
+    else:
+        ax.set_ylabel("$\mathrm{Amplitude~(ppm)}$")
     ax.set_xlabel("$\ln\mathrm{Period~(days)}$")
     plt.colorbar(cax, label="$\mathrm{Completeness~(\%)}$")
 #     plt.plot(Ps, amps, "k.")
-    plt.savefig("%s_hist_%s" % (fname, flag))
+    plt.savefig("../documents/%s_hist_%s.pdf" % (fname, flag))
     plt.close(fig)
     return K2_hist, xedges, yedges
 

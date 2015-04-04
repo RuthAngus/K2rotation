@@ -99,8 +99,6 @@ def K2_poster_child_plot(x, y, fs, s2n, epid):
     mx, my = max_peak_detect(fs, s2n)
     print my
 
-    x2, y2, _ = np.genfromtxt("/Users/angusr/data/K2/c1lcsr4/ep%s.csv" % epid,
-                              delimiter=",").T
     plt.clf()
     plt.subplot(2, 1, 1)
     l = x < 2016
@@ -111,14 +109,15 @@ def K2_poster_child_plot(x, y, fs, s2n, epid):
     plt.ylabel("$\mathrm{Normalized~Flux}$")
 
     plt.subplot(2, 1, 2)
-    plt.plot(fs, s2n, "k")
+    plt.plot(fs, s2n*1e5, "k")
     plt.xlabel("$\mathrm{Frequency~(days}^{-1}\mathrm{)}$")
-    plt.ylabel("$\mathrm{Power}$")
-    plt.ylim(0, my)
+    plt.ylabel("$\mathrm{S/N~(} \\times 10^5\mathrm{)}$")
+    plt.ylim(0, my*1e5)
     plt.subplots_adjust(hspace=.4)
     plt.axvline(mx, color=".5", linestyle="--",
                 label="$P_{rot}=%.2f ~\mathrm{days}$" % (1./mx))
     plt.legend()
+    print "../documents/K2_rotation_%s.pdf" % epid
     plt.savefig("../documents/K2_rotation_%s.pdf" % epid)
     return mx
 
@@ -133,7 +132,7 @@ def K2_conditioned_plot(fs, epid):
     # construct arrays
     AT = np.concatenate((basis, np.ones((3, len(y)))), axis=0)
     ATA = np.dot(AT, AT.T)
-    _, trends = eval_freq(x, y, mx, AT, ATA, compute_trends=True)
+    _, _, trends = eval_freq(x, y, mx, AT, ATA, compute_trends=True)
 
     plt.clf()
     plt.subplot(2, 1, 1)
@@ -147,11 +146,11 @@ def K2_conditioned_plot(fs, epid):
     plt.ylabel("$\mathrm{Normalized~Flux}$")
 
     plt.subplot(2, 1, 2)
-    plt.plot(fs, s2n, "k")
+    plt.plot(fs, s2n*1e5, "k")
     plt.xlabel("$\mathrm{Frequency~(days}^{-1}\mathrm{)}$")
-    plt.ylabel("$\mathrm{Power}$")
-    plt.ylim(0, my)
-    plt.subplots_adjust(hspace=.4)
+    plt.ylabel(r"$\mathrm{S/N~(} \\times 10^5\mathrm{)}$")
+    plt.ylim(0, my*1e5)
+    plt.subplots_adjust(hspace=.4, bottom=.2)
     plt.axvline(mx, color=".5", linestyle="--",
                 label="$P_{rot}=%.2f ~\mathrm{days}$" % (1./mx))
     plt.legend()
@@ -160,40 +159,41 @@ def K2_conditioned_plot(fs, epid):
 
 # plot the top 5 components
 def top_5(x, basis, w):
+    b = 3
     sw = np.sort(w)
     l = np.arange(len(w))[w == sw[0]][0]
     print l
     plt.clf()
     plt.subplot(5, 1, 1)
-    plt.plot(x, basis[l, :], "k")
+    plt.plot(x[::b], basis[l, :][::b], "k")
     plt.xticks(visible=False)
     plt.yticks(visible=False)
     plt.xlim(x[0], x[-1])
     plt.subplot(5, 1, 2)
     l = np.arange(len(w))[w == sw[1]][0]
     print l
-    plt.plot(x, basis[l, :], "k")
+    plt.plot(x[::b], basis[l, :][::b], "k")
     plt.yticks(visible=False)
     plt.xticks(visible=False)
     plt.xlim(x[0], x[-1])
     plt.subplot(5, 1, 3)
     l = np.arange(len(w))[w == sw[2]][0]
     print l
-    plt.plot(x, basis[l, :], "k")
+    plt.plot(x[::b], basis[l, :][::b], "k")
     plt.xticks(visible=False)
     plt.yticks(visible=False)
     plt.xlim(x[0], x[-1])
     plt.subplot(5, 1, 4)
     l = np.arange(len(w))[w == sw[3]][0]
     print l
-    plt.plot(x, basis[l, :], "k")
+    plt.plot(x[::b], basis[l, :][::b], "k")
     plt.xticks(visible=False)
     plt.yticks(visible=False)
     plt.xlim(x[0], x[-1])
     plt.subplot(5, 1, 5)
     l = np.arange(len(w))[w == sw[4]][0]
     print l
-    plt.plot(x, basis[l, :], "k")
+    plt.plot(x[::b], basis[l, :][::b], "k")
     plt.yticks(visible=False)
     plt.xlabel("$\mathrm{BJD-2454833}$")
     plt.subplots_adjust(hspace=0)
@@ -202,11 +202,11 @@ def top_5(x, basis, w):
 
 if __name__ == "__main__":
 
-    plotpar = {'axes.labelsize': 18,
-               'text.fontsize': 18,
-               'legend.fontsize': 18,
-               'xtick.labelsize': 18,
-               'ytick.labelsize': 18,
+    plotpar = {'axes.labelsize': 16,
+               'text.fontsize': 16,
+               'legend.fontsize': 16,
+               'xtick.labelsize': 14,
+               'ytick.labelsize': 16,
                'text.usetex': True}
     plt.rcParams.update(plotpar)
 
@@ -230,4 +230,5 @@ if __name__ == "__main__":
     amp2s, s2n, w  = K2pgram(x, y, basis, fs)
 
     K2_poster_child_plot(x, y, fs, amp2s, epid)
-    top_5(x, basis, w)
+#     top_5(x, basis, w)
+#     K2_conditioned_plot(fs, epid)
