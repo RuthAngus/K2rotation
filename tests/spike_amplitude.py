@@ -168,19 +168,22 @@ def experimental(mxs, mys):
     plt.axvspan(s2, s3, facecolor="m", alpha=.5, edgecolor="w")
     plt.axvspan(s3, s4, facecolor="c", alpha=.5, edgecolor="w")
     plt.hist(mxs, nbins, color=".3", edgecolor=".3", rwidth=.7)
+    plt.ylim(1e0, 1e5)
+    plt.yscale("log")
     nbins=50
     plt.xlim(40, 54)
     plt.xlabel("$\\nu~\mathrm{(}\mu\mathrm{Hz)}$")
-    plt.ylabel("$\mathrm{N}_{\mathrm{peaks}}$")
+    plt.ylabel("$\ln\mathrm{(N}_{\mathrm{peaks})}$")
     plt.subplot(2, 1, 2)
     plt.hist(np.log(mys[l2]), nbins, histtype="stepfilled", color="m",
              alpha=.5)
-    plt.hist(np.log(mys[l1]), nbins, histtype="stepfilled", color="#9966FF",
-             edgecolor=".3")
-    plt.hist(np.log(mys[l3]), nbins, histtype="stepfilled", color="c",
-             alpha=.5)
-    plt.ylabel("$\mathrm{N}_{\mathrm{peaks}}$")
+    plt.hist(np.log(mys[l1]), nbins, histtype="stepfilled",
+             color="#6666FF", edgecolor=".3")
+    plt.hist(np.log(mys[l3]), nbins, histtype="stepfilled",
+             color="#00FFCC", alpha=.5)
+    plt.ylabel("$\ln\mathrm{(N}_{\mathrm{peaks})}$")
     plt.xlabel("$\mathrm{\ln(Maximum~peak~height~(S/N)})$")
+    plt.yscale("log")
     plt.subplots_adjust(hspace=.3)
     plt.savefig("sip_hist.pdf")
 
@@ -206,10 +209,10 @@ def experimental_vbg(mxs, mys):
     plt.subplot(2, 1, 2)
     plt.hist(np.log(mys[l2]), nbins, histtype="stepfilled", color="m",
              alpha=.5)
-    plt.hist(np.log(mys[l1]), nbins, histtype="stepfilled", color="#9966FF",
+    plt.hist(np.log(mys[l1]), nbins, histtype="stepfilled", color="#6666FF",
              edgecolor=".3")
-    plt.hist(np.log(mys[l3]), nbins, histtype="stepfilled", color="c",
-             alpha=.5)
+    plt.hist(np.log(mys[l3]), nbins, histtype="stepfilled",
+             color="#00FFCC", alpha=.5)
     plt.ylabel("$\mathrm{N}_{\mathrm{peaks}}$")
     plt.xlabel("$\mathrm{\ln(Maximum~peak~height~(S/N)})$")
     plt.yscale("log")
