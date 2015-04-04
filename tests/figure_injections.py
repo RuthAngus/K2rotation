@@ -21,10 +21,13 @@ plt.rcParams.update(plotpar)
 
 def histo(amps, Ps, namps, npers, allas, allps, fname, flag):
     amps *= 1e4  # convert to ppm
-    print amps
+    allas *= 1e4
     nbins = namps
+    Ps = np.log10(Ps)
+    allps = np.log10(allps)
+    amps = np.log10(amps)
+    allas = np.log10(allas)
     max_n_per_bin = int(npers/namps)
-#     Ps = np.log(Ps)
     my_yedges = np.linspace(min(amps), max(amps), nbins)
     my_yedges = np.linspace(min(amps), max(amps), nbins)
     my_xedges = np.linspace(min(Ps), max(Ps), nbins)
@@ -45,19 +48,20 @@ def histo(amps, Ps, namps, npers, allas, allps, fname, flag):
     color = K2_hist.T/truth_hist.T * 100
     color[color==np.inf] = 0
     print color
+#     assert 0
     cax = ax.pcolormesh(X, Y, color, cmap="Blues")
-    ax.set_ylabel("$\mathrm{Amplitude~(ppm)}$")
-    ax.set_xlabel("$\ln\mathrm{Period~(days)}$")
+    ax.set_ylabel("$\log_{10}\mathrm{Amplitude~(ppm)}$")
+    ax.set_xlabel("$\log_{10}\mathrm{Period~(days)}$")
     plt.colorbar(cax, label="$\mathrm{Completeness~(\%)}$")
-    plt.subplots_adjust(bottom=.1)
+    plt.subplots_adjust(bottom=.2)
 #     plt.plot(Ps, amps, "k.")
 #     plt.plot(allps, allas, "r.", markersize=.5)
     plt.savefig("../injections/sine/%s_hist_%s.pdf" % (fname, flag))
     plt.close(fig)
 #     print K2_hist.T
-    return K2_hist, xedges, yedges
+    return K2_hist.T/truth_hist.T * 100, xedges, yedges
 
-def make_histogram_plot(flag, namps=11, npers=1000):
+def make_histogram_plot(flag, namps=30, npers=1000):
 
     hist_names = glob.glob("../injections/sine/histogram_*_*_%s.h5" % flag)
     truth_names = glob.glob("../injections/sine/truths_*_*_%s.h5" % flag)
@@ -83,32 +87,33 @@ def make_histogram_plot(flag, namps=11, npers=1000):
             allps = np.concatenate((allps, f["K2"][:, 1]))
     print min(allps), max(allps)
 
-#     if flag == "r":  # cut off short p_rots
-#         l = K2_Ps > np.exp(0.5)
-#         K2_amps, K2_Ps = K2_amps[l], K2_Ps[l]
-#         l = raw_Ps > np.exp(1)
-#         raw_amps, raw_Ps = raw_amps[l], raw_Ps[l]
+    if flag == "r":  # cut off short p_rots
+        l = K2_Ps > 10**(.3)
+        K2_amps, K2_Ps = K2_amps[l], K2_Ps[l]
+        l = raw_Ps > 10**(1)
+        raw_amps, raw_Ps = raw_amps[l], raw_Ps[l]
 
 #     K2_amps = np.log(K2_amps)
 
     K2_hist, xedges, yedges = histo(K2_amps, K2_Ps, namps, npers, allas, allps,
                                     "K2", flag)
-#     raw_hist, _, _ = histo(raw_amps, raw_Ps, namps, npers, "raw", flag)
-#
-#     fig = plt.figure()
-#     ax = fig.add_subplot(111)
-#     X, Y = np.meshgrid(xedges, yedges)
-#     b = K2_hist.T-raw_hist.T
-#     l = b < 0
-#     b[l] = 0
-# #     print b
-#     cax = ax.pcolormesh(X, Y, b, cmap="Blues")
-#     ax.set_ylabel("$\mathrm{Amplitude~(\%)}$")
-#     ax.set_xlabel("$\ln\mathrm{(Period)~(days)}$")
-#     plt.colorbar(cax, label="$\mathrm{Completeness~(\%)}$")
-# #     plt.plot(raw_Ps, raw_amps, "k.")
-#     plt.savefig("../injections/sine/both_hist_%s" % flag)
-#     plt.close(fig)
+    raw_hist, _, _ = histo(raw_amps, raw_Ps, namps, npers, allas, allps,
+                           "raw", flag)
+
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    X, Y = np.meshgrid(xedges, yedges)
+    b = K2_hist-raw_hist
+    l = b < 0
+    b[l] = 0
+#     print b
+    cax = ax.pcolormesh(X, Y, b, cmap="Blues")
+    ax.set_ylabel("$\log_{10}\mathrm{Amplitude~(ppm)}$")
+    ax.set_xlabel("$\log_{10}\mathrm{(Period)~(days)}$")
+    plt.colorbar(cax, label="$\mathrm{Completeness~(\%)}$")
+#     plt.plot(raw_Ps, raw_amps, "k.")
+    plt.savefig("../injections/sine/both_hist_%s" % flag)
+    plt.close(fig)
 
 if __name__ == "__main__":
     make_histogram_plot("r")

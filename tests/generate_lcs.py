@@ -52,15 +52,7 @@ if __name__ == "__main__":
     with h5py.File("../data/c1.h5", "r") as f:
         basis = f["basis"][:150, l]
 
-    periods = np.exp(np.linspace(np.log(.5), np.log(30), 1000))
-    plt.clf()
-    plt.plot(np.random.uniform(0, 1, len(periods)), periods, "k.")
-    plt.savefig("test")
-    assert 0
-    print np.log(.5), np.log(30)
-    print min(periods), max(periods)
-#     inject_sine_wave(raw_x, periods, "r")
-    periods = np.exp(np.linspace(np.log(1./24), np.log(2), 1000))
-    print np.log(1./24.), np.log(2)
-    print min(periods), max(periods)
-#     inject_sine_wave(raw_x, periods, "a")
+    periods = 10**(np.linspace(np.log10(.5), np.log10(30), 1000))
+    inject_sine_wave(raw_x, periods, "r")
+    periods = 10**(np.linspace(np.log10(1./24), np.log10(2), 1000))
+    inject_sine_wave(raw_x, periods, "a")

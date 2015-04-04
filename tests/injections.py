@@ -38,7 +38,7 @@ def grid_over_amps(basis, flux, raw_x, raw_y, truth, fs, amps, true_a,
     alla, allp = [], []
     for i, a in enumerate(amps):
         if random_amps:
-            a = np.exp(np.random.uniform(np.log(1e-5), np.log(1e-3)))
+            a = 10**(np.random.uniform(np.log10(1e-5), np.log10(1e-3)))
 
         tf = 1./truth
         print "period = ", truth
@@ -180,7 +180,7 @@ if __name__ == "__main__":
 
 #     amps = np.arange(.0, .001, .00005)  # 0 to 1000 ppm in steps of 50 ppm
     # 10 to 1000 ppm, randomly drawn from a log-normal
-    amps = np.exp(np.linspace(np.log(1e-5), np.log(1e-3), 20))
+    amps = 10**(np.linspace(np.log10(1e-5), np.log10(1e-3), 20))
 
     # for parallelisation, provide the starting and stopping indices
     start = int(sys.argv[2])
