@@ -83,7 +83,7 @@ def demo(epids, demo):
                     label="$%.2f\mathrm{~days}$" % mx)
         plt.legend()
         plt.plot(ps, s2n, "k")
-        plt.subplots_adjust(hspace=.3)
+        plt.subplots_adjust(hspace=.3, left=.2)
         plt.savefig("../documents/%s_%s.pdf" % (demo, fname))
 
 if __name__ == "__main__":
