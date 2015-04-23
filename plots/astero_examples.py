@@ -25,8 +25,7 @@ def astero_example_plots(names, vbg=False):
         else:
             plt.savefig("../documents/%s.pdf" % str(int(eid)))
 
-if __name__ == "__main__":
-
+def make_figs():
     plotpar = {'axes.labelsize': 20,
                'text.fontsize': 20,
                'legend.fontsize': 20,
@@ -52,3 +51,6 @@ if __name__ == "__main__":
 
 #     astero_example_plots(c0)
     astero_example_plots(c1)
+
+if __name__ == "__main__":
+    make_figs()

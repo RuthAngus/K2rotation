@@ -297,9 +297,15 @@ can be described by the ELCs alone.
 This issue is addressed further in \textsection\ref{section:rotation}.
 A caveat of these injection tests is that a single sinusoid with
 a constant amplitude over the full 80 day baseline of campaign 1 may not
-necessarily be a realistic model of acoustic modes in giant stars and is
-certainly not representative of stellar variability.
-Real signals, therefore are likely to be less easy to detect.
+necessarily be a realistic model of acoustic modes in giant stars, however
+average mode lifetimes in giants are often tens of days
+\citep[e.g.][]{Chaplin2009}, and therefore comparable to the length of a
+{\it K2} campaign.
+On the other hand, constant-amplitude sinusoids certainly not representative
+of typical stellar variability.
+% Real signals, therefore are likely to be less easy to detect.
+These injection tests are therefore a best-case representation of the
+ability of the SIP to recover real astrophysical signals.
 
 In order to demonstrate the consistent ability of the SIP method
 to remove the signal at 47\uHz, corresponding to the periodic $\sim$6 hour
@@ -345,6 +351,9 @@ subtracting a sinusoid of that frequency from the data, however this process
 will artificially supress all signals, both systematic and astrophysical, at
 that frequency.
 The SIP method eliminates the necessity for any such procedure.
+The bottom panel of figure \ref{fig:raw} shows the SIP for the same star; this
+figure demonstrates the ability of the SIP method to produce periodograms that
+are free from thruster firing signals.
 
 In order to search for high signal-to-noise asteroseismic modes in the giant
 star candidates of GO1059, we searched for a power excess in the SIPs using the
@@ -463,12 +472,13 @@ timescales as the rotation periods.
 \begin{figure*}
 \begin{center}
 \includegraphics[width=6in, clip=true]{rawvbg_201183188.pdf}
-\caption{LS periodogram of the raw (Top) and detrended
-	 (bottom) {\it K2} photometry for EPIC 201183188. The light curve was
- 	 detrended using the method of VJ14. The peak at
-	 $\sim$ 47 $\mu$Hz and its harmonics produced by the regular spacecraft
-	 thruster fires are still present in periodogram of the detrended
-	 data.}
+\caption{LS periodograms of the raw (Top) and detrended (middle) {\it K2}
+	 photometry for EPIC 201183188.
+	 The bottom panel shows the SIP for this target. The light curve was
+ 	 detrended using the method of VJ14.
+	 Peaks at $\sim$ 47 $\mu$Hz and its harmonics produced by the regular
+	 spacecraft thruster fires are still present in periodogram of the
+	 detrended data, but do not appear in the SIP.}
 \label{fig:raw}
 \end{center}
 \end{figure*}
@@ -478,10 +488,6 @@ timescales as the rotation periods.
 	\subfigure[]{
             \label{fig:1}
 	    \includegraphics[width=3in]{201545182.pdf}
-        }
-	\subfigure[]{
-            \label{fig:2}
-	    \includegraphics[width=3in]{201183188.pdf}
         }
 	\subfigure[]{
             \label{fig:3}
