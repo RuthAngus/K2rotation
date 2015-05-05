@@ -1,0 +1,12 @@
+*.fits
+*.pyc
+*.h5
+*.txt
+*.png
+*.pdf
+*.bbl
+*.log
+*.aux
+*.csv
+*.zip
+*.bash
