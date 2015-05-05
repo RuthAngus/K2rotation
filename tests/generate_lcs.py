@@ -54,5 +54,5 @@ if __name__ == "__main__":
 
     periods = 10**(np.linspace(np.log10(.5), np.log10(30), 1000))
     inject_sine_wave(raw_x, periods, "r")
-    periods = 10**(np.linspace(np.log10(1./24), np.log10(2), 1000))
+    periods = 10**(np.linspace(np.log10(1./24), np.log10(5), 1000))
     inject_sine_wave(raw_x, periods, "a")

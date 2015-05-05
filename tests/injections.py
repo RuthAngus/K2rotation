@@ -38,7 +38,10 @@ def grid_over_amps(basis, flux, raw_x, raw_y, truth, fs, amps, true_a,
     alla, allp = [], []
     for i, a in enumerate(amps):
         if random_amps:
-            a = 10**(np.random.uniform(np.log10(1e-5), np.log10(1e-3)))
+            if flag=="r":
+                a = 10**(np.random.uniform(np.log10(1e-5), np.log10(1e-3)))
+            elif flag=="a":
+                a = 10**(np.random.uniform(np.log10(1e-5), np.log10(1e-3)))
 
         tf = 1./truth
         print "period = ", truth
@@ -72,7 +75,13 @@ def grid_over_amps(basis, flux, raw_x, raw_y, truth, fs, amps, true_a,
         period = 1. / fs
         pg = model.periodogram(period)
         best_f2, best_pg2 = peak_detect(fs, pg)
-        if tf-.1*tf < best_f2 and best_f2 < tf+.1*tf:
+
+        if flag == "r":
+            threshold = .1
+        elif flag == "a":
+            threshold = .05
+
+        if tf-threshold*tf < best_f2 and best_f2 < tf+threshold*tf:
             rawP.append(truth)
             rawa.append(a)
 
@@ -92,7 +101,7 @@ def grid_over_amps(basis, flux, raw_x, raw_y, truth, fs, amps, true_a,
             plt.savefig("../injections/sine/%s_%s_result_%s"
                         % (str(n).zfill(2), str(i).zfill(2), flag))
             print "%s_%s_result_%s" % (str(n).zfill(2), str(i).zfill(2), flag)
-            raw_input('enter')
+            assert 0
     return np.array(K2a), np.array(K2P), np.array(rawa), np.array(rawP), \
             np.array(alla), np.array(allp)
 
@@ -107,7 +116,7 @@ def grid_over_periods(basis, raw_x, raw_y, true_p, fs, true_a, fnames, flag):
         K2a, K2P, rawa, rawP, alla, allp = grid_over_amps(basis, flux, raw_x,
                                                           raw_y, true_p[i], fs,
                                                           amps, true_a[i],
-                                                          flag, i)
+                                                          flag, i, plot=True)
         K2_amps.append(K2a)
         raw_amps.append(rawa)
         K2_Ps.append(K2P)
@@ -172,14 +181,14 @@ if __name__ == "__main__":
         fnames = glob.glob("../injections/*_lc.txt")
         name, true_p, true_a = np.genfromtxt("truth.txt").T
 
+    # The sip grid
     if flag == "r":
         ps = np.linspace(1., 50., 1000)
         fs = 1./ps
     elif flag == "a":
-        fs = np.linspace(2./4., 26., 1000)
+        fs = np.linspace(2./4., 26., 5000)
 
-#     amps = np.arange(.0, .001, .00005)  # 0 to 1000 ppm in steps of 50 ppm
-    # 10 to 1000 ppm, randomly drawn from a log-normal
+    # this is just a place holder, amps are random
     amps = 10**(np.linspace(np.log10(1e-5), np.log10(1e-3), 20))
 
     # for parallelisation, provide the starting and stopping indices

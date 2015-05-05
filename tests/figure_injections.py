@@ -19,6 +19,13 @@ plotpar = {'axes.labelsize': 20,
            'text.usetex': True}
 plt.rcParams.update(plotpar)
 
+def period2amp(period):
+    ps = 10**period * 24 * 3600
+    fHz = 1/ps
+    fuHz = fHz*1e6
+    amp = 860 * fuHz**-.71
+    return np.log10(amp)
+
 def histo(amps, Ps, namps, npers, allas, allps, fname, flag):
     amps *= 1e4  # convert to ppm
     allas *= 1e4
@@ -47,13 +54,14 @@ def histo(amps, Ps, namps, npers, allas, allps, fname, flag):
     X, Y = np.meshgrid(xedges, yedges)
     color = K2_hist.T/truth_hist.T * 100
     color[color==np.inf] = 0
-    print color
-#     assert 0
     cax = ax.pcolormesh(X, Y, color, cmap="Blues")
     ax.set_ylabel("$\log_{10}\mathrm{Amplitude~(ppm)}$")
     ax.set_xlabel("$\log_{10}\mathrm{Period~(days)}$")
     plt.colorbar(cax, label="$\mathrm{Completeness~(\%)}$")
     plt.subplots_adjust(bottom=.2)
+    plt.plot(np.sort(Ps), period2amp(np.sort(Ps)), color="#FF33CC",
+             linestyle="--")
+    plt.ylim(1, 3)
 #     plt.plot(Ps, amps, "k.")
 #     plt.plot(allps, allas, "r.", markersize=.5)
     plt.savefig("../injections/sine/%s_hist_%s.pdf" % (fname, flag))
