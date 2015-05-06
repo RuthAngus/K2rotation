@@ -3,6 +3,9 @@ import matplotlib.pyplot as plt
 import h5py
 import glob
 import fitsio
+from gatspy.periodic import LombScargle
+from scipy.signal import lombscargle
+from K2pgram import K2pgram
 
 """
 Fit all the light curves with the basis from c1 and then sample from those
@@ -79,6 +82,13 @@ def reconstruct_fake_lc(n):
     with h5py.File("../data/c1.h5", "r") as f:
         basis = f["basis"][:150]
 
+#     print np.shape(weights)
+#     plt.clf()
+#     plt.hist(weights[:, 0], 500)
+#     plt.xlim(-2, 2)
+#     plt.savefig("weight_hist")
+#     assert 0
+
     # generate 150 random numbers between 1 and the number of lcs
     # to select the weights.
     chosen_w = np.array([np.random.choice(weights[i]) for i in range(150)])
@@ -87,12 +97,31 @@ def reconstruct_fake_lc(n):
 
 if __name__ == "__main__":
 
-#     weights = fit_all_lcs()
-    nc1, nb = 21646, 150
+    nc1, nb = 21646, 150  # number of C1  targets, number of basis functions
+    fake_lc = reconstruct_fake_lc(nc1)
+
+    # load example star
+    path = "/export/bbq2/dfm/k2/web/lightcurves/c1/201100000/21000"
+    fname = "ktwo201121245-c01_lpd-lc.fits"
+    x, y, l = load_lc("%s/%s" % (path, fname))
+
+    # load basis
+    with h5py.File("../data/c1.h5", "r") as f:
+        basis = f["basis"][:150, l]
+
+    # compute SIP
+    fs = np.arange(.01, 10., .01)
+    amp2s, s2n, w = K2pgram(x, fake_lc[l], basis, fs)
 
     plt.clf()
-    for i in range(10):
-        print i
-        fake_lc = reconstruct_fake_lc(nc1)
-        plt.plot(fake_lc)
+    plt.subplot(3, 1, 1)
+    plt.plot(fake_lc)
+    plt.subplot(3, 1, 2)
+    plt.plot(fs, s2n)
+    plt.subplot(3, 1, 3)
+
+    # inject sinusoid
+    fake_lc[l] += np.sin(5*np.pi*2*x)
+    amp2s, s2n, w = K2pgram(x, fake_lc[l], basis, fs)
+    plt.plot(fs, s2n)
     plt.savefig("fake_lc")
