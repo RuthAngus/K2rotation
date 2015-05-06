@@ -16,7 +16,7 @@ weights
 3. fit_lc - fit the basis to one light curve and return the weights.
 4. fit_all_lcs - load file names, load data and fit all the light curves.
     Return a 2d array of weights.
-5. reconstruct_fake_lc - randomly sample 150 weight values from the 2d array
+5. reconstruct_fake_lc - randomly sample nb weight values from the 2d array
     and make a new fake light curve.
 """
 
@@ -44,18 +44,18 @@ def load_lc(fname):
     y -= 1
     return x, y, l
 
-def fit_lc(x, y, basis):
+def fit_lc(x, y, basis, nb):
     # construct arrays
-    AT = np.ones((151, len(y)))
+    AT = np.ones((nb+1, len(y)))
     AT[:-1, :] = basis
     ATA = np.dot(AT, AT.T)
     return np.linalg.solve(ATA, np.dot(AT, y))
 
-def fit_all_lcs():
+def fit_all_lcs(nb):
 
     # load basis
     with h5py.File("../data/c1.h5", "r") as f:
-        basis = f["basis"][:150]
+        basis = f["basis"][:nb]
 
     # generate list of all k2 lc filenames
     fnames = assemble_fnames()
@@ -64,7 +64,7 @@ def fit_all_lcs():
     weights = np.zeros((151, len(fnames)))
     for i, fname in enumerate(fnames):
         x, y, l = load_lc(fname)
-        weights[:, i] = fit_lc(x, y, basis.T[l].T)
+        weights[:, i] = fit_lc(x, y, basis.T[l].T, nb)
 
     # save the weights
     f = h5py.File("all_weights.h5", "w")
@@ -72,7 +72,7 @@ def fit_all_lcs():
     data[:, :] = weights[:, :]
     return weights
 
-def reconstruct_fake_lc(n):
+def reconstruct_fake_lc(n, nb):
 
     # load the weights
     with h5py.File("all_weights.h5", "r") as f:
@@ -80,25 +80,18 @@ def reconstruct_fake_lc(n):
 
     # load basis
     with h5py.File("../data/c1.h5", "r") as f:
-        basis = f["basis"][:150]
+        basis = f["basis"][:nb]
 
-#     print np.shape(weights)
-#     plt.clf()
-#     plt.hist(weights[:, 0], 500)
-#     plt.xlim(-2, 2)
-#     plt.savefig("weight_hist")
-#     assert 0
-
-    # generate 150 random numbers between 1 and the number of lcs
+    # generate nb random numbers between 1 and the number of lcs
     # to select the weights.
-    chosen_w = np.array([np.random.choice(weights[i]) for i in range(150)])
+    chosen_w = np.array([np.random.choice(weights[i]) for i in range(nb)])
     fake_lc = np.sum(basis.T * chosen_w, axis=1)
     return fake_lc
 
 if __name__ == "__main__":
 
     nc1, nb = 21646, 150  # number of C1  targets, number of basis functions
-    fake_lc = reconstruct_fake_lc(nc1)
+    fake_lc = reconstruct_fake_lc(nc1, nb)
 
     # load example star
     path = "/export/bbq2/dfm/k2/web/lightcurves/c1/201100000/21000"
@@ -107,7 +100,7 @@ if __name__ == "__main__":
 
     # load basis
     with h5py.File("../data/c1.h5", "r") as f:
-        basis = f["basis"][:150, l]
+        basis = f["basis"][:nb, l]
 
     # compute SIP
     fs = np.arange(.01, 10., .01)
