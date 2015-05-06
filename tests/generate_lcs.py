@@ -5,6 +5,7 @@ from mklc import mklc
 import fitsio
 import h5py
 from K2pgram import K2pgram
+from fit_all_the_light_curves import load_lc
 
 def inject_star_spots(raw_x, periods):
     amps = []
@@ -34,19 +35,10 @@ def inject_sine_wave(raw_x, periods, flag):
 
 if __name__ == "__main__":
 
-    fnames = [201310650, 201311700, 201311941]
-    fname = fnames[-1]
-
-    # load K2 light curve
-    data = fitsio.read("../data/c1/ktwo%s-c01_lpd-lc.fits" % fname)
-    aps = fitsio.read("../data/c1/ktwo%s-c01_lpd-lc.fits" % fname, 2)
-    raw_y = data["flux"][:, np.argmin(aps["cdpp6"])]
-    raw_x = data["time"]
-    q = data["quality"]
-    l = np.isfinite(raw_y) * np.isfinite(raw_x) * (q==0)
-    raw_y, raw_x = raw_y[l], raw_x[l]
-    raw_y /= np.median(raw_y)
-    raw_y -= 1
+    # load example star to get time array
+    path = "/export/bbq2/dfm/k2/web/lightcurves/c1/201100000/21000"
+    fname = "ktwo201121245-c01_lpd-lc.fits"
+    raw_x, y, l = load_lc("%s/%s" % (path, fname))
 
     # load basis
     with h5py.File("../data/c1.h5", "r") as f:

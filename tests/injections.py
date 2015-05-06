@@ -10,6 +10,7 @@ from K2pgram import K2pgram, eval_freq
 from gatspy.periodic import LombScargle
 import glob
 import sys
+from fit_all_the_light_curves import load_lc, reconstruct_fake_lc
 
 plotpar = {'axes.labelsize': 20,
            'text.fontsize': 20,
@@ -159,19 +160,12 @@ def grid_over_periods(basis, raw_x, raw_y, true_p, fs, true_a, fnames, flag):
 
 if __name__ == "__main__":
 
-#     fname = 201295312
-    fname = 201311941
+    # load example star
+    path = "/export/bbq2/dfm/k2/web/lightcurves/c1/201100000/21000"
+    fname = "ktwo201121245-c01_lpd-lc.fits"
+    raw_x, y, l = load_lc("%s/%s" % (path, fname))
 
-    # load K2 light curve
-    data = fitsio.read("../data/c1/ktwo%s-c01_lpd-lc.fits" % fname)
-    aps = fitsio.read("../data/c1/ktwo%s-c01_lpd-lc.fits" % fname, 2)
-    raw_y = data["flux"][:, np.argmin(aps["cdpp6"])]
-    raw_x = data["time"]
-    q = data["quality"]
-    l = np.isfinite(raw_y) * np.isfinite(raw_x) * (q==0)
-    raw_y, raw_x = raw_y[l], raw_x[l]
-    raw_y /= np.median(raw_y)
-    raw_y -= 1
+    raw_y = reconstruct_fake_lc()
 
     # load basis
     with h5py.File("../data/c1.h5", "r") as f:

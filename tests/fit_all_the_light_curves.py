@@ -72,7 +72,7 @@ def fit_all_lcs(nb):
     data[:, :] = weights[:, :]
     return weights
 
-def reconstruct_fake_lc(n, nb):
+def reconstruct_fake_lc(n=21646, nb=150):
 
     # load the weights
     with h5py.File("all_weights.h5", "r") as f:
@@ -95,10 +95,9 @@ if __name__ == "__main__":
     producing an SIP.
     """
 
-    nc1, nb = 21646, 150  # number of C1  targets, number of basis functions
-    fake_lc = reconstruct_fake_lc(nc1, nb)
+    fake_lc = reconstruct_fake_lc()
 
-    # load example star
+    # load example star to get time array
     path = "/export/bbq2/dfm/k2/web/lightcurves/c1/201100000/21000"
     fname = "ktwo201121245-c01_lpd-lc.fits"
     x, y, l = load_lc("%s/%s" % (path, fname))
