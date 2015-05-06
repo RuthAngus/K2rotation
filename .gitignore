@@ -1,6 +1,5 @@
 *.fits
 *.pyc
-*.h5
 *.txt
 *.png
 *.pdf
