@@ -87,32 +87,23 @@ def grid_over_amps(basis, flux, raw_x, raw_y, truth, fs, amps, true_a,
             rawa.append(a)
 
         if plot:
-            if s == 0:
-                plt.clf()
-                plt.subplot(2, 1, 1)
-                plt.plot(raw_x, y, "k.")
-                plt.plot(raw_x, fx, color="g")
-                plt.title("$\mathrm{Amp = %s, P = %.3f}$" % (a, (1./tf)))
-                plt.subplot(2, 1, 2)
-#                     plt.axvline(1./tf, color="k", linestyle="--")
-#                     plt.axvspan(1./tf-1./threshold*1./tf, 1./tf+1./threshold*1./tf,
-#                                 color="k", alpha=.4)
-                plt.axvline(tf, color="k", linestyle="--")
-                plt.axvspan(tf-threshold*tf, tf+threshold*tf,
-                            color="k", alpha=.4)
-    #             plt.axhline(threshold, color=".7")
-                c = "b"
-                if s == 1:
-                    c = "m"
-#                     plt.plot(1./fs, pgram, color=c,
-                plt.plot(fs, pgram, color=c,
-                         label="$\mathrm{K2pgram$}")
-                plt.savefig("../injections/sine/%s_%s_result_%s"
-                            % (str(n).zfill(2), str(i).zfill(2), flag))
-                # n is the period index, i is the amplitude index
-                print "%s_%s_result_%s" % (str(n).zfill(2), str(i).zfill(2),
-                                           flag)
-#             assert 0
+            plt.clf()
+            plt.subplot(2, 1, 1)
+            plt.plot(raw_x, y, "k.")
+            plt.plot(raw_x, fx, color="g")
+            plt.title("$\mathrm{Amp = %s, P = %.3f}$" % (a, (1./tf)))
+            plt.subplot(2, 1, 2)
+            plt.axvline(tf, color="k", linestyle="--")
+            c = "b"
+            if s == 1:
+                c = "m"
+            plt.plot(fs, pgram, color=c,
+                     label="$\mathrm{K2pgram$}")
+            plt.savefig("../injections/sine/%s_%s_result_%s"
+                        % (str(n).zfill(2), str(i).zfill(2), flag))
+            # n is the period index, i is the amplitude index
+            print "%s_%s_result_%s" % (str(n).zfill(2), str(i).zfill(2),
+                                       flag)
     return np.array(K2a), np.array(K2P), np.array(rawa), np.array(rawP), \
             np.array(alla), np.array(allp)
 
@@ -127,7 +118,7 @@ def grid_over_periods(basis, raw_x, raw_y, true_p, fs, true_a, fnames, flag):
         K2a, K2P, rawa, rawP, alla, allp = grid_over_amps(basis, flux, raw_x,
                                                           raw_y, true_p[i], fs,
                                                           amps, true_a[i],
-                                                          flag, i, plot=True)
+                                                          flag, i)
         K2_amps.append(K2a)
         raw_amps.append(rawa)
         K2_Ps.append(K2P)
@@ -165,7 +156,7 @@ if __name__ == "__main__":
     fname = "ktwo201121245-c01_lpd-lc.fits"
     raw_x, y, l = load_lc("%s/%s" % (path, fname))
 
-    raw_y = reconstruct_fake_lc()
+    raw_y = reconstruct_fake_lc()[l]
 
     # load basis
     with h5py.File("../data/c1.h5", "r") as f:
