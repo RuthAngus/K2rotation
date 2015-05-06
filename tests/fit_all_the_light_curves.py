@@ -90,6 +90,11 @@ def reconstruct_fake_lc(n, nb):
 
 if __name__ == "__main__":
 
+    """
+    Test by generating a fake light curve, injecting a sinusoid and
+    producing an SIP.
+    """
+
     nc1, nb = 21646, 150  # number of C1  targets, number of basis functions
     fake_lc = reconstruct_fake_lc(nc1, nb)
 
