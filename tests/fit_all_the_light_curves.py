@@ -102,6 +102,7 @@ if __name__ == "__main__":
     fname = "ktwo201121245-c01_lpd-lc.fits"
     x, y, l = load_lc("%s/%s" % (path, fname))
 
+    nb = 150
     # load basis
     with h5py.File("../data/c1.h5", "r") as f:
         basis = f["basis"][:nb, l]
