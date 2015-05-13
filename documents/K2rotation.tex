@@ -356,10 +356,19 @@ Figure \ref{fig:top5} shows the 5 ELCs with the highest weights for this star.
 Most of these ELCs vary on timescales close to 10 days.
 The light curve of EPIC 201317002 is therefore easily described by the ELCs
 alone, without the need for an additional sinusoidal signal.
-In fact, many of the ELCs have dominant sinusoidal variation, with periods
-of a few days (the cause of this is still unclear).
+In fact, many of the ELCs show dominant sinusoidal variation, with periods
+of a few days.
 For this reason the SIP method is not as well suited to stellar rotation as it
 is to asteroseismology, which is concerned with higher frequency signals.
+It may be possible to improve the performance of the SIP algorithm for low
+frequency signals by using regularization.
+This would prevent ELCs that are low-weighted when generated from the
+ensemble of light curves from being weighted high in individual light curve
+cases.
+Since we are satisfied with the capabilities of the SIP when applied to
+asteroseismology, we leave further adaptations which might optimize the
+algorithm for rotation period studies for future work.
+
 In order to thoroughly test the advantages and shortcomings of the SIP method
 for measuring stellar rotation periods, it would be beneficial to inject
 sinusoids into raw {\it K2} light curves, then to detrend them using, for
@@ -417,17 +426,16 @@ The SIP method is highly successful for campaign 1 targets where the large
 number of stars, observed for a baseline of 80 days ensures that most of the
 systematics are captured in the ELCs and we anticipate that it will
 be equally effective for the up-and-coming campaigns.
-It is not, however, suitable for campaign 0 light curves, where the reduced
-observational baseline means that the systematics are not fully captured by the
-top 150 ELCs.
 
 The successes of the SIP method are most apparent in the high frequency regime,
 particularly in the region of frequency space relevent to the study of
-asteroseismic oscillations in giant stars.
-It performs well for signals with periods between $\sim$ 1 hour and $\sim$
-2 days, however it is not well optimised for measuring longer periods, due to
-the fact that many ELCs are dominated by periodic variations on the same
-timescales as the rotation periods.
+asteroseismic oscillations in giant stars and for any signals with a timescale
+close to 6 hours.
+The method it is not currently well optimized for measuring longer periods,
+due to the fact that many ELCs are dominated by periodic variations on the
+same timescales as the rotation periods.
+A regularized version of the SIP algorithm may improve performance for
+measuring stellar rotation periods.
 
 \begin{figure*}
 \begin{center}
