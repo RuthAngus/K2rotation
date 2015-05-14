@@ -41,7 +41,8 @@ Cambridge, MA, USA}
 
 % Aims
 From pulsating stars to transiting exoplanets, the search for periodic signals
-in {\it K2} data is relevent to a long list of scientific goals.
+in {\it K2} data, {\it Kepler's} 2-wheeled extention, is relevent to a long
+list of scientific goals.
 Systematics affecting {\it K2} light curves due to the decreased
 spacecraft pointing precision inhibit the easy extraction of periodic signals
 from the data.
@@ -56,12 +57,13 @@ We extend this principle by including systematic trends, based on a set of
 model as well as a sum of sine and cosine functions over a grid of
 frequencies.
 % Results
-Using this method we are able to produce periodograms, free from
+Using this method we are able to produce periodograms with vastly reduced
 systematic features.
 The quality of the resulting periodograms at short periods are such that we
 can recover acoustic oscillations in giants and detect variable stars,
 eclipsing binaries and short-period exoplanet candidates without the need for
 any detrending.
+The SIP code is available at https://github.com/RuthAngus/SIPK2.
 
 \end{abstract}
 
@@ -98,8 +100,8 @@ Any physical processes with characteristic timescales of order
 6 hours; asteroseimic oscillations in giants and short period
 exoplanets, for example, therefore need to be treated extremely carefully.
 A detrending method for {\it K2} light curves, specifically intended for the
-asteroseismic analysis of giant stars is being developed by Lund {\it et al.}
-(in prep.), in which the systematics due to roll are corrected, again on
+asteroseismic analysis of giant stars has been developed by \citet{Lund2015},
+in which the systematics due to roll are corrected, again on
 a star-by-star basis and any remaining periodic signals at 47 $\mu$Hz (6 hour
 period) or its harmonics are removed by prewhitening.
 The method developed here, the Systematics-Insenstive Periodogram (SIP)
@@ -181,6 +183,16 @@ even AGN.
 The development of tools for extracting periodic information from {\it K2}
 data is essential if it is to be as revolutionary in time-domain
 astronomy as the original {\it Kepler} mission was.
+
+In \textsection\ref{sec:Method} we outline the method behind the SIP and
+provide the results of some simple tests which show exactly {\it how}
+`insensitive' the SIP is to systematic features.
+Next, we apply the SIP to real {\it K2} light curves in
+\textsection\ref{section:rotation}, using some giant asteroseismic pulsators as
+test cases.
+We also demonstrate the SIP's usefulness regarding other periodically varying
+objects in this section, before presenting our conclusions in
+\textsection\ref{sec:conclusions}.
 
 \section{Method}
 \label{sec:Method}
@@ -305,7 +317,7 @@ $\sim$ 47 \uHz\ have a large power.
 The SIP method is able to consistently remove the 47 \uHz signal which is
 present in almost every VJ14 light curve.
 
-\subsection{Application to real light curves: results and discussion}
+\section{Application to real light curves: results and discussion}
 \label{section:rotation}
 
 An example LS periodogram of the raw {\it K2} photometry
@@ -381,10 +393,11 @@ In practise, the ACF method is likely to perform just as well if not better
 than the SIP method for stars that show relatively high-amplitude variability.
 Whilst the SIP method may outperform ACF in the low signal-to-noise cases,
 any `marginal' rotation period measurements calculated using either method
-should be treated with caution unless a representative uncertainty is provided.
-In general, neither ACF nor periodogram methods are equipped to provide such
-uncertainties and as such, performing ACF on detrended light curves is likely
-to provide sufficient results for stellar rotation.
+should be treated with caution unless a representative uncertainty is provided,
+however, in general neither ACF nor periodogram methods are equipped to provide
+such uncertainties.
+In practise, we recommend using both the SIP and ACF methods to measure
+rotation periods for {\it K2} stars.
 
 Figures \ref{fig:RRLyrae} and \ref{fig:EB} show the conditioned light curves
 and SIPs of an RR Lyrae star, selected from Guest observing program GO1018 and
@@ -414,6 +427,7 @@ with the density or surface gravity of a star, for example, the mean excess
 power at frequencies near those relevent to granulation timescales.
 
 \section{Conclusions}
+\label{sec:conclusions}
 We demonstrate that modelling campaign 1 {\it K2} photometry as a linear
 combination of 150 PCA components plus a sinusoid can produce beautiful
 periodograms without the need for detrending.
@@ -426,16 +440,18 @@ The SIP method is highly successful for campaign 1 targets where the large
 number of stars, observed for a baseline of 80 days ensures that most of the
 systematics are captured in the ELCs and we anticipate that it will
 be equally effective for the up-and-coming campaigns.
+The SIP code is available for public use and can be found at
+https://github.com/RuthAngus/SIPK2.
 
 The successes of the SIP method are most apparent in the high frequency regime,
 particularly in the region of frequency space relevent to the study of
 asteroseismic oscillations in giant stars and for any signals with a timescale
 close to 6 hours.
-The method it is not currently well optimized for measuring longer periods,
-due to the fact that many ELCs are dominated by periodic variations on the
-same timescales as the rotation periods.
-A regularized version of the SIP algorithm may improve performance for
-measuring stellar rotation periods.
+The method it is not currently well optimized for measuring rotation periods,
+due to the fact that many ELCs are dominated by periodic variations on
+timescales of a few days.
+In the future, a regularized version of the SIP algorithm may be developed in
+order to improve performance for stellar rotation period measurement.
 
 \begin{figure*}
 \begin{center}

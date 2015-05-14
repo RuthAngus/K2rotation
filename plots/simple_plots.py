@@ -81,7 +81,7 @@ def demo(epids, demo):
         plt.ylim(0, max(s2n)+.2*max(s2n))
         plt.axvline(mx, color=".5", linestyle="--",
                     label="$%.2f\mathrm{~days}$" % mx)
-        plt.legend()
+        plt.legend(loc="best")
         plt.plot(ps, s2n, "k")
         plt.subplots_adjust(hspace=.3, left=.2)
         plt.savefig("../documents/%s_%s.pdf" % (demo, fname))
