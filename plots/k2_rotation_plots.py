@@ -95,6 +95,14 @@ def plot_best(x, y, fs, AT, ATA, mx):
 
 def K2_poster_child_plot(x, y, fs, s2n, epid):
 
+    plotpar = {'axes.labelsize': 16,
+               'text.fontsize': 16,
+               'legend.fontsize': 16,
+               'xtick.labelsize': 14,
+               'ytick.labelsize': 16,
+               'text.usetex': True}
+    plt.rcParams.update(plotpar)
+
     # find highest peak
     mx, my = max_peak_detect(fs, s2n)
     print my
@@ -201,14 +209,6 @@ def top_5(x, basis, w):
     plt.savefig("../documents/%s_top5.pdf" % epid)
 
 if __name__ == "__main__":
-
-    plotpar = {'axes.labelsize': 16,
-               'text.fontsize': 16,
-               'legend.fontsize': 16,
-               'xtick.labelsize': 14,
-               'ytick.labelsize': 16,
-               'text.usetex': True}
-    plt.rcParams.update(plotpar)
 
     epid = "201317002"
     # epid = "201372313"

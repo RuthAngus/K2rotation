@@ -33,6 +33,15 @@ def max_peak_detect(x, y):
 x, y, _ = np.genfromtxt("../data/ep201317002.csv", delimiter=",").T
 
 def p_child_plot(x, y, eid):
+
+    plotpar = {'axes.labelsize': 15,
+               'text.fontsize': 15,
+               'legend.fontsize': 15,
+               'xtick.labelsize': 15,
+               'ytick.labelsize': 15,
+               'text.usetex': True}
+    plt.rcParams.update(plotpar)
+
     y = y/np.median(y) - 1
 
     # compute acf
@@ -85,14 +94,6 @@ def p_child_plot(x, y, eid):
     return acfx, px
 
 if __name__ == "__main__":
-
-    plotpar = {'axes.labelsize': 15,
-               'text.fontsize': 15,
-               'legend.fontsize': 15,
-               'xtick.labelsize': 15,
-               'ytick.labelsize': 15,
-               'text.usetex': True}
-    plt.rcParams.update(plotpar)
 
     eid = "201317002"
     x, y, _ = np.genfromtxt("../data/c1/ep%s.csv" % eid, delimiter=",").T
