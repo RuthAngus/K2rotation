@@ -11,10 +11,23 @@ from K2pgram import K2pgram, eval_freq
 from rotation_poster_child import max_peak_detect
 import h5py
 from gatspy.periodic import LombScargle
+import wget
+import subprocess
 
 def read_data(epid, nbases):
     # read the data
-    data = fitsio.read("../data/c1/ktwo%s-c01_lpd-lc.fits" % epid)
+    try:
+        data = fitsio.read("../data/c1/ktwo%s-c01_lpd-lc.fits" % epid)
+    except:
+        e = str(int(epid))
+        base_url = "http://bbq.dfm.io/ketu/lightcurves/c1"
+        url = "%s/%s00000/%s000/ktwo%s-c01_lpd-lc.fits" \
+                % (base_url, e[:4], e[4:6], e)
+        print url
+        wget.download(url)
+        subprocess.call("mv ktwo%s-c01_lpd-lc.fits ../data/c1" % epid,
+                        shell=True)
+        data = fitsio.read("../data/c1/ktwo%s-c01_lpd-lc.fits" % epid)
     aps = fitsio.read("../data/c1/ktwo%s-c01_lpd-lc.fits" % epid, 2)
     y = data["flux"][:, np.argmin(aps["cdpp6"])]
     x = data["time"]
@@ -107,6 +120,17 @@ def K2_poster_child_plot(x, y, fs, s2n, epid):
     mx, my = max_peak_detect(fs, s2n)
     print my
 
+    fname = "../data/c1/ktwo%s-c01_lpd-lc.fits" % epid
+    data = fitsio.read(fname)
+    aps = fitsio.read(fname, 2)
+    y = data["flux"][:, np.argmin(aps["cdpp6"])]
+    x = data["time"]
+    q = data["quality"]
+    l = np.isfinite(y) * np.isfinite(x) * (q==0)
+    y, x = y[l], x[l]
+    MAD = np.median(y - np.median(y))
+    print MAD
+
     plt.clf()
     plt.subplot(2, 1, 1)
     l = x < 2016
@@ -117,9 +141,10 @@ def K2_poster_child_plot(x, y, fs, s2n, epid):
     plt.ylabel("$\mathrm{Normalized~Flux}$")
 
     plt.subplot(2, 1, 2)
-    plt.plot(fs, s2n*1e5, "k")
+    if MAD == 0.: MAD = 1
+    plt.plot(fs, s2n/MAD**2*1e5, "k")
     plt.xlabel("$\mathrm{Frequency~(days}^{-1}\mathrm{)}$")
-    plt.ylabel("$\mathrm{S/N~(} \\times 10^5\mathrm{)}$")
+    plt.ylabel("$\mathrm{Relative~S/N~(} \\times 10^5\mathrm{)}$")
     plt.ylim(0, my*1e5)
     plt.subplots_adjust(hspace=.4)
     plt.axvline(mx, color=".5", linestyle="--",
@@ -211,6 +236,7 @@ def top_5(x, basis, w):
 if __name__ == "__main__":
 
     epid = "201317002"
+    epid = "201129544"
     # epid = "201372313"
     # epid = "201310077"
     # epid = "201315808"
@@ -218,7 +244,7 @@ if __name__ == "__main__":
     # epid = "201318479"
     # epid = "201310768"
 
-    x, y, basis = read_data(epid, 200)
+    x, y, basis = read_data(epid, 150)
 
     # compute K2 pgram
     try:
@@ -226,9 +252,9 @@ if __name__ == "__main__":
         print "periodogram file found"
     except:
         fs = np.linspace(1e-6, .7, 1000)
+        amp2s, s2n, w  = K2pgram(x, y, basis, fs)
         np.savetxt("%spgram.txt" % epid, np.transpose((fs, s2n)))
-    amp2s, s2n, w  = K2pgram(x, y, basis, fs)
 
-    K2_poster_child_plot(x, y, fs, amp2s, epid)
+    K2_poster_child_plot(x, y, fs, s2n, epid)
 #     top_5(x, basis, w)
 #     K2_conditioned_plot(fs, epid)

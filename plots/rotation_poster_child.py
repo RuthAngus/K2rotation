@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import emcee
 from gatspy.periodic import LombScargle
 import scipy.signal as sps
+import subprocess
 
 def acf_peak_detect(x, y):
     x, y = x[50:], y[50:]
@@ -30,15 +31,15 @@ def max_peak_detect(x, y):
         return 0, 0
 
 # load poster child light curve
-x, y, _ = np.genfromtxt("../data/ep201317002.csv", delimiter=",").T
+# x, y, _ = np.genfromtxt("../data/ep201317002.csv", delimiter=",").T
 
 def p_child_plot(x, y, eid):
 
     plotpar = {'axes.labelsize': 15,
                'text.fontsize': 15,
                'legend.fontsize': 15,
-               'xtick.labelsize': 15,
-               'ytick.labelsize': 15,
+               'xtick.labelsize': 12,
+               'ytick.labelsize': 12,
                'text.usetex': True}
     plt.rcParams.update(plotpar)
 
@@ -90,11 +91,19 @@ def p_child_plot(x, y, eid):
     plt.legend()
     plt.subplots_adjust(hspace=.4)
 #     plt.savefig("vbg_%s" % eid)
-    plt.savefig("../documents/rotation_poster_child.pdf")
+#     plt.savefig("../documents/rotation_poster_child.pdf")
+    plt.savefig("../documents/rotation%s.pdf" % eid)
     return acfx, px
 
 if __name__ == "__main__":
 
-    eid = "201317002"
-    x, y, _ = np.genfromtxt("../data/c1/ep%s.csv" % eid, delimiter=",").T
+#     eid = "201317002"
+    eid = "201129544"
+    try:
+        x, y, _ = np.genfromtxt("../data/c1/ep%s.csv" % eid, delimiter=",").T
+    except:
+        print "copying data"
+        print "cp /Users/angusr/data/K2/c1lcsr4/ep%s.csv ../data/c1" % eid
+        subprocess.call("cp /Users/angusr/data/K2/c1lcsr4/ep%s.csv ../data/c1"
+                        % eid, shell=True)
     p_child_plot(x, y, eid)

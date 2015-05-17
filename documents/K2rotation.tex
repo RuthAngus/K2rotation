@@ -272,21 +272,21 @@ $\mathbf{w}$ is
 \begin{equation}
 	\mathbf{w_k}^* \gets (\mathbf{A}^T\mathbf{A})^{-1}\mathbf{A}^T\mathbf{f_k}.
 \end{equation}
-% and the sum of the last two elements of $\mathbf{w}_k$, squared, provides the
-% power of the signal at a given frequency.
-% This operation is performed over a grid of frequencies to produce a power
-% spectrum.
-% We then calculate the signal-to-noise ratio (S/N) frequency by comparing the
-% power at each frequency to a robust estimate of the variance in power across
-% all frequencies.
-We then calculate the signal-to-noise ratio (S/N) by computing
-the amplitude of the last two elements in the weight vector,
-divided by the marginalized uncertainty on the amplitude.
-This operation is performed over a grid of frequencies to produce an
-SIP\footnote{The code used in this project can be found at
-https://github.com/RuthAngus/SIPK2.}.
-% In practise, the S/N, rather than the power is plotted against frequency to
-% produce an SIP
+Under this linear model with Gaussian uncertainties, the marginalized
+likelihood for the periodic amplitude is a two-dimensional Gaussian with mean
+given by the last two elements ($\mathbf{a}$) of $\mathbf{w}*$ and covariance
+given by the bottom right two-by-two block ($\mathbf{S_a}$) of
+$(\mathbf{A}^T \mathbf{C}^{-1} \mathbf{A})^{-1}$, where the $\mathbf{C}$
+matrix contains observational uncertainties on the diagonal.
+These uncertainties are estimated as $1.48 \times$ the Median Absolute
+Deviation (MAD), following \citet{Aigrain2015}.
+Therefore, the signal-to-noise ratio, $S/N$ of the amplitude measurement is
+$\sqrt{\mathbf{a}^T \mathbf{S_a}^{-1} \mathbf{a}}$.
+The $(S/N)^2$ is calculated over a grid of frequencies to produce an
+SIP.
+The $(S/N)$ operation takes into account the goodness of fit, i.e. if the
+amplitude of the sinusoid at a given frequency is not well constrained,
+it is penalized.
 
 \subsection{Tests}
 
@@ -452,6 +452,19 @@ due to the fact that many ELCs are dominated by periodic variations on
 timescales of a few days.
 In the future, a regularized version of the SIP algorithm may be developed in
 order to improve performance for stellar rotation period measurement.
+
+It is a pleasure to thank Andrew Vanderburg (Harvard) and Ben Montet (Harvard)
+for their extremely helpful suggestions and recommendations regarding this
+project.
+The data presented in this paper were obtained from the Mikulski Archive for
+Space Telescopes (MAST).
+STScI is operated by the Association of Universities for Research in Astronomy,
+Inc., under NASA contract NAS5-26555.
+Support for MAST for non-HST data is provided by the NASA Office of Space
+Science via grant NNX09AF08G and by other grants and contracts.
+This paper includes data collected by the Kepler mission.
+Funding for the Kepler mission is provided by the NASA Science Mission
+directorate.
 
 \begin{figure*}
 \begin{center}

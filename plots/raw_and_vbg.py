@@ -5,11 +5,11 @@ import fitsio
 
 def raw_and_vbg():
 
-    plotpar = {'axes.labelsize': 14,
+    plotpar = {'axes.labelsize': 12,
                'text.fontsize': 18,
                'legend.fontsize': 18,
                'xtick.labelsize': 14,
-               'ytick.labelsize': 16,
+               'ytick.labelsize': 14,
                'text.usetex': True}
     plt.rcParams.update(plotpar)
 
@@ -25,6 +25,7 @@ def raw_and_vbg():
     q = data["quality"]
     l = np.isfinite(y) * np.isfinite(x) * (q==0)
     y, x = y[l], x[l]
+    MAD = np.median(y - np.median(y))
     y /= np.median(y)
     y -= 1
     x *= 24*3600  # convert to seconds
@@ -75,14 +76,14 @@ def raw_and_vbg():
     fs, s2n = np.genfromtxt("../astero/%sastero_pgram.txt"
                             % str(int(eid))).T
     ax3 = fig.add_subplot(313)
-    plt.plot(fs[::3], s2n[::3]*10e4, "k")
+    if MAD == 0.: MAD = 1.
+    plt.plot(fs[::3], s2n[::3]*10e4/MAD**2, "k")
     ax3.set_xlim(10, 280)
-    plt.ylabel("$\mathrm{S/N~(} \\times 10^{-4}\mathrm{)}$")
+    plt.ylabel("$\mathrm{Relative~(S/N)}^2\mathrm{~(} \\times 10^{-4}\mathrm{)}$")
     plt.xlabel("$\\nu\mathrm{~(}\mu\mathrm{Hz)}$")
     fig.subplots_adjust(hspace=0, bottom=.1)
-    ticks = ax3.get_yticks()
-    print ticks
-    ax3.set_yticks(ticks[1:-1])
+#     ticks = ax3.get_yticks()
+#     ax3.set_yticks(ticks[1:-1])
     plt.savefig("../documents/rawvbg_%s.pdf" % eid)
 
 if __name__ == "__main__":
