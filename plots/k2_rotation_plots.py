@@ -145,7 +145,7 @@ def K2_poster_child_plot(x, y, fs, s2n, epid):
     plt.plot(fs, s2n/MAD**2*1e5, "k")
     plt.xlabel("$\mathrm{Frequency~(days}^{-1}\mathrm{)}$")
     plt.ylabel("$\mathrm{Relative~S/N~(} \\times 10^5\mathrm{)}$")
-    plt.ylim(0, my*1e5)
+#     plt.ylim(0, my*1e5)
     plt.subplots_adjust(hspace=.4)
     plt.axvline(mx, color=".5", linestyle="--",
                 label="$P_{rot}=%.2f ~\mathrm{days}$" % (1./mx))
@@ -235,26 +235,26 @@ def top_5(x, basis, w):
 
 if __name__ == "__main__":
 
-    epid = "201317002"
-    epid = "201129544"
-    # epid = "201372313"
-    # epid = "201310077"
-    # epid = "201315808"
-    # epid = "201370145"
-    # epid = "201318479"
-    # epid = "201310768"
+    epid = "201317002"  # original
+    epid = "201129544"  # slight discrepancy between ACF and pgrams
+    epid = "201132518"
+    eids = [201129544, 201132518, 201133037, 201133147, 201135311, 201138638,
+            201138849, 201142023, 201142127]
+    eids = [201133037]
 
-    x, y, basis = read_data(epid, 150)
+    for epid in eids:
+        x, y, basis = read_data(epid, 150)
 
-    # compute K2 pgram
-    try:
-        fs, s2n = np.genfromtxt("%spgram.txt" % epid).T
-        print "periodogram file found"
-    except:
-        fs = np.linspace(1e-6, .7, 1000)
-        amp2s, s2n, w  = K2pgram(x, y, basis, fs)
-        np.savetxt("%spgram.txt" % epid, np.transpose((fs, s2n)))
+        # compute K2 pgram
+        try:
+            fs, s2n, w = np.genfromtxt("%spgram.txt" % epid).T
+            print "periodogram file found"
+        except:
+            print "calculating SIP"
+            fs = np.linspace(1e-6, .7, 1000)
+            amp2s, s2n, w  = K2pgram(x, y, basis, fs)
+            np.savetxt("%spgram.txt" % epid, np.transpose((fs, s2n)))
 
-    K2_poster_child_plot(x, y, fs, s2n, epid)
-#     top_5(x, basis, w)
-#     K2_conditioned_plot(fs, epid)
+#         K2_poster_child_plot(x, y, fs, s2n, epid)
+        top_5(x, basis, w)
+    #     K2_conditioned_plot(fs, epid)

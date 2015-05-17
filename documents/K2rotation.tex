@@ -26,7 +26,7 @@
    Daniel Foreman-Mackey\altaffilmark{\nyu},
    John A. Johnson\altaffilmark{\cfa},
    Daniel Huber\altaffilmark{\sydney,\seti,\aarhus}
-   David W. Hogg\altaffilmark{\nyu}
+   and David W. Hogg\altaffilmark{\nyu}
 }
 
 \altaffiltext{\oxford}{Subdepartment of Astrophysics, University of Oxford, OX1 3RH, UK}
@@ -63,6 +63,8 @@ The quality of the resulting periodograms at short periods are such that we
 can recover acoustic oscillations in giants and detect variable stars,
 eclipsing binaries and short-period exoplanet candidates without the need for
 any detrending.
+The SIP method is also suited to measuring stellar rotation periods, despite
+the fact that long-term systematics exist on similar timescales.
 The SIP code is available at https://github.com/RuthAngus/SIPK2.
 
 \end{abstract}
@@ -350,41 +352,27 @@ Figures \ref{fig:1} to \ref{fig:6} show example power spectra of 6 targets for
 which we detect pulsations using this method.
 
 The top panel of figure \ref{fig:rotation_poster_child} shows the light curve
-of an active, rotating star, EP201317002.
+of an active, rotating star, EPIC 201317002.
+The brightness fluctuations clearly visible in the light curve of this
+target are produced by active regions rotating with the stellar surface,
+reducing the stellar flux periodically.
+The rotation period of this star is therefore around 20 days.
 This light curve has been detrended using the method of
 VJ14.
 The middle and bottom panels show an ACF and LS periodogram of the
 detrended light curve.
-% The highest peaks in both the ACF and periodogram are located at around 10
-% days.
 Figure \ref{fig:K2_rotation_poster_child} shows the raw light curve of the
 same target (top panel) with its SIP (bottom panel).
-% calculated by modeling the data as
-% a linear combination of ELCs and a sine and cosine function at a range of
-% frequencies.
-Each of these 3 methods measures a rotation period of around 10 days for this
+Each of these 3 methods measures a rotation period of around 20 days for this
 target.
-Figure \ref{fig:top5} shows the 5 ELCs with the highest weights for this star.
-Most of these ELCs vary on timescales close to 10 days.
-The light curve of EPIC 201317002 is therefore easily described by the ELCs
-alone, without the need for an additional sinusoidal signal.
-In fact, many of the ELCs show dominant sinusoidal variation, with periods
-of a few days.
-For this reason the SIP method is not as well suited to stellar rotation as it
-is to asteroseismology, which is concerned with higher frequency signals.
-It may be possible to improve the performance of the SIP algorithm for low
-frequency signals by using regularization.
-This would prevent ELCs that are low-weighted when generated from the
-ensemble of light curves from being weighted high in individual light curve
-cases.
-Since we are satisfied with the capabilities of the SIP when applied to
-asteroseismology, we leave further adaptations which might optimize the
-algorithm for rotation period studies for future work.
+This example demonstates the ability of the SIP to recover rotation periods
+that agree with those measured from detrended light curves by autocorrelation.
+% add some things about more tests?
 
 In order to thoroughly test the advantages and shortcomings of the SIP method
-for measuring stellar rotation periods, it would be beneficial to inject
-sinusoids into raw {\it K2} light curves, then to detrend them using, for
-example the VJ15 method and to attempt to recover signals using a LS
+for measuring stellar rotation periods, ideally we would inject
+sinusoids into raw {\it K2} light curves, detrend them using
+the VJ15 method (for example) and attempt to recover signals using a LS
 periodogram, or similar.
 However, it has been shown that the ACF method often performs better than
 periodogram methods for measuring stellar rotation periods
@@ -443,15 +431,15 @@ be equally effective for the up-and-coming campaigns.
 The SIP code is available for public use and can be found at
 https://github.com/RuthAngus/SIPK2.
 
-The successes of the SIP method are most apparent in the high frequency regime,
-particularly in the region of frequency space relevent to the study of
+We have demonstrated that the SIP method is capable of detecting periodicities
+in {\it K2} data in the region of frequency space relevent to the study of
 asteroseismic oscillations in giant stars and for any signals with a timescale
 close to 6 hours.
-The method it is not currently well optimized for measuring rotation periods,
-due to the fact that many ELCs are dominated by periodic variations on
-timescales of a few days.
-In the future, a regularized version of the SIP algorithm may be developed in
-order to improve performance for stellar rotation period measurement.
+The SIP is also effective at measuring stellar rotation periods and is an
+improvement upon a simple LS periodogram of detrended data.
+In practise, the best approach for measuring rotation periods in {\it K2} data
+is likely to be a combination of the SIP method and the ACF method, where
+autocorrelation is performed on detrended light curves.
 
 It is a pleasure to thank Andrew Vanderburg (Harvard) and Ben Montet (Harvard)
 for their extremely helpful suggestions and recommendations regarding this
@@ -511,34 +499,34 @@ directorate.
 
 \begin{figure*}
 \begin{center}
-\includegraphics[width=6in, clip=true]{rotation_poster_child.pdf}
-\caption{{\it Top}: Light curve of EPIC 201317002, detrended using the method
+\includegraphics[width=6in, clip=true]{rotation201133037.pdf}
+\caption{{\it Top}: Light curve of EPIC 201133037, detrended using the method
 of VJ14. {\it Middle}: Autocorrelation function of the
 detrended light curve. The autocorrelation function method measures a rotation
-period of 8.77 days for this star. {\it Bottom}: The LS periodogram
+period of 20.33 days for this star. {\it Bottom}: The LS periodogram
 of the detrended light curve. The highest peak in the periodogram is centred at
-10.52 days.}
+24.27 days.}
 \label{fig:rotation_poster_child}
 \end{center}
 \end{figure*}
 
 \begin{figure*}
 \begin{center}
-\includegraphics[width=6in, clip=true]{K2_rotation_201317002.pdf}
-\caption{{\it Top}: Raw light curve of EPIC 201317002. {\it Bottom}: A
+\includegraphics[width=6in, clip=true]{K2_rotation_201133037.pdf}
+\caption{{\it Top}: Raw light curve of EPIC 201133037. {\it Bottom}: A
 periodogram produced by modelling the data using the top 150 ELCs
 plus a sine and cosine function at a range of frequencies. The highest peak in
-the periodogram is centred at 10.34 days.}
+the periodogram is centred at 24.61 days.}
 \label{fig:K2_rotation_poster_child}
 \end{center}
 \end{figure*}
 
 \begin{figure*}
 \begin{center}
-\includegraphics[width=6in, clip=true]{201317002_top5.pdf}
-\caption{The 5 highest-weighted ELCs for EPIC 201317002. At least 3 of these
+\includegraphics[width=6in, clip=true]{201133037_top5.pdf}
+\caption{The 5 highest-weighted ELCs for EPIC 201133037. At least 3 of these
 	ELCs show sinusoidal variability with a $\sim$ 10 day period.
-	The light curve of EPIC 201317002 is therefore easily described by the
+	The light curve of EPIC 201133037 is therefore easily described by the
 	ELCs alone, without the additional sinusoid model.
 	This illustrates the difficulty in measuring rotation periods using the
 	SIP method.}

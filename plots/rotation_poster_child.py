@@ -92,18 +92,25 @@ def p_child_plot(x, y, eid):
     plt.subplots_adjust(hspace=.4)
 #     plt.savefig("vbg_%s" % eid)
 #     plt.savefig("../documents/rotation_poster_child.pdf")
+    print "../documents/rotation%s.pdf" % eid
     plt.savefig("../documents/rotation%s.pdf" % eid)
     return acfx, px
 
 if __name__ == "__main__":
 
 #     eid = "201317002"
-    eid = "201129544"
-    try:
-        x, y, _ = np.genfromtxt("../data/c1/ep%s.csv" % eid, delimiter=",").T
-    except:
-        print "copying data"
-        print "cp /Users/angusr/data/K2/c1lcsr4/ep%s.csv ../data/c1" % eid
-        subprocess.call("cp /Users/angusr/data/K2/c1lcsr4/ep%s.csv ../data/c1"
-                        % eid, shell=True)
-    p_child_plot(x, y, eid)
+#     eid = "201129544"
+#     eid = "201132518"
+    eids = [201129544, 201132518, 201133037, 201133147, 201135311, 201138638,
+            201138849, 201142023, 201142127]
+    for eid in eids:
+        print eid
+        try:
+            x, y, _ = np.genfromtxt("../data/c1/ep%s.csv" % eid, delimiter=",").T
+        except:
+            print "copying data"
+            print "cp /Users/angusr/data/K2/c1lcsr4/ep%s.csv ../data/c1" % eid
+            subprocess.call("cp /Users/angusr/data/K2/c1lcsr4/ep%s.csv ../data/c1"
+                            % eid, shell=True)
+            x, y, _ = np.genfromtxt("../data/c1/ep%s.csv" % eid, delimiter=",").T
+        p_child_plot(x, y, eid)
