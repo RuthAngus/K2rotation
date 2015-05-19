@@ -45,6 +45,12 @@ def p_child_plot(x, y, eid):
 
     y = y/np.median(y) - 1
 
+    # SUBTRACT LINEAR TREND!
+    plv = np.polyfit(x, y, 1)
+    print plv
+    poly = plv[1] + x * plv[0]
+    y -= poly
+
     # compute acf
     dt = 0.02043359821692  # time resolution of K2 data (from header)
     acf = emcee.autocorr.function(y)
@@ -68,7 +74,9 @@ def p_child_plot(x, y, eid):
     plt.xlabel("$\mathrm{BJD-2454833~(days)}$")
     plt.ylabel("$\mathrm{Normalized~Flux}$")
     plt.xlim(min(x), max(x))
-    plt.ylim(-.02, .02)
+    plt.title("$\mathrm{EPIC~%s}$" % eid)
+
+#     plt.ylim(-.02, .02)
 
     plt.subplot(3, 1, 2)
     plt.plot(lags, acf, "k")
@@ -81,14 +89,20 @@ def p_child_plot(x, y, eid):
     plt.xlim(min(lags), max(lags))
 
     plt.subplot(3, 1, 3)
-    plt.plot(fs, pgram, "k")
-    plt.xlabel("$\mathrm{Frequency~(days}^{-1}\mathrm{)}$")
+#     plt.plot(fs, pgram, "k")
+#     plt.xlim(min(fs), fmax)
+    plt.plot(1./fs, pgram, "k")
+    plt.xlim(min(1./fs), max(lags))
+    plt.xlabel("$\mathrm{Period~(days)}$")
+#     plt.xlabel("$\mathrm{Frequency~(days}^{-1}\mathrm{)}$")
     plt.ylabel("$\mathrm{Power}$")
-    mx, my = max_peak_detect(fs, pgram)
-    plt.xlim(min(fs), fmax)
+    l = fs > 1./100
+    mx, my = max_peak_detect(fs[l], pgram[l])
     px = 1./mx
-    plt.axvline(mx, color=".5", linestyle="--", label="$P_{rot}=%.2f$" % px)
-    plt.legend()
+#     plt.axvline(mx, color=".5", linestyle="--", label="$P_{rot}=%.2f$" % px)
+    plt.axvline(px, color=".5", linestyle="--", label="$P_{max}=%.2f$" % px)
+#     plt.ylim(0, .6)
+    plt.legend(loc="best")
     plt.subplots_adjust(hspace=.4)
 #     plt.savefig("vbg_%s" % eid)
 #     plt.savefig("../documents/rotation_poster_child.pdf")
@@ -103,8 +117,10 @@ if __name__ == "__main__":
 #     eid = "201132518"
     eids = [201129544, 201132518, 201133037, 201133147, 201135311, 201138638,
             201138849, 201142023, 201142127]
+#     eids = [201133037, 201132518]
+    eids = [201133037]
+#     eids = [201142127]
     for eid in eids:
-        print eid
         try:
             x, y, _ = np.genfromtxt("../data/c1/ep%s.csv" % eid, delimiter=",").T
         except:

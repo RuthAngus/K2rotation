@@ -119,7 +119,6 @@ def K2_poster_child_plot(x, y, fs, s2n, epid):
 
     # find highest peak
     mx, my = max_peak_detect(fs, s2n)
-    print my
 
     fname = "../data/c1/ktwo%s-c01_lpd-lc.fits" % epid
     data = fitsio.read(fname)
@@ -130,7 +129,6 @@ def K2_poster_child_plot(x, y, fs, s2n, epid):
     l = np.isfinite(y) * np.isfinite(x) * (q==0)
     y, x = y[l], x[l]
     MAD = np.median(y - np.median(y))
-    print MAD
 
     plt.clf()
     plt.subplot(2, 1, 1)
@@ -140,6 +138,7 @@ def K2_poster_child_plot(x, y, fs, s2n, epid):
     plt.xlim(min(x), max(x))
     plt.xlabel("$\mathrm{BJD-2454833~(days)}$")
     plt.ylabel("$\mathrm{Relative~Flux}$")
+    plt.title("$\mathrm{EPIC~%s}$" % epid)
 
     plt.subplot(2, 1, 2)
     if MAD == 0.: MAD = 1
@@ -152,12 +151,13 @@ def K2_poster_child_plot(x, y, fs, s2n, epid):
     else:
         plt.plot(1./fs, signal, "k")
         plt.ylabel("$\mathrm{Relative~S/N}$")
-    plt.xlabel("$\mathrm{Frequency~(days}^{-1}\mathrm{)}$")
+#     plt.xlabel("$\mathrm{Frequency~(days}^{-1}\mathrm{)}$")
+    plt.xlabel("$\mathrm{Period~(days)}$")
 #     plt.ylim(0, my*1e5)
-    plt.xlim(0, 50)
+    plt.xlim(min(1./fs), 70)
     plt.subplots_adjust(left=.13, hspace=.4)
     plt.axvline(1./mx, color=".5", linestyle="--",
-                label="$P_{rot}=%.2f ~\mathrm{days}$" % (1./mx))
+                label="$P_{max}=%.2f ~\mathrm{days}$" % (1./mx))
     plt.legend()
     print "../documents/K2_rotation_%s.pdf" % epid
     plt.savefig("../documents/K2_rotation_%s.pdf" % epid)
@@ -253,7 +253,7 @@ def top_5_pgram(x, basis, w):
     plt.rcParams.update(plotpar)
     x = np.array([j.astype("float64") for j in x])
     b = 3
-    ps = np.linspace(1., 150, 500)
+    ps = np.linspace(1., 70, 500)
     fs = 1./ps
     sw = np.sort(w)
     l = np.arange(len(w))[w == sw[0]][0]
@@ -341,7 +341,7 @@ if __name__ == "__main__":
     epid = "201132518"
     eids = [201129544, 201132518, 201133037, 201133147, 201135311, 201138638,
             201138849, 201142023, 201142127]
-    eids = [201133037, 201132518]
+#     eids = [201133037, 201132518]
 
     for epid in eids:
         x, y, basis = read_data(epid, 150)
@@ -356,7 +356,7 @@ if __name__ == "__main__":
             amp2s, s2n, w  = K2pgram(x, y, basis, fs)
             np.savetxt("%spgram.txt" % epid, np.transpose((fs, s2n)))
 
-        K2_poster_child_plot(x, y, fs, s2n, epid)
+#         K2_poster_child_plot(x, y, fs, s2n, epid)
 #         top_5(x, basis, w)
-#         top_5_pgram(x, basis, w)
+        top_5_pgram(x, basis, w)
     #     K2_conditioned_plot(fs, epid)
