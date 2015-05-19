@@ -13,6 +13,7 @@ import h5py
 from gatspy.periodic import LombScargle
 import wget
 import subprocess
+import scipy.signal as sps
 
 def read_data(epid, nbases):
     # read the data
@@ -138,16 +139,24 @@ def K2_poster_child_plot(x, y, fs, s2n, epid):
     plt.plot(x[~l], y[~l], "k")
     plt.xlim(min(x), max(x))
     plt.xlabel("$\mathrm{BJD-2454833~(days)}$")
-    plt.ylabel("$\mathrm{Normalized~Flux}$")
+    plt.ylabel("$\mathrm{Relative~Flux}$")
 
     plt.subplot(2, 1, 2)
     if MAD == 0.: MAD = 1
-    plt.plot(fs, s2n/MAD**2*1e5, "k")
+    signal = s2n/MAD**2
+    oom = - int(np.log10(signal[signal==max(signal)]))
+#     plt.plot(1./fs, signal*10**oom, "k")
+    if abs(oom) > 1:
+        plt.plot(1./fs, signal*10**oom, "k")
+        plt.ylabel("$\mathrm{Relative~S/N~(} \\times 10^%s\mathrm{)}$" % oom)
+    else:
+        plt.plot(1./fs, signal, "k")
+        plt.ylabel("$\mathrm{Relative~S/N}$")
     plt.xlabel("$\mathrm{Frequency~(days}^{-1}\mathrm{)}$")
-    plt.ylabel("$\mathrm{Relative~S/N~(} \\times 10^5\mathrm{)}$")
 #     plt.ylim(0, my*1e5)
-    plt.subplots_adjust(hspace=.4)
-    plt.axvline(mx, color=".5", linestyle="--",
+    plt.xlim(0, 50)
+    plt.subplots_adjust(left=.13, hspace=.4)
+    plt.axvline(1./mx, color=".5", linestyle="--",
                 label="$P_{rot}=%.2f ~\mathrm{days}$" % (1./mx))
     plt.legend()
     print "../documents/K2_rotation_%s.pdf" % epid
@@ -233,6 +242,98 @@ def top_5(x, basis, w):
     plt.xlim(x[0], x[-1])
     plt.savefig("../documents/%s_top5.pdf" % epid)
 
+# plot the top 5 components
+def top_5_pgram(x, basis, w):
+    plotpar = {'axes.labelsize': 15,
+               'text.fontsize': 15,
+               'legend.fontsize': 15,
+               'xtick.labelsize': 12,
+               'ytick.labelsize': 14,
+               'text.usetex': True}
+    plt.rcParams.update(plotpar)
+    x = np.array([j.astype("float64") for j in x])
+    b = 3
+    ps = np.linspace(1., 150, 500)
+    fs = 1./ps
+    sw = np.sort(w)
+    l = np.arange(len(w))[w == sw[0]][0]
+    print l
+    plt.clf()
+    plt.subplot(5, 2, 1)
+    plt.plot(x[::b], basis[l, :][::b], "k")
+    plt.xticks(visible=False)
+    plt.yticks(visible=False)
+    plt.xlim(x[0], x[-1])
+    plt.title("$\mathrm{Top~5~Eigen~light~curves}$")
+    plt.subplot(5, 2, 2)
+    pgram = sps.lombscargle(x, basis[l, :], 2*np.pi*fs)
+#     plt.plot(fs, pgram, "k")
+    plt.plot(ps, pgram, "k")
+    plt.xticks(visible=False)
+    plt.yticks(visible=False)
+    plt.xlim(min(ps), max(ps))
+    plt.title("$\mathrm{LS~periodograms}$")
+
+    plt.subplot(5, 2, 3)
+    l = np.arange(len(w))[w == sw[1]][0]
+    print l
+    plt.plot(x[::b], basis[l, :][::b], "k")
+    plt.yticks(visible=False)
+    plt.xticks(visible=False)
+    plt.xlim(x[0], x[-1])
+    plt.subplot(5, 2, 4)
+    pgram = sps.lombscargle(x, basis[l, :], 2*np.pi*fs)
+    plt.plot(ps, pgram, "k")
+    plt.xticks(visible=False)
+    plt.yticks(visible=False)
+    plt.xlim(min(ps), max(ps))
+
+    plt.subplot(5, 2, 5)
+    l = np.arange(len(w))[w == sw[2]][0]
+    print l
+    plt.plot(x[::b], basis[l, :][::b], "k")
+    plt.xticks(visible=False)
+    plt.yticks(visible=False)
+    plt.xlim(x[0], x[-1])
+    plt.subplot(5, 2, 6)
+    pgram = sps.lombscargle(x, basis[l, :], 2*np.pi*fs)
+    plt.plot(ps, pgram, "k")
+    plt.xticks(visible=False)
+    plt.yticks(visible=False)
+    plt.ylabel("$\mathrm{Power}$")
+    plt.xlim(min(ps), max(ps))
+
+    plt.subplot(5, 2, 7)
+    l = np.arange(len(w))[w == sw[3]][0]
+    print l
+    plt.plot(x[::b], basis[l, :][::b], "k")
+    plt.xticks(visible=False)
+    plt.yticks(visible=False)
+    plt.xlim(x[0], x[-1])
+    plt.subplot(5, 2, 8)
+    pgram = sps.lombscargle(x, basis[l, :], 2*np.pi*fs)
+    plt.plot(ps, pgram, "k")
+    plt.xticks(visible=False)
+    plt.yticks(visible=False)
+    plt.xlim(min(ps), max(ps))
+
+    plt.subplot(5, 2, 9)
+    l = np.arange(len(w))[w == sw[4]][0]
+    print l
+    plt.plot(x[::b], basis[l, :][::b], "k")
+    plt.yticks(visible=False)
+    plt.xlabel("$\mathrm{BJD-2454833 (days)}$")
+    plt.subplots_adjust(hspace=0)
+    plt.xlim(x[0], x[-1])
+    plt.subplot(5, 2, 10)
+    pgram = sps.lombscargle(x, basis[l, :], 2*np.pi*fs)
+    plt.plot(ps, pgram, "k")
+    plt.yticks(visible=False)
+    plt.xlabel("$\mathrm{Period (days)}$")
+    plt.xlim(min(ps), max(ps))
+    plt.subplots_adjust(left=.01, right=.97, wspace=.1)
+    plt.savefig("../documents/top5pgram_%s.pdf" % epid)
+
 if __name__ == "__main__":
 
     epid = "201317002"  # original
@@ -240,7 +341,7 @@ if __name__ == "__main__":
     epid = "201132518"
     eids = [201129544, 201132518, 201133037, 201133147, 201135311, 201138638,
             201138849, 201142023, 201142127]
-    eids = [201133037]
+    eids = [201133037, 201132518]
 
     for epid in eids:
         x, y, basis = read_data(epid, 150)
@@ -255,6 +356,7 @@ if __name__ == "__main__":
             amp2s, s2n, w  = K2pgram(x, y, basis, fs)
             np.savetxt("%spgram.txt" % epid, np.transpose((fs, s2n)))
 
-#         K2_poster_child_plot(x, y, fs, s2n, epid)
-        top_5(x, basis, w)
+        K2_poster_child_plot(x, y, fs, s2n, epid)
+#         top_5(x, basis, w)
+#         top_5_pgram(x, basis, w)
     #     K2_conditioned_plot(fs, epid)
