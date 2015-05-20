@@ -6,10 +6,6 @@
 \usepackage{graphicx, subfigure}
 \usepackage{color}
 
-\title{Systematics-insensitive periodic signal search with K2}
-
-\begin{document}
-
 \newcommand{\article}{article}
 \newcommand{\nGO}{4923}
 \newcommand{\uHz}{$\mu$Hz}
@@ -19,18 +15,22 @@
 \newcommand{\sydney}{4}
 \newcommand{\seti}{5}
 \newcommand{\aarhus}{6}
-
 \newcommand{\nC}{21,000}
 \newcommand{\rpc}{201133037}
-\newcommand{\rpcc}{201142127}
+\newcommand{\rpcc}{201142043}
+
+\begin{document}
+
+\title{Systematics-insensitive periodic signal search with K2}
 
 \author{%
    Ruth Angus\altaffilmark{\oxford, \cfa}
-   Daniel Foreman-Mackey\altaffilmark{\nyu},
-   \& John A. Johnson\altaffilmark{\cfa},
+   Daniel Foreman-Mackey\altaffilmark{\nyu}
+   \& John A. Johnson\altaffilmark{\cfa}
 }
 
-\altaffiltext{\oxford}{Subdepartment of Astrophysics, University of Oxford, OX1 3RH, UK}
+\altaffiltext{\oxford}{Subdepartment of Astrophysics, University of Oxford, OX1 3RH, UK.
+ruthangus@gmail.com}
 \altaffiltext{\nyu}{Center for Cosmology and Particle Physics, New York University, NY, USA}
 \altaffiltext{\cfa}{Harvard-Smithsonian Center for Astrophysics, 60 Garden St.,
 Cambridge, MA, USA}
@@ -49,7 +49,7 @@ are insensitive to pointing-induced systematics; the Systematics-Insensitive
 Periodogram (SIP).
 % Methods
 Traditional sine-fitting periodograms use a generative model to find the
-frequency of the sinusoid that best describes the data.
+frequency of a sinusoid that best describes the data.
 We extend this principle by including systematic trends, based on a set of
 `Eigen light curves', following \citet{Foreman-Mackey2015}, in our generative
 model as well as a sum of sine and cosine functions over a grid of
@@ -57,15 +57,22 @@ frequencies.
 % Results
 Using this method we are able to produce periodograms with vastly reduced
 systematic features.
-The quality of the resulting periodograms at short periods are such that we
-can recover acoustic oscillations in giants and detect variable stars,
-eclipsing binaries and short-period exoplanet candidates without the need for
-any detrending.
-The SIP method is also suited to measuring stellar rotation periods, despite
-the fact that long-term systematics exist on similar timescales.
+The quality of the resulting periodograms are such that we can recover
+acoustic oscillations in giant stars and measure stellar rotation periods
+without the need for any detrending.
+The algorithm is also applicable to the detection of other periodic phenomena
+such as variable stars, eclipsing binaries and short-period exoplanet
+candidates.
 The SIP code is available at https://github.com/RuthAngus/SIPK2.
 
 \end{abstract}
+
+\keywords{asteroseismology ---
+	methods: statistical ---
+	methods: data analysis ---
+	stars: rotation ---
+	techniques: photometric
+}
 
 \section{Introduction}
 \label{Introduction}
@@ -74,7 +81,7 @@ The excellent precision achieved by the original {\it Kepler} mission relied
 on extremely precise pointing, for which three reaction wheels were required.
 % John: cite original mission and Howell here.
 After the failure of one of these wheels, the {\it Kepler} team devised a new
-pointing scheme where the spacecraft is stabilized by the Solar wind for
+pointing scheme in which the spacecraft is stabilized by the Solar wind for
 ecliptic plane viewing zones \citep{Howell2014}.
 In this configuration the spacecraft is able to maintain an unstable
 equilibrium, with the two functioning reaction wheels controlling pitch and
@@ -83,22 +90,20 @@ The spacecraft fires its thrusters once every $\sim$ 6 hours
 \citep{Vanderburg2014} to correct for
 this slow drift and, as stars move across pixels with different sensitivities,
 their flux varies.
-Developing methods for the extraction of high-precision photometry from K2
-light curves, despite the reduced pointing precision, is extremely
-important.
-Several methods for detrending {\it K2} light curves have already been
-developed.
+The extraction of high-precision photometry from {\it K2} target pixel files,
+despite the reduced pointing precision, is a requirement for many fields of
+research and several methods for the extraction and detrending of {\it K2}
+light curves have already been developed.
 For example, \citet{Vanderburg2014} (hereafter VJ14) and \citet{Crossfield2015}
 use simple aperture photometry and correct the light curve of each star
 individually and \citet{Aigrain2015} use a Gaussian process to model the
 non-linear dependence of stellar flux on the roll angle of the telescope.
 Whilst these methods successfully remove most systematic trends and
 produce light curves suitable for exoplanet search and some stellar
-variability studies, the $\sim$ 6 hour thruster firing signal may still appear
+variability studies, residual systematics can still affect the light curves on
+timescales relevent to asteroseismology and stellar rotation.
+In particular, the $\sim$ 6 hour thruster firing signal may still appear
 with high power in the periodograms of these detrended light curves.
-Any physical processes with characteristic timescales of order
-6 hours; asteroseimic oscillations in giants and short period
-exoplanets, for example, therefore need to be treated extremely carefully.
 A detrending method for {\it K2} light curves, specifically intended for the
 asteroseismic analysis of giant stars has been developed by \citet{Lund2015},
 in which the systematics due to roll are corrected, again on
@@ -107,6 +112,8 @@ period) or its harmonics are removed by prewhitening.
 The method developed here, the Systematics-Insenstive Periodogram (SIP)
 produces periodograms of {\it K2} light curves without the need for detrending
 or prewhitening.
+
+\subsection{Asteroseismology}
 
 As well as providing data that has lead to the discovery thousands of
 exoplanets, the original {\it Kepler} mission revolutionized many fields of
@@ -150,6 +157,8 @@ These peaks lie in an important region of parameter space for giant star
 asteroseismology and could affect the stellar parameters measured for thousands
 of giants if not dealt with appropriately.
 
+\subsection{Stellar rotation}
+
 Stellar rotation studies have hugely benefitted from the era of high-precision
 space photometry.
 Active regions on the surface of rotating stars produce periodic variations
@@ -167,9 +176,9 @@ or some combination thereof.
 Stellar variability is not typically sinusoidal, therefore sine-fitting
 periodograms are not perfectly suited to measuring rotation periods.
 For this reason, the ACF method is often favoured over the periodogram method.
-However, because autocorrelation is performed directly on the light curves,
-and cannot be written down as a generative model, it is not possible use
-autocorrelation techniques on untreated {\it K2} data.
+However, because autocorrelation is performed directly on detrended light
+curves, and cannot be written down as a generative model, it is not possible
+use autocorrelation techniques on untreated {\it K2} data.
 A quasi-periodic Gaussian process is a much better effective model for stellar
 variability than a sinusoid, however we choose to focus on the more generally
 applicable (and computationally tractable) sine-wave periodogram, leaving the
@@ -184,14 +193,13 @@ The development of tools for extracting periodic information from {\it K2}
 data is essential if it is to be as revolutionary in time-domain
 astronomy as the original {\it Kepler} mission was.
 
-In \textsection\ref{sec:Method} we outline the method behind the SIP and
-provide the results of some simple tests which show exactly {\it how}
-`insensitive' the SIP is to systematic features.
-Next, we apply the SIP to real {\it K2} light curves in
-\textsection\ref{section:rotation}, using some giant asteroseismic pulsators as
-test cases.
-We also demonstrate the SIP's usefulness regarding other periodically varying
-objects in this section, before presenting our conclusions in
+In \textsection\ref{sec:Method} we outline the method behind the SIP.
+In \textsection\ref{section:rotation} we apply the SIP to real {\it K2} light
+curves, using some giant asteroseismic pulsators and rotating stars as test
+cases and then provide the results of some simple tests which show exactly
+{\it how} `insensitive' the SIP is to systematic features.
+Finally, we demonstrate the SIP's usefulness regarding other periodically
+varying objects in this section, before presenting our conclusions in
 \textsection\ref{sec:conclusions}.
 
 \section{Method}
@@ -288,6 +296,112 @@ The $(S/N)$ operation takes into account the goodness of fit, i.e. if the
 amplitude of the sinusoid at a given frequency is not well constrained,
 it is penalized.
 
+\section{Application to real light curves}
+\label{section:rotation}
+
+An example LS periodogram of the raw {\it K2} photometry
+for giant star, EPIC 201211472 is shown in figure \ref{fig:raw}.
+Peaks appearing at 47 $\mu$Hz and its harmonics are produced by the regular
+$\sim$ 6 hour thruster fires that repoint the spacecraft.
+These peaks are also present in periodograms of the VJ14 detrended light
+curves.
+The presence of systematic signals at these timescales are problematic for
+asteroseismic analysis since they lie in a region of frequency space
+that is often populated by giant asteroseismic modes.
+It is possible to remove these signals by `prewhitening' the data, i.e.
+subtracting a sinusoid of that frequency from the data, however this process
+will artificially supress all signals, both systematic and astrophysical, at
+that frequency.
+The SIP method eliminates the necessity for any such procedure.
+The bottom panel of figure \ref{fig:raw} shows the SIP for the same star,
+demonstrating the ability of the SIP method to produce periodograms that
+are free from thruster firing signals.
+
+In order to search for high signal-to-noise asteroseismic modes in the giant
+star candidates of GO1059, we searched for a power excess in the SIPs using the
+method of \citet{Huber2009}: autocorrelation functions were calculated for
+sections of the power spectrum in order to search for regions of increased
+correlation and locate the frequency of maximum power.
+The increased correlation arises from the even frequency spacing of acoustic
+modes, and the frequency of maximum correlation at the location of the power
+excess corresponds to the large frequecy separation, $\Delta\nu$.
+Figures \ref{fig:1} to \ref{fig:6} show example power spectra of 6 targets for
+which we detect pulsations using this method.
+
+The top panel of figure \ref{fig:rotation_poster_child} shows the
+VJ14-detrended light curve of an active, rotating star, EPIC \rpc, with
+a linear trend subtracted off.
+The brightness fluctuations clearly visible in the light curve of this target
+are produced by cool active regions on the stellar surface, which reduce
+the stellar flux periodically.
+The rotation period of this star is therefore around 20 days.
+The middle and bottom panels show an ACF and LS periodogram of the
+detrended light curve.
+The top panel of figure \ref{fig:K2_rotation_poster_child} shows the raw light
+curve of the same target in grey,  with the conditioned light curve in black.
+This conditioned light curve was produced by removing the best fitting
+systematic trends, described by a certain conbination of the ELCs, at the best
+fitting period of the sinusoid.
+The bottom panel shows the SIP.
+Each of these 3 methods measures a rotation period of around 20 days for this
+target.
+This example demonstates the ability of the SIP to recover rotation periods
+that agree with those measured from detrended light curves by autocorrelation.
+We also include an example that demonstrates the ability of the SIP to
+outperform a periodogram of detrended data.
+Figure \ref{fig:rotation_poster_child2} shows the light curve, ACF and LS
+periodogram of another rotating star, EPIC \rpcc\ and figure
+\ref{fig:K2_rotation_poster_child2} shows its SIP.
+This star shows lower amplitude variability than the previous example and the
+careful treatment of systematics is much more important.
+Whereas the ACF method is able to measure a rotation of $\sim$ 3 days for
+this star, the LS periodogram of the detrended light curve incorrectly
+measures a period of 59 days.
+Although there is a small peak at the rotation period of the star, it is not
+the dominant periodic signal.
+The SIP method is, by definition, insensitive to these long-term systematics
+and is able to measure a period of $\sim$ 2 days.
+This example further demonstrates the fact that long-term systematic trends
+caused by slow pointing variations are often not removed by conventional
+detrending methods.
+The 59 day signal is almost certainly a systematic trend and not an
+astrophysical signal because it does not appear in the SIP.
+It is well described by the ELCs and must therefore be common to many stars.
+
+We have shown that the SIP method is able to measure stellar rotation periods
+and does better than producing periodogram from detrended data.
+However, it has been shown that the ACF method often performs better than
+periodogram methods in general for measuring stellar rotation periods
+\citep[][]{McQuillan2013, McQuillan2013b, Mazeh2015}.
+For stars with relatively high-amplitude variability, for which perfect
+removal of systematic trends is less important, performing the ACF method
+on detrended data is likely to produce similar results to the SIP method.
+The SIP method is ideally suited to low-amplitude cases, where systematic
+trends could drastically influence rotation period measurements.
+Whilst the SIP method may outperform ACF in the low-amplitude cases,
+any `marginal' rotation period measurements calculated using either method
+should be treated with caution unless a representative uncertainty is provided.
+In general neither ACF nor periodogram methods are equipped to provide
+such uncertainties.
+In practise, we recommend using both the SIP and ACF methods, in combination
+with a by-eye check, to measure rotation periods for {\it K2} stars.
+
+Figures \ref{fig:RRLyrae} and \ref{fig:EB} show the conditioned light curves
+and SIPs of an RR Lyrae star, selected from Guest observing program GO1018 and
+an Eclipsing Binary (EB), selected from the \citet{Armstrong2015} {\it K2} EB
+and variable star catalogue respectively.
+Figure \ref{fig:planet} shows the conditioned light curve and SIP of the
+short-period, disintegrating planet candidate discovered by
+\citet{Sanchis-Ojeda2015}.
+This planet has a period of around 0.4 days, short enough to be detectable
+with a periodogram, as was demonstrated for a number of ultra-short
+period {\it Kepler} exoplanets by \citet{Sanchis-Ojeda2014}.
+The top panels of these three figures show the {\it K2} light curves of these
+objects, conditioned on the highest S/N sinusoidal signal in the
+periodograms.
+These light curves were produced by subtracting the trends that best describe
+the data at the highest S/N period found in the SIP.
+
 \subsection{Tests}
 
 In order to demonstrate the consistent ability of the SIP method
@@ -317,101 +431,6 @@ $\sim$ 47 \uHz\ have a large power.
 The SIP method is able to consistently remove the 47 \uHz signal which is
 present in almost every VJ14 light curve.
 
-\section{Application to real light curves: results and discussion}
-\label{section:rotation}
-
-An example LS periodogram of the raw {\it K2} photometry
-for giant star, EPIC 201211472 is shown in figure \ref{fig:raw}.
-Peaks appearing at 47 $\mu$Hz and its harmonics are produced by the regular
-$\sim$ 6 hour thruster fires that repoint the spacecraft.
-These peaks are also present in periodograms of the VJ14 detrended light
-curves.
-The presence of systematic signals at these timescales are problematic for
-asteroseismic analysis since they lie in a region of frequency space
-that is often populated by giant asteroseismic modes.
-It is possible to remove these signals by `prewhitening' the data, i.e.
-subtracting a sinusoid of that frequency from the data, however this process
-will artificially supress all signals, both systematic and astrophysical, at
-that frequency.
-The SIP method eliminates the necessity for any such procedure.
-The bottom panel of figure \ref{fig:raw} shows the SIP for the same star; this
-figure demonstrates the ability of the SIP method to produce periodograms that
-are free from thruster firing signals.
-
-In order to search for high signal-to-noise asteroseismic modes in the giant
-star candidates of GO1059, we searched for a power excess in the SIPs using the
-method of \citet{Huber2009}: autocorrelation functions were calculated for
-sections of the power spectrum in order to search for regions of increased
-correlation and locate the frequency of maximum power.
-The increased correlation arises from the even frequency spacing of acoustic
-modes, and the frequency of maximum correlation at the location of the power
-excess corresponds to the large frequecy separation, $\Delta\nu$.
-Figures \ref{fig:1} to \ref{fig:6} show example power spectra of 6 targets for
-which we detect pulsations using this method.
-
-The top panel of figure \ref{fig:rotation_poster_child} shows the
-VJ14-detrended light curve of an active, rotating star, EPIC \rpc, with
-a linear trend subtracted off.
-The brightness fluctuations clearly visible in the light curve of this
-target are produced by active regions rotating with the stellar surface,
-reducing the stellar flux periodically.
-The rotation period of this star is therefore around 20 days.
-The middle and bottom panels show an ACF and LS periodogram of the
-detrended light curve.
-Figure \ref{fig:K2_rotation_poster_child} shows the raw light curve of the
-same target (top panel) with its SIP (bottom panel).
-Each of these 3 methods measures a rotation period of around 20 days for this
-target.
-This example demonstates the ability of the SIP to recover rotation periods
-that agree with those measured from detrended light curves by autocorrelation.
-We also include an example that demonstrates the ability of the SIP to
-outperform a periodogram of detrended data.
-Figure \ref{fig:rotation_poster_child2} shows the light curve, ACF and LS
-periodogram of another rotating star, EPIC \rpcc\ and figure
-\ref{fig:K2_rotation_poster_child2} shows its SIP.
-Whereas the ACF method is able to measure a rotation of $\sim$ 6 days, the
-LS periodogram of the detrended light curve shows high power at long
-periods and although there is a small peak at the rotation period of the
-star, it is not the dominant periodic signal.
-The SIP method is, by definition, insensitive to these long-term systematics
-and is able to measure a period of $\sim$ 7 days.
-This example further demonstrates the fact that long-term systematic trends
-caused by slow pointing variations are often not removed by conventional
-detrending methods.
-
-In order to thoroughly test the advantages and shortcomings of the SIP method
-for measuring stellar rotation periods, ideally we would inject
-sinusoids into raw {\it K2} light curves, detrend them using
-the VJ15 method (for example) and attempt to recover signals using a LS
-periodogram, or similar.
-However, it has been shown that the ACF method often performs better than
-periodogram methods for measuring stellar rotation periods
-\citep[][]{McQuillan2013, McQuillan2013b, Mazeh2015}.
-In practise, the ACF method is likely to perform just as well if not better
-than the SIP method for stars that show relatively high-amplitude variability.
-Whilst the SIP method may outperform ACF in the low signal-to-noise cases,
-any `marginal' rotation period measurements calculated using either method
-should be treated with caution unless a representative uncertainty is provided,
-however, in general neither ACF nor periodogram methods are equipped to provide
-such uncertainties.
-In practise, we recommend using both the SIP and ACF methods to measure
-rotation periods for {\it K2} stars.
-
-Figures \ref{fig:RRLyrae} and \ref{fig:EB} show the conditioned light curves
-and SIPs of an RR Lyrae star, selected from Guest observing program GO1018 and
-an Eclipsing Binary (EB), selected from the \citet{Armstrong2015} {\it K2} EB
-and variable star catalogue respectively.
-Figure \ref{fig:planet} shows the conditioned light curve and SIP of a
-short-period planet candidate.
-This planet has a period of around 0.4 days, short enough to be detectable
-with a periodogram, as was demonstrated for a number of ultra-short
-period {\it Kepler} exoplanets by \citet{Sanchis-Ojeda2014}.
-The top panels of these three figures show the {\it K2} light curves of these
-objects, conditioned on the highest S/N sinusoidal signal in the
-periodograms.
-These light curves were produced by subtracting the trends that best describe
-the data at the highest S/N period found in the SIP.
-
 Photometric variability in dwarf stars on timescales less than 8 hours, often
 known as flicker, has been linked to surface gravity
 \citep[][]{Bastien2013, Kipping2014}.
@@ -423,33 +442,34 @@ performed on detrended light curves, not inferred from periodograms.
 However, it may be possible to derive a property of the periodogram that scales
 with the density or surface gravity of a star, for example, the mean excess
 power at frequencies near those relevent to granulation timescales.
+The SIP method presented here would be useful for such a technique.
 
 \section{Conclusions}
 \label{sec:conclusions}
 We demonstrate that modelling campaign 1 {\it K2} photometry as a linear
-combination of 150 PCA components plus a sinusoid can produce beautiful
-periodograms without the need for detrending.
+combination of 150 PCA components plus a sinusoid can produce periodograms
+that almost completely free from instrumental systematics signals, without the
+need for detrending.
 We find that the 47 $\mu$Hz signal, generated by the spacecraft thruster
-fires is not present in the vast majority of systematics-insensitive
-periodograms for more than 4000 targets
+fires is not present in the vast majority of Systematics-Insensitive
+Periodograms (SIPs) for more than 4000 targets
 selected from the {\it K2} guest observer program, GO1059, ``Galactic
 Archaeology on a grand scale" (PI: Stello, D.).
 The SIP method is highly successful for campaign 1 targets where the large
 number of stars, observed for a baseline of 80 days ensures that most of the
 systematics are captured in the ELCs and we anticipate that it will
 be equally effective for the up-and-coming campaigns.
-The SIP code is available for public use and can be found at
-https://github.com/RuthAngus/SIPK2.
 
-We have demonstrated that the SIP method is capable of detecting periodicities
-in {\it K2} data in the region of frequency space relevent to the study of
-asteroseismic oscillations in giant stars and for any signals with a timescale
-close to 6 hours.
-The SIP is also effective at measuring stellar rotation periods and is an
+The SIP method is capable of detecting periodicities in {\it K2} data in the
+region of frequency space relevent to the study of asteroseismic oscillations
+in giant stars and for any signals with a timescale close to 6 hours.
+It is also effective at measuring stellar rotation periods and is an
 improvement upon a simple LS periodogram of detrended data.
 In practise, the best approach for measuring rotation periods in {\it K2} data
 is likely to be a combination of the SIP method and the ACF method, where
 autocorrelation is performed on detrended light curves.
+The SIP code is available for public use and can be found at
+https://github.com/RuthAngus/SIPK2.
 
 It is a pleasure to thank Dan Huber (Sydney) who provided comments for this
 paper and useful asteroseismology tips.
@@ -470,13 +490,12 @@ directorate.
 \begin{figure*}
 \begin{center}
 \includegraphics[width=6in, clip=true]{rawvbg_201183188.pdf}
-\caption{LS periodograms of the raw (Top) and detrended (middle) {\it K2}
-	 photometry for EPIC 201183188.
-	 The bottom panel shows the SIP for this target. The light curve was
- 	 detrended using the method of VJ14.
+\caption{LS periodograms of the raw (Top) and VJ14 detrended (middle) {\it K2}
+	 light curves of EPIC 201183188.
+	 The bottom panel shows the SIP for this target.
 	 Peaks at $\sim$ 47 $\mu$Hz and its harmonics produced by the regular
-	 spacecraft thruster fires are still present in periodogram of the
-	 detrended data, but do not appear in the SIP.}
+	 spacecraft thruster fires are still present in the LS periodogram of
+	 the detrended data, but do not appear in the SIP.}
 \label{fig:raw}
 \end{center}
 \end{figure*}
@@ -504,9 +523,10 @@ directorate.
 	    \includegraphics[width=3in]{201607835.pdf}
         }
     \end{center}
-    \caption{SIPs of 6 long cadence {\it K2} giants with pulsations. These
-	     were selected from the guest observing program, GO1059 and were
-	     identified using the method of \citet{Huber2009}.
+    \caption{SIPs of 6 long cadence {\it K2} giants with asteroseismic
+	    oscillations.
+	    These were selected from the guest observing program, GO1059 and
+	    identified using the method of \citet{Huber2009}.
 \label{fig:astero_examples}}
 \end{figure}
 
@@ -514,11 +534,12 @@ directorate.
 \begin{center}
 \includegraphics[width=6in, clip=true]{rotation201133037.pdf}
 \caption{{\it Top}: Light curve of EPIC 201133037, detrended using the method
-of VJ14. {\it Middle}: Autocorrelation function of the
-detrended light curve. The autocorrelation function method measures a rotation
-period of 20 days for this star. {\it Bottom}: The LS periodogram
-of the detrended light curve. The highest peak in the periodogram is centred at
-24 days.}
+	of VJ14.
+	{\it Middle}: Autocorrelation function of the detrended light
+	curve. The autocorrelation function method measures a rotation period
+	of 20 days for this star.
+	{\it Bottom}: The LS periodogram of the detrended light curve.
+	The highest peak in the periodogram is located at 25 days.}
 \label{fig:rotation_poster_child}
 \end{center}
 \end{figure*}
@@ -526,47 +547,46 @@ of the detrended light curve. The highest peak in the periodogram is centred at
 \begin{figure*}
 \begin{center}
 \includegraphics[width=6in, clip=true]{K2_rotation_201133037.pdf}
-\caption{{\it Top}: Raw light curve of EPIC \rpc. {\it Bottom}: An
-SIP, produced by modelling the data using the top 150 ELCs
-plus a sine and cosine function at a range of frequencies. The highest peak in
-the SIP is centred at 25 days.}
+\caption{{\it Top}: The raw light curve of EPIC \rpc\ is shown in grey and
+	the conditioned light curve is shown in black. The conditioned light
+	curve is produced by removing the trends that best describe the
+	data, at the best fitting frequency. {\it Bottom}: An SIP of the raw
+	light curve, produced by modelling the data using the top 150 ELCs
+	plus a sine and cosine function at a range of frequencies.
+	The highest peak in the SIP is located at 25 days.}
 \label{fig:K2_rotation_poster_child}
 \end{center}
 \end{figure*}
 
 \begin{figure*}
 \begin{center}
-\includegraphics[width=6in, clip=true]{rotation201142127.pdf}
+\includegraphics[width=6in, clip=true]{rotation201142023.pdf}
 \caption{{\it Top}: Light curve of EPIC \rpc, detrended using the method
-of VJ14. {\it Middle}: Autocorrelation function of the
-detrended light curve. The autocorrelation function method measures a rotation
-period of 6 days for this star. {\it Bottom}: The LS periodogram
-of the detrended light curve. The highest peak in the periodogram is centred at
-24 days.}
+	of VJ14.
+	{\it Middle}: Autocorrelation function of the detrended light curve.
+	The autocorrelation function method measures a rotation period of 6
+	days for this star.
+	{\it Bottom}: The LS periodogram of the detrended light curve.
+	The highest peak in the periodogram is located at 54 days and is likely
+	to be a systematic trend produced by spacecraft pointing variations.}
 \label{fig:rotation_poster_child2}
 \end{center}
 \end{figure*}
 
 \begin{figure*}
 \begin{center}
-\includegraphics[width=6in, clip=true]{K2_rotation_201142127.pdf}
-\caption{{\it Top}: Raw light curve of EPIC \rpcc. {\it Bottom}: An
-SIP, produced by modelling the data using the top 150 ELCs
-plus a sine and cosine function at a range of frequencies, measuring
-a rotation period of 7 days.}
+\includegraphics[width=6in, clip=true]{K2_rotation_201142023.pdf}
+\caption{{\it Top}: The raw light curve of EPIC \rpc\ is shown in grey and
+	the conditioned light curve is shown in black. The conditioned light
+	curve is produced by removing the trends that best describe the
+	data, at the best fitting frequency.
+	{\it Bottom}: An SIP, produced by modelling the data as a linear
+	combination of the top 150 ELCs plus a sine and cosine function at a
+	range of frequencies, measuring a rotation period of 7 days.
+	The SIP is, by definition, insensitive to the long-timescale
+	systematics that dominate the LS periodogram of the detrended data,
+	shown in figure \ref{fig:rotation_poster_child2}.}
 \label{fig:K2_rotation_poster_child2}
-\end{center}
-\end{figure*}
-
-\begin{figure*}
-\begin{center}
-\includegraphics[width=6in, clip=true]{top5pgram_201133037.pdf}
-\caption{The 5 highest-weighted ELCs for EPIC \rpc, with their corresponding LS
-	periodograms.
-	The 3 highest-weighted ELCs have power at long periods.
-	The SIP is insensitve to these long-term systematics, but they may
-	still be present in detrended data.}
-\label{fig:top5}
 \end{center}
 \end{figure*}
 
