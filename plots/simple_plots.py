@@ -8,7 +8,7 @@ from colours import plot_colours
 cols = plot_colours()
 
 plotpar = {'axes.labelsize': 18,
-           'legend.fontsize': 18,
+           'legend.fontsize': 15,
            'xtick.labelsize': 18,
            'ytick.labelsize': 18,
            'text.usetex': True}
@@ -76,13 +76,14 @@ def demo(epids, demo):
         plt.xlabel("$\mathrm{BJD~(days) - 2454833}$")
         plt.ylabel("$\mathrm{Normalized~Flux}$")
         plt.subplot(2, 1, 2)
-        plt.xlabel("$\mathrm{Period~(days)}$")
-        plt.ylabel("$\mathrm{S/N}$")
+        plt.xlabel("$\mathrm{Period~(hours)}$")
+        plt.ylabel("$\mathrm{Relative~(S/N)}^2$")
         plt.ylim(0, max(s2n)+.2*max(s2n))
-        plt.axvline(mx, color=".5", linestyle="--",
-                    label="$%.2f\mathrm{~days}$" % mx)
+        plt.xlim(min(ps*24), max(ps*24))
+        plt.axvline(24*mx, color=".5", linestyle="--",
+                    label="$P_{max} = %.2f\mathrm{~hours}$" % (mx*24))
         plt.legend(loc="best")
-        plt.plot(ps, s2n, "k")
+        plt.plot(ps*24, s2n, "k")
         plt.subplots_adjust(hspace=.3, left=.2)
         plt.savefig("../documents/%s_%s.pdf" % (demo, fname))
 

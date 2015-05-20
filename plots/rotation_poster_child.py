@@ -65,6 +65,7 @@ def p_child_plot(x, y, eid):
     fs = np.linspace(1e-6, fmax, 1000)
     ps = 1./fs
     pgram = model.periodogram(ps)
+    np.savetxt("lspgram_%s.txt" % eid, np.transpose((ps, pgram)))
 
     plt.clf()
     plt.subplot(3, 1, 1)
@@ -112,14 +113,9 @@ def p_child_plot(x, y, eid):
 
 if __name__ == "__main__":
 
-#     eid = "201317002"
-#     eid = "201129544"
-#     eid = "201132518"
     eids = [201129544, 201132518, 201133037, 201133147, 201135311, 201138638,
             201138849, 201142023, 201142127]
-#     eids = [201133037, 201132518]
-    eids = [201133037]
-#     eids = [201142127]
+    eids = [201133037, 201142023]
     for eid in eids:
         try:
             x, y, _ = np.genfromtxt("../data/c1/ep%s.csv" % eid, delimiter=",").T

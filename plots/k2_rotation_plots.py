@@ -14,6 +14,8 @@ from gatspy.periodic import LombScargle
 import wget
 import subprocess
 import scipy.signal as sps
+from plotstuff import colours
+cols = colours()
 
 def read_data(epid, nbases):
     # read the data
@@ -130,35 +132,53 @@ def K2_poster_child_plot(x, y, fs, s2n, epid):
     y, x = y[l], x[l]
     MAD = np.median(y - np.median(y))
 
+    # construct arrays
+    AT = np.concatenate((basis, np.ones((3, len(y)))), axis=0)
+    ATA = np.dot(AT, AT.T)
+    _, _, trends = eval_freq(x, y, mx, AT, ATA, compute_trends=True)
+
     plt.clf()
     plt.subplot(2, 1, 1)
     l = x < 2016
-    plt.plot(x[l], y[l], "k")
-    plt.plot(x[~l], y[~l], "k")
+    m1 = np.median(y[l])
+    m2 = np.median(y[~l])
+    plt.plot(x[l], y[l], ".7")
+    plt.plot(x[l], y[l]-trends[l]+m1, "k")
+    plt.plot(x[~l], y[~l], ".7")
+    plt.plot(x[~l], y[~l]-trends[~l]+m1, "k")
     plt.xlim(min(x), max(x))
     plt.xlabel("$\mathrm{BJD-2454833~(days)}$")
     plt.ylabel("$\mathrm{Relative~Flux}$")
     plt.title("$\mathrm{EPIC~%s}$" % epid)
 
+    ps2, pgram = np.genfromtxt("lspgram_%s.txt" % epid).T
+
     plt.subplot(2, 1, 2)
     if MAD == 0.: MAD = 1
     signal = s2n/MAD**2
     oom = - int(np.log10(signal[signal==max(signal)]))
-#     plt.plot(1./fs, signal*10**oom, "k")
     if abs(oom) > 1:
+#         if epid == 201142023:
+#             print "plotting both", "\n"
+#             plt.plot(ps2, pgram*2, "r")
         plt.plot(1./fs, signal*10**oom, "k")
-        plt.ylabel("$\mathrm{Relative~S/N~(} \\times 10^%s\mathrm{)}$" % oom)
+        plt.ylabel("$\mathrm{Relative~(S/N}^2\mathrm{)~(} \\times 10^%s\mathrm{)}$" % oom)
     else:
+#         if epid == 201142023:
+#             print "plotting both", "\n"
+#             plt.plot(ps2, pgram*2, "r")
         plt.plot(1./fs, signal, "k")
-        plt.ylabel("$\mathrm{Relative~S/N}$")
-#     plt.xlabel("$\mathrm{Frequency~(days}^{-1}\mathrm{)}$")
+        plt.ylabel("$\mathrm{Relative~(S/N)}^2$")
     plt.xlabel("$\mathrm{Period~(days)}$")
-#     plt.ylim(0, my*1e5)
-    plt.xlim(min(1./fs), 70)
+    if epid == 201142023:
+        plt.xscale("log")
+        plt.xlim(10**.2, 10**2)
+    else:
+        plt.xlim(min(1./fs), 70)
     plt.subplots_adjust(left=.13, hspace=.4)
     plt.axvline(1./mx, color=".5", linestyle="--",
                 label="$P_{max}=%.2f ~\mathrm{days}$" % (1./mx))
-    plt.legend()
+    plt.legend(loc="best")
     print "../documents/K2_rotation_%s.pdf" % epid
     plt.savefig("../documents/K2_rotation_%s.pdf" % epid)
     return mx
@@ -339,9 +359,9 @@ if __name__ == "__main__":
     epid = "201317002"  # original
     epid = "201129544"  # slight discrepancy between ACF and pgrams
     epid = "201132518"
-    eids = [201129544, 201132518, 201133037, 201133147, 201135311, 201138638,
-            201138849, 201142023, 201142127]
-#     eids = [201133037, 201132518]
+#     eids = [201129544, 201132518, 201133037, 201133147, 201135311, 201138638,
+#             201138849, 201142023, 201142127]
+    eids = [201133037, 201142023]
 
     for epid in eids:
         x, y, basis = read_data(epid, 150)
@@ -356,7 +376,7 @@ if __name__ == "__main__":
             amp2s, s2n, w  = K2pgram(x, y, basis, fs)
             np.savetxt("%spgram.txt" % epid, np.transpose((fs, s2n)))
 
-#         K2_poster_child_plot(x, y, fs, s2n, epid)
+        K2_poster_child_plot(x, y, fs, s2n, epid)
 #         top_5(x, basis, w)
-        top_5_pgram(x, basis, w)
-    #     K2_conditioned_plot(fs, epid)
+#         top_5_pgram(x, basis, w)
+#         K2_conditioned_plot(fs, epid)
