@@ -89,23 +89,25 @@ In this configuration the spacecraft is able to maintain an unstable
 equilibrium, with the two functioning reaction wheels controlling pitch and
 yaw whilst the spacecraft slowly rolls about the boresight.
 The spacecraft fires its thrusters once every $\sim$ 6 hours
-\citep{Vanderburg2014} to correct for
+\citep{Vanderburg2014} (hereafter VJ14) to correct for
 this slow drift and, as stars move across pixels with different sensitivities,
 their flux varies.
 The extraction of high-precision photometry from {\it K2} target pixel files,
 despite the reduced pointing precision, is a requirement for many fields of
 research and several methods for the extraction and detrending of {\it K2}
 light curves have already been developed.
-For example, \citet{Vanderburg2014} (hereafter VJ14) and \citet{Crossfield2015}
+For example, \citet{Vanderburg2014} and \citet{Crossfield2015}
 use simple aperture photometry and correct the light curve of each star
 individually and \citet{Aigrain2015} use a Gaussian process to model the
 non-linear dependence of stellar flux on the roll angle of the telescope.
+
 Whilst these methods successfully remove most systematic trends and
 produce light curves suitable for exoplanet search and some stellar
 variability studies, residual systematics can still affect the light curves on
 timescales relevent to asteroseismology and stellar rotation.
 In particular, the $\sim$ 6 hour thruster firing signal may still appear
-with high power in the periodograms of these detrended light curves.
+with high power in the periodograms of these detrended light curves
+(see figure \ref{fig:raw}).
 A detrending method for {\it K2} light curves, specifically intended for the
 asteroseismic analysis of giant stars has been developed by \citet{Lund2015},
 in which the systematics due to roll are corrected, again on
@@ -117,7 +119,7 @@ or prewhitening.
 
 \subsection{Asteroseismology}
 
-As well as providing data that has lead to the discovery thousands of
+As well as providing data that have lead to the discovery thousands of
 exoplanets, the original {\it Kepler} mission revolutionized many fields of
 stellar astronomy, particularly asteroseismology.
 Fundamental stellar parameters---in some cases, extremely precise ones---can
@@ -134,7 +136,8 @@ For short cadence {\it Kepler} data, this detrending method is described in
 Due to the precise pointing of the original {\it Kepler} mission, systematics
 present in these light curves, caused by temperature fluctuations and minor
 pointing shifts, are relatively low amplitude.
-This is not the case for {\it K2} light curves however: the precision over a
+
+However, this is not the case for {\it K2} light curves: the precision over a
 6 hour timescale is estimated to be 4 times worse in {\it K2} data
 \citep{Howell2014}, therefore new approaches to the treatment of systematics
 are necessary.
@@ -168,17 +171,19 @@ Active regions on the surface of rotating stars produce periodic variations
 in flux and stellar rotation periods can therefore be measured from
 {\it Kepler} light curves.
 Stellar rotation is a field of active interest as the rotation period of star
-can be used to infer its age \citep{Skumanich1972, Barnes2007, Epstein2014},
-is thought to be tied to the stellar magnetic dynamo, and could even reveal
-dynamical interations with companion stars or planets \citep[e.g.][]{Beky2014,
-Poppenhaeger2014}.
+can be used to infer its age via gyrochronology
+\citep{Skumanich1972, Barnes2007, Epstein2014, Angus2015}, is thought to be
+tied to the stellar magnetic dynamo, and could even reveal dynamical
+interations with companion stars or planets
+\citep[e.g.][]{Beky2014, Poppenhaeger2014}.
 Current methods for measuring rotation periods from {\it Kepler} light curves
 include periodogram \citep[e.g.][]{Reinhold2013}, AutoCorrelation Function
 (ACF) \citep{McQuillan2013} and wavelet \citep[e.g.][]{Garcia2014} analysis,
 or some combination thereof.
 Stellar variability is not typically sinusoidal, therefore sine-fitting
 periodograms are not perfectly suited to measuring rotation periods.
-For this reason, the ACF method is often favoured over the periodogram method.
+For this reason, the ACF method is often favoured over the periodogram method
+\citep{McQuillan2013}.
 However, because autocorrelation is performed directly on detrended light
 curves, and cannot be written down as a generative model, it is not possible
 use autocorrelation techniques on untreated {\it K2} data.
@@ -209,7 +214,7 @@ varying objects in this section, before presenting our conclusions in
 \label{sec:Method}
 
 The method implemented in this \article\ is an extention of the planet-search
-algorithm developed by \citet{Foreman-Mackey2015} (hereafter FM15).
+algorithm developed by \citet[][hereafter FM15]{Foreman-Mackey2015}.
 All targets observed by {\it Kepler} move on the CCD in the same way,
 therefore the systematics affecting each individual star's light curve have
 shared properties.
@@ -222,6 +227,7 @@ original {\it Kepler} mission \citep[][]{Stumpe2012, Smith2012}.
 The resulting ELCs from campaign 1 can be used to model any campaign 1 {\it
 K2} light curve, (campaign 0 ELCs for campaign 0, etc) and specifically, can
 model the data in combination with an arbitrary physical model.
+
 In order to construct sets of ELCs for campaigns 0 and 1, FM15 downloaded the
 target pixel files for all stars in these two fields.
 % ; 21,703 in total.
@@ -234,13 +240,16 @@ light curve with the lowest CDPP within a 6 hour window
 light curves for campaigns 0 and 1 are available at
 \url{http://bbq.dfm.io/ketu/lightcurves/}}.
 PCA was then performed on the full set of targets in order to produce ELCs.
+
 FM15 used 150 of these ELCs, plus a transit model, in order to
 search for exoplanet candidates without the need for a `detrending' step.
 The likelihood of the data, conditioned on the ELC-plus-transit
 model was calculated over a fine grid of periods and transit depths, resulting
 in the detection of 36 new exoplanet candidates.
-We use exactly the same technique to find periodic signals in {\it K2} data,
-however, instead of an exoplanet transit, our model is a sinusoid.
+% We use exactly the same technique to find periodic signals in {\it K2} data,
+% however, instead of an exoplanet transit, our model is a sinusoid.
+We use a very similar technique to find periodic signals in K2 data.
+The primary difference is that we use a sinusoid rather than a transit model.
 This model is linear, therefore the likelihood function conditioned on
 a specific frequency can be calculated and the systematics model marginalized
 over analytically.
@@ -284,6 +293,7 @@ $\mathbf{w}$ is
 \begin{equation}
 	\mathbf{w_k}^* \gets (\mathbf{A}^T\mathbf{A})^{-1}\mathbf{A}^T\mathbf{f_k}.
 \end{equation}
+
 Under this linear model with Gaussian uncertainties, the marginalized
 likelihood for the periodic amplitude is a two-dimensional Gaussian with mean
 given by the last two elements ($\mathbf{a}$) of $\mathbf{w}*$ and covariance
@@ -347,8 +357,9 @@ This conditioned light curve was produced by removing the best fitting
 systematic trends, described by a certain conbination of the ELCs, at the best
 fitting period of the sinusoid.
 The bottom panel shows the SIP.
-Each of these 3 methods measures a rotation period of around 20 days for this
-target.
+
+Each of these three methods measures a rotation period of around 20 days for
+this target.
 This example demonstates the ability of the SIP to recover rotation periods
 that agree with those measured from detrended light curves by autocorrelation.
 We also include an example that demonstrates the ability of the SIP to
@@ -420,7 +431,7 @@ The SIP method is able to consistently remove the 47 \uHz signal which is
 present in almost every VJ14 light curve.
 
 Figures \ref{fig:RRLyrae} and \ref{fig:EB} show the conditioned light curves
-and SIPs of an RR Lyrae star, selected from Guest observing program GO1018 and
+and SIPs of an RR Lyrae star, selected from Guest observer program GO1018 and
 an Eclipsing Binary (EB), selected from the \citet{Armstrong2015} {\it K2} EB
 and variable star catalogue respectively.
 Figure \ref{fig:planet} shows the conditioned light curve and SIP of the
@@ -481,6 +492,8 @@ We would also like to thank Suzanne Aigrain (Oxford) and David Hogg (NYU) for
 their comments and Andrew Vanderburg (Harvard) and Ben Montet (Caltech)
 for their extremely helpful suggestions and recommendations regarding this
 project.
+J.A.J is supported by generous grants from the David and Lucile Packard and
+Alfred P. Sloan Foundations.
 The data presented in this paper were obtained from the Mikulski Archive for
 Space Telescopes (MAST).
 STScI is operated by the Association of Universities for Research in Astronomy,
