@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import fitsio
+import scipy.stats as sps
 
 def astero_example_plots(names, vbg=False):
     for eid in names:
@@ -24,14 +25,21 @@ def astero_example_plots(names, vbg=False):
                                     % str(int(eid))).T
         plt.clf()
         if MAD == 0: MAD = 1
-        plt.plot(fs[::3], s2n[::3]/MAD**2, "k")
+
+        signal = s2n/MAD**2
+        oom = 6
+        print oom, "oom"
+
+#         plt.plot(fs[::3], s2n[::3]/MAD**2, "k")
+        plt.plot(fs[::3], s2n[::3]*10**oom, "k")
 
         plt.xlim(min(fs), 280)
         plt.xlabel("$\\nu\mathrm{~(}\mu\mathrm{Hz)}$")
-        plt.ylabel("$\mathrm{Relative~(S/N)}^2$")
+        plt.ylabel("$\mathrm{Relative~(S/N)}^2 \mathrm{(} \\times 10^%s\mathrm{)}$"
+                   % oom)
         ylims = plt.gca().get_ylim()
         plt.title("$\mathrm{EPIC~%s}$" % str(int(eid)))
-        plt.subplots_adjust(bottom=.15, left=.15)
+        plt.subplots_adjust(bottom=.15, left=.2)
 #         plt.text(15, ylims[-1]-.05*ylims[-1], "$\mathrm{EPIC~%s}$"
 #                  % str(int(eid)))
         if vbg:
