@@ -63,7 +63,7 @@ without the need for any detrending.
 The algorithm is also applicable to the detection of other periodic phenomena
 such as variable stars, eclipsing binaries and short-period exoplanet
 candidates.
-The SIP code is available at https://github.com/RuthAngus/SIPK2.
+The SIP code is available at \url{https://github.com/RuthAngus/SIPK2}.
 
 \end{abstract}
 
@@ -140,9 +140,10 @@ Figure \ref{fig:raw} demonstrates the need for careful systematics treatment
 of {\it K2} photometry for asteroseismology.
 The top panel shows a Lomb-Scargle\footnote{All LS periodograms
 produced in this project were produced using the gatspy Python module:
-https://github.com/astroML/gatspy/tree/master/gatspy/periodic} (LS) periodogram
-of the raw, simple aperture photometry\footnote{The method used to extract this photometry is described in \textsection \ref{sec:Method}} of EPIC 201183188,
-a pulsating giant star.
+\url{https://github.com/astroML/gatspy/tree/master/gatspy/periodic}} (LS)
+periodogram of the raw, simple aperture photometry\footnote{The method used to
+extract this photometry is described in \textsection \ref{sec:Method}} of EPIC
+201183188, a pulsating giant star.
 The large peaks at $\sim$ 47 $\mu$Hz and its harmonics are caused by the
 regular thruster fires of the spacecraft.
 The bottom panel shows the LS periodogram of this light curve, after
@@ -229,7 +230,7 @@ Following the procedure of VJ14, the aperture producing the
 light curve with the lowest CDPP within a 6 hour window
 \citep{Christiansen2012} was selected\footnote{The simple aperture photometry
 light curves for campaigns 0 and 1 are available at
-http://bbq.dfm.io/ketu/lightcurves/}.
+\url{http://bbq.dfm.io/ketu/lightcurves/}}.
 PCA was then performed on the full set of targets in order to produce ELCs.
 FM15 used 150 of these ELCs, plus a transit model, in order to
 search for exoplanet candidates without the need for a `detrending' step.
@@ -264,7 +265,8 @@ $\mathbf{A}$ is the design matrix:
 \end{array}\right )
 \end{eqnarray}
 where the $x_{ij}$s are the ELCs\footnote{Campaign 0 and 1 ELCs are
-available at http://bbq.dfm.io/ketu/elcs/}, with $i$ denoting the ELC number
+available at \url{http://bbq.dfm.io/ketu/elcs/}}, with $i$ denoting the ELC number
+
 and $j$ the time index.
 The design matrix contains the basis functions of the linear model.
 The basis functions for the systematic features in the light curves are the ELC
@@ -469,12 +471,12 @@ In practise, the best approach for measuring rotation periods in {\it K2} data
 is likely to be a combination of the SIP method and the ACF method, where
 autocorrelation is performed on detrended light curves.
 The SIP code is available for public use and can be found at
-https://github.com/RuthAngus/SIPK2.
+\url{https://github.com/RuthAngus/SIPK2}.
 
-It is a pleasure to thank Dan Huber (Sydney) who provided comments for this
-paper and useful asteroseismology tips.
-We would also like to thank Suzanne Aigrain (Oxford) David Hogg (NYU) for
-their comments and Andrew Vanderburg (Harvard) and Ben Montet (Harvard)
+It is a pleasure to thank Dan Huber (Sydney) who provided many excellent
+comments for this paper and useful asteroseismology tips.
+We would also like to thank Suzanne Aigrain (Oxford) and David Hogg (NYU) for
+their comments and Andrew Vanderburg (Harvard) and Ben Montet (Caltech)
 for their extremely helpful suggestions and recommendations regarding this
 project.
 The data presented in this paper were obtained from the Mikulski Archive for
