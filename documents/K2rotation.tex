@@ -1,5 +1,7 @@
 \documentclass[useAMS, usenatbib, preprint, 12pt]{aastex}
-\usepackage{cite,natbib}
+\usepackage{cite, natbib}
+% \documentclass[onecolumn, 12pt, usenatbib, preprint]{emulateapj}
+\usepackage{float}
 \usepackage{epsfig}
 \usepackage{cases}
 \usepackage[section]{placeins}
@@ -388,22 +390,6 @@ such uncertainties.
 In practise, we recommend using both the SIP and ACF methods, in combination
 with a by-eye check, to measure rotation periods for {\it K2} stars.
 
-Figures \ref{fig:RRLyrae} and \ref{fig:EB} show the conditioned light curves
-and SIPs of an RR Lyrae star, selected from Guest observing program GO1018 and
-an Eclipsing Binary (EB), selected from the \citet{Armstrong2015} {\it K2} EB
-and variable star catalogue respectively.
-Figure \ref{fig:planet} shows the conditioned light curve and SIP of the
-short-period, disintegrating planet candidate discovered by
-\citet{Sanchis-Ojeda2015}.
-This planet has a period of around 0.4 days, short enough to be detectable
-with a periodogram, as was demonstrated for a number of ultra-short
-period {\it Kepler} exoplanets by \citet{Sanchis-Ojeda2014}.
-The top panels of these three figures show the {\it K2} light curves of these
-objects, conditioned on the highest S/N sinusoidal signal in the
-periodograms.
-These light curves were produced by subtracting the trends that best describe
-the data at the highest S/N period found in the SIP.
-
 \subsection{Tests}
 
 In order to demonstrate the consistent ability of the SIP method
@@ -432,6 +418,22 @@ skewed towards higher powers, i.e. a substantial fraction of the peaks at
 $\sim$ 47 \uHz\ have a large power.
 The SIP method is able to consistently remove the 47 \uHz signal which is
 present in almost every VJ14 light curve.
+
+Figures \ref{fig:RRLyrae} and \ref{fig:EB} show the conditioned light curves
+and SIPs of an RR Lyrae star, selected from Guest observing program GO1018 and
+an Eclipsing Binary (EB), selected from the \citet{Armstrong2015} {\it K2} EB
+and variable star catalogue respectively.
+Figure \ref{fig:planet} shows the conditioned light curve and SIP of the
+short-period, disintegrating planet candidate discovered by
+\citet{Sanchis-Ojeda2015}.
+This planet has a period of around 0.4 days, short enough to be detectable
+with a periodogram, as was demonstrated for a number of ultra-short
+period {\it Kepler} exoplanets by \citet{Sanchis-Ojeda2014}.
+The top panels of these three figures show the {\it K2} light curves of these
+objects, conditioned on the highest S/N sinusoidal signal in the
+periodograms.
+These light curves were produced by subtracting the trends that best describe
+the data at the highest S/N period found in the SIP.
 
 Photometric variability in dwarf stars on timescales less than 8 hours, often
 known as flicker, has been linked to surface gravity
@@ -592,7 +594,7 @@ directorate.
 \end{center}
 \end{figure*}
 
-\begin{figure*}
+\begin{figure*}[h]
 \begin{center}
 \includegraphics[width=6in, clip=true]{sip_hist.pdf}
 \caption{{\it Top:} Histogram of the frequencies of the highest peaks in the
@@ -607,7 +609,7 @@ directorate.
 \end{center}
 \end{figure*}
 
-\begin{figure*}
+\begin{figure*}[h]
 \begin{center}
 \includegraphics[width=6in, clip=true]{vbg_hist.pdf}
 \caption{{\it Top:} Histogram of the frequencies of the highest peaks in the
