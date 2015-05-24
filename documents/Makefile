@@ -5,7 +5,7 @@ RM          = rm -rf
 TMP_SUFFS   = pdf aux bbl blg log dvi ps eps out
 CHECK_RERUN = grep Rerun $*.log
 
-NAME = k2rotation
+NAME = K2rotation
 
 all: ${NAME}.pdf
 
