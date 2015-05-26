@@ -8,6 +8,7 @@ from colours import plot_colours
 cols = plot_colours()
 
 plotpar = {'axes.labelsize': 18,
+           'text.fontsize': 15,
            'legend.fontsize': 15,
            'xtick.labelsize': 18,
            'ytick.labelsize': 18,

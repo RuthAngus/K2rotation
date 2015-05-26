@@ -39,11 +39,16 @@ def raw_and_vbg():
     model = LombScargle().fit(x, y, np.ones_like(y)*1e-5)
     period = 1. / fs
     raw_pgram = model.periodogram(period)
-    ax1.plot(fs[::3]*1e6, raw_pgram[::3], "k")
+    ax1.plot(fs[::3]*1e6, raw_pgram[::3], "k", label="$\mathrm{Raw}$")
     ax.set_title("$\mathrm{EPIC~%s}$" % eid)
     ax1.set_xlim(10, 280)
     ax1.set_ylim(0, .015)
     plt.ylabel("$\mathrm{Power}$")
+#     plt.legend()
+    from matplotlib.patches import Rectangle
+#     leg1 = Rectangle((0, 0), 0, 0, alpha=0.0)
+#     plt.legend([leg1], "$\mathrm{Raw}$", handlelength=0)
+    plt.text(230, .012, "$\mathrm{Raw}$")
     ticks = ax1.get_yticks()
     print ticks
     ax1.set_yticks(ticks[1:-1])
@@ -62,7 +67,10 @@ def raw_and_vbg():
     model = LombScargle().fit(x, y, np.ones_like(y)*1e-5)
     ps = 1. / fs
     pgram = model.periodogram(ps)
-    ax2.plot(fs[::3]*1e6, pgram[::3], "k")
+    ax2.plot(fs[::3]*1e6, pgram[::3], "k", label="$\mathrm{VJ14~Detrended}$")
+    plt.text(200, .012, "$\mathrm{VJ14~Detrended}$")
+#     leg1 = Rectangle((0, 0), 0, 0, alpha=0.0)
+#     plt.legend([leg1], "$\mathrm{VJ14~Detrended}$", handlelength=0)
     ax2.set_xlim(10, 280)
     ax2.set_ylim(0, .015)
     plt.ylabel("$\mathrm{Power}$")
@@ -77,7 +85,10 @@ def raw_and_vbg():
                             % str(int(eid))).T
     ax3 = fig.add_subplot(313)
     if MAD == 0.: MAD = 1.
-    plt.plot(fs[::3], s2n[::3]*10e4/MAD**2, "k")
+    plt.plot(fs[::3], s2n[::3]*10e4/MAD**2, "k", label="$\mathrm{SIP}$")
+#     leg1 = Rectangle((0, 0), 0, 0, alpha=0.0)
+#     plt.legend([leg1], "$\mathrm{SIP}$", handlelength=0)
+    plt.text(230, 2.3, "$\mathrm{SIP}$")
     ax3.set_xlim(10, 280)
     plt.ylabel("$\mathrm{Relative~(S/N)}^2\mathrm{~(} \\times 10^{4}\mathrm{)}$")
     plt.xlabel("$\\nu\mathrm{~(}\mu\mathrm{Hz)}$")

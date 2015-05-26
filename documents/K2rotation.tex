@@ -207,8 +207,8 @@ Gaussian process periodogram for future consideration.
 In this \article\ we focus on the examples of asteroseismology and stellar
 rotation, however many other fields of astronomy utilize periodic information
 in {\it K2} light curves.
-These include eclipsing binaries, variable stars, exoplanets, white dwarfs and
-even AGN.
+These include studies of eclipsing binaries, variable stars, exoplanets, white
+dwarfs and even AGN.
 The development of tools for extracting periodic information from {\it K2}
 data is essential if it is to be as revolutionary in time-domain
 astronomy as the original {\it Kepler} mission was.
@@ -226,7 +226,7 @@ varying objects in this section, before presenting our conclusions in
 \label{sec:Method}
 
 The method implemented in this \article\ is an extention of the planet-search
-algorithm developed by \citet[][hereafter FM15]{Foreman-Mackey2015}.
+algorithm developed by \citet{Foreman-Mackey2015} (hereafter FM15).
 All targets observed by {\it Kepler} move on the CCD in the same way,
 therefore the systematics affecting each individual star's light curve have
 shared properties.
@@ -324,7 +324,7 @@ it is penalized.
 \label{section:rotation}
 
 An example LS periodogram of the raw {\it K2} photometry
-for giant star, EPIC 201211472 is shown in figure \ref{fig:raw}.
+for giant star, EPIC 201183188 is shown in figure \ref{fig:raw}.
 Peaks appearing at 47 $\mu$Hz and its harmonics are produced by the regular
 $\sim$ 6 hour thruster fires that repoint the spacecraft.
 These peaks are also present in periodograms of the VJ14 detrended light
@@ -344,7 +344,7 @@ are free from thruster firing signals.
 In order to search for high signal-to-noise asteroseismic modes in the giant
 star candidates of GO1059, we searched for a power excess in the SIPs using the
 method of \citet{Huber2009}: autocorrelation functions were calculated for
-sections of the power spectrum in order to search for regions of increased
+sections of the SIP in order to search for regions of increased
 correlation and locate the frequency of maximum power.
 The increased correlation arises from the even frequency spacing of acoustic
 modes, and the frequency of maximum correlation at the location of the power
@@ -509,14 +509,14 @@ thruster firings, we computed SIPs for \nGO\ targets from the GO1049
 proposal: ``Galactic Archaeology on a grand scale" (PI: Stello, D.).
 For each target, an SIP of its raw photometry and a LS periodogram of its
 VJ14 light curve was calculated for frequencies between
-44 and 54 \uHz.
+40 and 54 \uHz.
 Both the height and frequency of the highest peak in the SIP and the highest
-peak in the LS periodogram was recorded.
+peak in the LS periodogram were recorded.
 A histogram of the frequencies of the highest peaks in the SIPs of all \nGO\
 targets is shown in the top panel of figure \ref{fig:sip_hist}.
 The bottom panel shows the histograms of peak heights within the
 correspondingly colored ranges indicated in the top panel.
-This figure shows that whilst there are a greater number of maximum peaks
+This figure shows that while there are a greater number of maximum peaks
 around 47 \uHz, the S/Ns of these peaks are comparable to those found just
 above and just below this frequency.
 Figure \ref{fig:vbg_hist} shows the equivalent results for the
@@ -534,7 +534,7 @@ present in almost every VJ14 light curve.
 \begin{center}
 \includegraphics[width=6in, clip=true]{sip_hist.pdf}
 \caption{{\it Top:} Histogram of the frequencies of the highest peaks in the
-	SIPs of \nGO\ {\it K2} targets within the range 44 - 54 \uHz.
+	SIPs of \nGO\ {\it K2} targets within the range 40--54 \uHz.
 	{\it Bottom:} Histograms of peak heights within the correspondingly
 	colored ranges indicated in the top panel.
 	Whilst there is a larger number maximum peaks around 47 \uHz\ (the
@@ -550,7 +550,7 @@ present in almost every VJ14 light curve.
 \includegraphics[width=6in, clip=true]{vbg_hist.pdf}
 \caption{{\it Top:} Histogram of the frequencies of the highest peaks in the
 	LS periodograms of the \citet{Vanderburg2014} light curves of \nGO\
-	{\it K2} targets within the range 44 - 54 \uHz.
+	{\it K2} targets within the range 40--54 \uHz.
 	{\it Bottom:} Histograms of peak heights within the correspondingly
 	colored ranges indicated in the top panel.
 	The frequency of maximum peak height was $\sim$ 47 \uHz\ in almost
@@ -564,7 +564,8 @@ present in almost every VJ14 light curve.
 \end{figure*}
 
 Figures \ref{fig:RRLyrae} and \ref{fig:EB} show the conditioned light curves
-and SIPs of an RR Lyrae star, selected from Guest observer program GO1018 and
+and SIPs of an RR Lyrae star, selected from Guest observer program GO1018;
+``Long Cadence RR Lyrae targets" (PI: Plachy, E.) and
 an Eclipsing Binary (EB), selected from the \citet{Armstrong2015} {\it K2} EB
 and variable star catalogue respectively.
 Figure \ref{fig:planet} shows the conditioned light curve and SIP of the
@@ -585,7 +586,8 @@ the data at the highest S/N period found in the SIP.
 \caption{{\it Top:} The light curve of RR Lyrae star, EPIC 201339783,
 	conditioned on the highest amplitude sinusoidal signal found in the
 	SIP. {\it Bottom:} The systematic-insensitive periodogram of
-	this light curve. This target was selected from GO1018.}
+	this light curve. This target was selected from GO1018
+	(PI: Plachy, E.).}
 \label{fig:RRLyrae}
 \end{center}
 \end{figure}
