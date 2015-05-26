@@ -36,7 +36,6 @@ def histo(amps, Ps, namps, npers, allas, allps, fname, flag):
     allas = np.log10(allas)
     max_n_per_bin = int(npers/namps)
     my_yedges = np.linspace(min(amps), max(amps), nbins)
-    my_yedges = np.linspace(min(amps), max(amps), nbins)
     my_xedges = np.linspace(min(Ps), max(Ps), nbins)
     K2_hist, xedges, yedges = np.histogram2d(Ps, amps, bins=nbins,
                                              range=[[min(my_xedges),
@@ -63,7 +62,7 @@ def histo(amps, Ps, namps, npers, allas, allps, fname, flag):
              linestyle="--")
     plt.ylim(1, 3)
 #     plt.plot(Ps, amps, "k.")
-#     plt.plot(allps, allas, "r.", markersize=.5)
+    plt.plot(allps, allas, "r.", markersize=.5)
     plt.savefig("../injections/sine/%s_hist_%s.pdf" % (fname, flag))
     plt.close(fig)
 #     print K2_hist.T
@@ -124,5 +123,5 @@ def make_histogram_plot(flag, namps=30, npers=1000):
     plt.close(fig)
 
 if __name__ == "__main__":
-    make_histogram_plot("r")
     make_histogram_plot("a")
+    make_histogram_plot("r")

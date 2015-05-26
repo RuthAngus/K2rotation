@@ -155,7 +155,7 @@ def make_plot(fnames, s2ns):
         kepmags = f["spikes"][:, 1]
     l = mys
 
-def experimental(mxs, mys):
+def experimental(mxs, mys, paper=True):
     mxs *= 1e6
     s1, s2, s3, s4 = 45, 46.5, 48, 49.5
     l1 = (mxs < s2) * (s1 < mxs)
@@ -164,25 +164,39 @@ def experimental(mxs, mys):
     nbins = 50
     plt.clf()
     plt.subplot(2, 1, 1)
-    plt.axvspan(s1, s2, facecolor="b", alpha=.5, edgecolor="w")
-    plt.axvspan(s2, s3, facecolor="m", alpha=.5, edgecolor="w")
-    plt.axvspan(s3, s4, facecolor="c", alpha=.5, edgecolor="w")
+    if paper == True:
+#         plt.axvspan(s1+.05, s2-.05, facecolor="#6666FF", edgecolor="w", hatch="\\")
+        plt.axvspan(s1+.05, s2, facecolor="#9999FF", edgecolor="w", hatch="\\")
+        plt.axvspan(s2, s3-.05, facecolor="w", edgecolor="#FF66FF", hatch="\\")
+        plt.axvspan(s3, s4-.05, facecolor="w", edgecolor="#00CCCC", hatch="/")
+    else:
+        plt.axvspan(s1, s2, facecolor="#6666FF", edgecolor="w", hatch="\\")
+        plt.axvspan(s2, s3, facecolor="#FF66FF", edgecolor="w")
+        plt.axvspan(s3, s4, facecolor="#00CCCC", edgecolor="w", hatch="/")
     plt.hist(mxs, nbins, color=".3", edgecolor=".3", rwidth=.7)
     plt.ylim(1e0, 1e5)
     plt.yscale("log")
     nbins=50
     plt.xlim(40, 54)
     plt.xlabel("$\\nu~\mathrm{(}\mu\mathrm{Hz)}$")
-    plt.ylabel("$\ln\mathrm{(N}_{\mathrm{peaks})}$")
+    plt.ylabel("$\ln\mathrm{(N}_{\mathrm{peaks}})$")
     plt.subplot(2, 1, 2)
-    plt.hist(np.log(mys[l2]), nbins, histtype="stepfilled", color="m",
-             alpha=.5)
-    plt.hist(np.log(mys[l1]), nbins, histtype="stepfilled",
-             color="#6666FF", edgecolor=".3")
-    plt.hist(np.log(mys[l3]), nbins, histtype="stepfilled",
-             color="#00FFCC", alpha=.5)
-    plt.ylabel("$\ln\mathrm{(N}_{\mathrm{peaks})}$")
-    plt.xlabel("$\mathrm{\ln(Maximum~peak~height~(S/N)})$")
+    if paper == True:
+        plt.hist(np.log(mys[l2]), nbins, histtype="stepfilled",
+                color="w", edgecolor="#FF66FF", hatch="\\")
+        plt.hist(np.log(mys[l1]), nbins, histtype="stepfilled",
+                 color="#9999FF", edgecolor="w", hatch="\\")
+        plt.hist(np.log(mys[l3]), nbins, histtype="stepfilled",
+                 color="w", edgecolor="#00CCCC", hatch="/")
+    else:
+        plt.hist(np.log(mys[l2]), nbins, histtype="stepfilled",
+                color="#FF66FF", edgecolor="w")
+        plt.hist(np.log(mys[l1]), nbins, histtype="stepfilled",
+                 color="#6666FF", edgecolor="w", hatch="\\")
+        plt.hist(np.log(mys[l3]), nbins, histtype="stepfilled",
+                 color="#00CCCC", edgecolor="w", hatch="/")
+    plt.ylabel("$\ln\mathrm{(N}_{\mathrm{peaks}})$")
+    plt.xlabel("$\mathrm{\ln(Maximum~peak~height~[Relative~(S/N)}^2\mathrm{])}$")
     plt.yscale("log")
     plt.subplots_adjust(hspace=.3)
     plt.savefig("sip_hist.pdf")
@@ -196,9 +210,9 @@ def experimental_vbg(mxs, mys):
     nbins = 50
     plt.clf()
     plt.subplot(2, 1, 1)
-    plt.axvspan(s1, s2, facecolor="b", alpha=.5, edgecolor="w")
-    plt.axvspan(s2, s3, facecolor="m", alpha=.5, edgecolor="w")
-    plt.axvspan(s3, s4, facecolor="c", alpha=.5, edgecolor="w")
+    plt.axvspan(s1, s2, facecolor="#6666FF", edgecolor="w", hatch="\\")
+    plt.axvspan(s2, s3, facecolor="#FF66FF", edgecolor="w")
+    plt.axvspan(s3, s4, facecolor="#00CCCC", edgecolor="w", hatch="/")
     plt.hist(mxs, nbins, color=".3", edgecolor=".3", rwidth=.7)
     plt.xlabel("$\\nu~\mathrm{(}\mu\mathrm{Hz)}$")
     plt.ylabel("$\mathrm{N}_{\mathrm{peaks}}$")
@@ -207,12 +221,12 @@ def experimental_vbg(mxs, mys):
     plt.ylim(10e-1, 10e4)
     plt.ylabel("$\ln(\mathrm{N}_{\mathrm{peaks}})$")
     plt.subplot(2, 1, 2)
-    plt.hist(np.log(mys[l2]), nbins, histtype="stepfilled", color="m",
-             alpha=.5)
-    plt.hist(np.log(mys[l1]), nbins, histtype="stepfilled", color="#6666FF",
-             edgecolor=".3")
+    plt.hist(np.log(mys[l2]), nbins, histtype="stepfilled", color="#FF66FF",
+            edgecolor="w")
+    plt.hist(np.log(mys[l1]), nbins, histtype="stepfilled",
+             color="#6666FF", edgecolor="w", hatch="\\")
     plt.hist(np.log(mys[l3]), nbins, histtype="stepfilled",
-             color="#00FFCC", alpha=.5)
+             color="#00CCCC", edgecolor="w", hatch="/")
     plt.ylabel("$\mathrm{N}_{\mathrm{peaks}}$")
     plt.xlabel("$\mathrm{\ln(Maximum~peak~height~(S/N)})$")
     plt.yscale("log")

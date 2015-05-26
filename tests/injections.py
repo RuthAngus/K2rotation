@@ -49,7 +49,14 @@ def grid_over_amps(basis, flux, raw_x, raw_y, truth, fs, amps, true_a,
         print "period = ", truth
 
         # add lcs together
-        fx = flux * a
+#         plt.clf()
+#         plt.plot(flux * a, "k.")
+        noise = np.random.randn(len(flux))*50*13**.5*1e-6
+#         print 50*13**.5*1e-6, a
+        fx = flux * a + noise
+#         plt.plot(fx, "r.")
+#         plt.savefig("Test")
+#         assert 0
         y = fx + raw_y
         SN = np.var(fx) / np.var(raw_y)
 
@@ -124,7 +131,7 @@ def grid_over_periods(basis, raw_x, raw_y, true_p, fs, true_a, fnames, flag):
         time, flux = np.genfromtxt(fname).T
         K2a, K2P, rawa, rawP, alla, allp, all_results = \
                 grid_over_amps(basis, flux, raw_x, raw_y, true_p[i], fs,
-                               amps, true_a[i], flag, i, plot=True)
+                               amps, true_a[i], flag, i, plot=False)
         K2_amps.append(K2a)
         raw_amps.append(rawa)
         K2_Ps.append(K2P)
@@ -187,9 +194,9 @@ if __name__ == "__main__":
 
     # The sip grid
     if flag == "r":
-#         ps = np.linspace(.4, 50., 1000)
-#         fs = 1./ps
-        fs = np.linspace(1/50., 1/.4, 1000)
+        ps = np.linspace(.4, 50., 1000)
+        fs = 1./ps
+#         fs = np.linspace(1/50., 1/.4, 1000)
     elif flag == "a":
         fs = np.linspace(2./4., 26., 5000)
 
