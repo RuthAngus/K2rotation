@@ -79,7 +79,7 @@ def raw_and_vbg():
     if MAD == 0.: MAD = 1.
     plt.plot(fs[::3], s2n[::3]*10e4/MAD**2, "k")
     ax3.set_xlim(10, 280)
-    plt.ylabel("$\mathrm{Relative~(S/N)}^2\mathrm{~(} \\times 10^{-4}\mathrm{)}$")
+    plt.ylabel("$\mathrm{Relative~(S/N)}^2\mathrm{~(} \\times 10^{4}\mathrm{)}$")
     plt.xlabel("$\\nu\mathrm{~(}\mu\mathrm{Hz)}$")
     fig.subplots_adjust(hspace=0, bottom=.1)
 #     ticks = ax3.get_yticks()
