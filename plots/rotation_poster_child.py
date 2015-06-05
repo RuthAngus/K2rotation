@@ -64,6 +64,8 @@ def p_child_plot(x, y, eid):
     fmax = max(lags)/100.
     fs = np.linspace(1e-6, fmax, 1000)
     ps = 1./fs
+#     ps = np.linspace(.1, 2, 1000)
+#     fs = 1./ps
     pgram = model.periodogram(ps)
     np.savetxt("lspgram_%s.txt" % eid, np.transpose((ps, pgram)))
 
@@ -93,6 +95,7 @@ def p_child_plot(x, y, eid):
 #     plt.plot(fs, pgram, "k")
 #     plt.xlim(min(fs), fmax)
     plt.plot(1./fs, pgram, "k")
+#     plt.xlim(0, 2)
     plt.xlim(min(1./fs), max(lags))
     plt.xlabel("$\mathrm{Period~(days)}$")
 #     plt.xlabel("$\mathrm{Frequency~(days}^{-1}\mathrm{)}$")
@@ -116,6 +119,7 @@ if __name__ == "__main__":
     eids = [201129544, 201132518, 201133037, 201133147, 201135311, 201138638,
             201138849, 201142023, 201142127]
     eids = [201133037, 201142023]
+#     eids = [201637175, 201665500]
     for eid in eids:
         try:
             x, y, _ = np.genfromtxt("../data/c1/ep%s.csv" % eid, delimiter=",").T

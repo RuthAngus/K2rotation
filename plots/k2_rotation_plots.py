@@ -356,23 +356,25 @@ def top_5_pgram(x, basis, w):
 
 if __name__ == "__main__":
 
-    epid = "201317002"  # original
-    epid = "201129544"  # slight discrepancy between ACF and pgrams
-    epid = "201132518"
+#     epid = "201317002"  # original
+#     epid = "201129544"  # slight discrepancy between ACF and pgrams
+#     epid = "201132518"
 #     eids = [201129544, 201132518, 201133037, 201133147, 201135311, 201138638,
 #             201138849, 201142023, 201142127]
     eids = [201133037, 201142023]
+    eids = [201142023]
 
     for epid in eids:
         x, y, basis = read_data(epid, 150)
 
         # compute K2 pgram
         try:
-            fs, s2n, w = np.genfromtxt("%spgram.txt" % epid).T
+            fs, s2n, w = np.genfromtxt("%spgram_.txt" % epid).T
             print "periodogram file found"
         except:
             print "calculating SIP"
             fs = np.linspace(1e-6, .7, 1000)
+            s2n, amp2s, w  = K2pgram(x, y, basis, fs)
             amp2s, s2n, w  = K2pgram(x, y, basis, fs)
             np.savetxt("%spgram.txt" % epid, np.transpose((fs, s2n)))
 
