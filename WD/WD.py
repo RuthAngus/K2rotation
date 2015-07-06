@@ -63,35 +63,3 @@ plt.legend(loc="best")
 plt.xlabel("Period (days)")
 plt.ylabel("Relative (S/N)^2")
 plt.savefig("%s_sip_zoom" % EPIC)
-
-# t, flux, _ = np.genfromtxt("ep201563164.csv", delimiter=",").T
-# plt.clf()
-# plt.subplot(2, 1, 1)
-# plt.plot(t, flux, "k")
-# plt.ylim(.9, 1.1)
-# plt.subplot(2, 1, 2)
-# model = LombScargle().fit(t, flux, np.ones_like(t)*1e-5)
-# pgram = model.periodogram(periods)
-# m = pgram == max(pgram)
-# # plt.plot(periods, pgram, "k", label="period = %.5f" % periods[m])
-# plt.plot(freqs, pgram, "k", label="period = %.5f" % periods[m])
-# plt.xlabel("Period (days)")
-# plt.legend()
-# plt.savefig("%s_vbg" % EPIC)
-
-# import nufft
-# t, flux, _ = np.genfromtxt("ep201563164.csv", delimiter=",").T
-# m = flux < 1.05
-# t, flux = t[m], flux[m]
-# flux -= np.mean(flux)
-# plt.clf()
-# plt.subplot(2, 1, 1)
-# plt.plot(t, flux, "k")
-# plt.subplot(2, 1, 2)
-# pgram = nufft.nufft3(t, flux, freqs*2*np.pi)
-# plt.ylim(0, .001)
-# m = pgram == max(pgram)
-# # plt.plot(periods, pgram, "k", label="period = %.5f" % periods[m])
-# plt.plot(freqs, pgram, "k")
-# plt.xlabel("Period (days)")
-# plt.savefig("%s_vbg_fft" % EPIC)
