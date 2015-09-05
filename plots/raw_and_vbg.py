@@ -52,6 +52,8 @@ def raw_and_vbg():
     ticks = ax1.get_yticks()
     print ticks
     ax1.set_yticks(ticks[1:-1])
+    ax.set_yticklabels(ax.get_yticklabels(), visible=False)
+    ax.set_xticklabels(ax.get_xticklabels(), visible=False)
 
     ax.spines['top'].set_color('none')
     ax.spines['bottom'].set_color('none')
@@ -67,8 +69,8 @@ def raw_and_vbg():
     model = LombScargle().fit(x, y, np.ones_like(y)*1e-5)
     ps = 1. / fs
     pgram = model.periodogram(ps)
-    ax2.plot(fs[::3]*1e6, pgram[::3], "k", label="$\mathrm{VJ14~Detrended}$")
-    plt.text(200, .012, "$\mathrm{VJ14~Detrended}$")
+    ax2.plot(fs[::3]*1e6, pgram[::3], "k", label="$\mathrm{Detrended}$")
+    plt.text(200, .010, "$\mathrm{VJ14~Detrended}$")
 #     leg1 = Rectangle((0, 0), 0, 0, alpha=0.0)
 #     plt.legend([leg1], "$\mathrm{VJ14~Detrended}$", handlelength=0)
     ax2.set_xlim(10, 280)
@@ -88,7 +90,7 @@ def raw_and_vbg():
     plt.plot(fs[::3], s2n[::3]*10e4/MAD**2, "k", label="$\mathrm{SIP}$")
 #     leg1 = Rectangle((0, 0), 0, 0, alpha=0.0)
 #     plt.legend([leg1], "$\mathrm{SIP}$", handlelength=0)
-    plt.text(230, 2.3, "$\mathrm{SIP}$")
+    plt.text(230, 2.2, "$\mathrm{SIP}$")
     ax3.set_xlim(10, 280)
     plt.ylabel("$\mathrm{Relative~(S/N)}^2\mathrm{~(} \\times 10^{4}\mathrm{)}$")
     plt.xlabel("$\\nu\mathrm{~(}\mu\mathrm{Hz)}$")
@@ -96,6 +98,7 @@ def raw_and_vbg():
 #     ticks = ax3.get_yticks()
 #     ax3.set_yticks(ticks[1:-1])
     plt.savefig("../documents/rawvbg_%s.pdf" % eid)
+    plt.savefig("poster_rawvbg_%s" % eid, transparent=True)
 
 if __name__ == "__main__":
     raw_and_vbg()

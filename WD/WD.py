@@ -31,35 +31,36 @@ def EPICSIP(EPIC, C, periods, nELC=150):
     s2n, amp2s, w = SIP(x, y, basis, freqs)
     return x, y, s2n, amp2s, w
 
-EPIC, C = "201563164", 1
+if __name__ == "__main__":
+    EPIC, C = "201563164", 1
 
-freqs = np.arange(.5, 24, .001)
-periods = 1./freqs
-x, y, s2n, amp2s, w = EPICSIP(EPIC, C, periods, nELC=1000)
+    freqs = np.arange(.5, 24, .001)
+    periods = 1./freqs
+    x, y, s2n, amp2s, w = EPICSIP(EPIC, C, periods)
 
-plt.clf()
-plt.subplot(2, 1, 1)
-plt.plot(x, y, "k")
-plt.ylim(-.1, .1)
-plt.subplot(2, 1, 2)
-m = s2n == max(s2n)
-plt.plot(freqs, s2n/max(s2n), "k", label="period = %.5f" % periods[m])
-plt.legend(loc="best")
-plt.xlabel("Period (days)")
-plt.ylabel("Relative (S/N)^2")
-plt.savefig("%s_sip" % EPIC)
+    plt.clf()
+    plt.subplot(2, 1, 1)
+    plt.plot(x, y, "k")
+    plt.ylim(-.1, .1)
+    plt.subplot(2, 1, 2)
+    m = s2n == max(s2n)
+    plt.plot(freqs, s2n/max(s2n), "k", label="period = %.5f" % periods[m])
+    plt.legend(loc="best")
+    plt.xlabel("Period (days)")
+    plt.ylabel("Relative (S/N)^2")
+    plt.savefig("%s_sip" % EPIC)
 
-np.savetxt("%s_sip" % EPIC, np.transpose((freqs, amp2s)))
+    np.savetxt("%s_sip.txt" % EPIC, np.transpose((freqs, amp2s)))
 
-freqs = np.arange(4, 7, .0001)
-periods = 1./freqs
-x, y, s2n, amp2s, w = EPICSIP(EPIC, C, periods)
+    freqs = np.arange(4, 7, .0001)
+    periods = 1./freqs
+    x, y, s2n, amp2s, w = EPICSIP(EPIC, C, periods)
 
-plt.clf()
-m = s2n == max(s2n)
-plt.plot(freqs, s2n/max(s2n), "k", label="period = %.5f" % periods[m])
-plt.plot(freqs, amp2s/max(amp2s), "r", label="period = %.5f" % periods[m])
-plt.legend(loc="best")
-plt.xlabel("Period (days)")
-plt.ylabel("Relative (S/N)^2")
-plt.savefig("%s_sip_zoom" % EPIC)
+    plt.clf()
+    m = s2n == max(s2n)
+    plt.plot(freqs, s2n/max(s2n), "k", label="period = %.5f" % periods[m])
+    plt.plot(freqs, amp2s/max(amp2s), "r", label="period = %.5f" % periods[m])
+    plt.legend(loc="best")
+    plt.xlabel("Period (days)")
+    plt.ylabel("Relative (S/N)^2")
+    plt.savefig("%s_sip_zoom" % EPIC)

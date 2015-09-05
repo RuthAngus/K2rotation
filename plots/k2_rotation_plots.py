@@ -181,6 +181,7 @@ def K2_poster_child_plot(x, y, fs, s2n, epid):
     plt.legend(loc="best")
     print "../documents/K2_rotation_%s.pdf" % epid
     plt.savefig("../documents/K2_rotation_%s.pdf" % epid)
+    plt.savefig("K2_rotation_%s" % epid, transparent=True)
     return mx
 
 def K2_conditioned_plot(fs, epid):
@@ -362,7 +363,7 @@ if __name__ == "__main__":
 #     eids = [201129544, 201132518, 201133037, 201133147, 201135311, 201138638,
 #             201138849, 201142023, 201142127]
     eids = [201133037, 201142023]
-    eids = [201142023]
+#     eids = [201142023]
 
     for epid in eids:
         x, y, basis = read_data(epid, 150)
