@@ -10,10 +10,6 @@ from WD import EPICSIP
 from SIP import SIP, eval_freq
 
 def sigma_clipping(x, y, low, high):
-
-    plt.clf()
-    plt.plot(x, y, "r.")
-
     # running median with 100 points
     N = 100
     nsections = len(x)/N + 1
@@ -40,10 +36,6 @@ def sigma_clipping(x, y, low, high):
     # get rid of initial dip
     clip = 170
     y[:clip], x[:clip] = np.ones(clip)*np.nan, np.ones(clip)*np.nan
-
-    m = np.isfinite(y) * np.isfinite(x)
-    plt.plot(x[m], y[m], "k.")
-    plt.show()
 
     return x, y
 
