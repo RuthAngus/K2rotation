@@ -49,7 +49,7 @@ def load_data(id):
         q = data["quality"]
 
         # sigma clip
-        x, y = sigma_clipping(x, y, 4, 4)
+#         x, y = sigma_clipping(x, y, 4, 4)
         l = np.isfinite(y) * np.isfinite(x) * (q==0)
         y, x = y[l], x[l]
 
@@ -72,7 +72,7 @@ def list_SIP(epids):
 
         plt.clf()
         plt.plot(x, y, "k.")
-        plt.savefig("%s_lc" % id)
+        plt.savefig("%s_lc_ns" % id)
 
         print "computing SIP..."
         fs = np.arange(10, 300, 4e-2) * 1e-6
@@ -81,19 +81,19 @@ def list_SIP(epids):
         data = np.vstack((fs, amps2**.5*1e6)).T
 
         print "saving SIP"
-        np.savetxt("%s.txt" % id, data)
+        np.savetxt("%s_ns.txt" % id, data)
 
 if __name__ == "__main__":
     epids = np.genfromtxt("ktwo_c1_APO-RGs_llc.dat.epic.list", dtype=str).T
     list_SIP(epids)
 
     for id in epids:
-        fs, amp2s = np.genfromtxt("%s.txt" % id).T
-        print "plotting..."
+        fs, amp2s = np.genfromtxt("%s_ns.txt" % id).T
+        print "plotting %s..." % id
         plt.clf()
-        plt.plot(fs[::5], amp2s[::5], "k")
+        plt.plot(fs, amp2s, "k")
         plt.xlabel("$\\nu\mathrm{~(}\mu\mathrm{Hz)}$")
         plt.ylabel("$\mathrm{Relative~(S/N)}^2$")
         plt.title("$\mathrm{EPIC~%s}$" % str(int(id)))
         plt.subplots_adjust(bottom=.15, left=.2)
-        plt.savefig("%s" % str(int(id)))
+        plt.savefig("%s_ns" % str(int(id)))
