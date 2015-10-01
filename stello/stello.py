@@ -75,7 +75,7 @@ def list_SIP(epids):
         plt.savefig("%s_lc_ns" % id)
 
         print "computing SIP..."
-        fs = np.arange(10, 300, 4e-2) * 1e-6
+        fs = np.arange(10, 280, 4e-2) * 1e-6
         amps2, s2n, w = K2pgram(x, y, basis, fs)
 
         data = np.vstack((fs, amps2**.5*1e6)).T
