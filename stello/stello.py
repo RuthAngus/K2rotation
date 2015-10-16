@@ -83,10 +83,7 @@ def list_SIP(epids):
         print "saving SIP"
         np.savetxt("%s_ns.txt" % id, data)
 
-if __name__ == "__main__":
-    epids = np.genfromtxt("ktwo_c1_APO-RGs_llc.dat.epic.list", dtype=str).T
-    list_SIP(epids)
-
+def plot_results(epids):
     for id in epids:
         fs, amp2s = np.genfromtxt("%s_ns.txt" % id).T
         print "plotting %s..." % id
@@ -97,3 +94,12 @@ if __name__ == "__main__":
         plt.title("$\mathrm{EPIC~%s}$" % str(int(id)))
         plt.subplots_adjust(bottom=.15, left=.2)
         plt.savefig("%s_ns" % str(int(id)))
+
+if __name__ == "__main__":
+#     epids = np.genfromtxt("ktwo_c1_APO-RGs_llc.dat.epic.list", dtype=str).T
+    epids = np.genfromtxt("K2Campaign1-ObservedTargets_K2GAP.txt",
+                          skip_header=1).T
+    print epids[:10]
+    print type(epids[0])
+    assert 0
+    list_SIP(epids)
