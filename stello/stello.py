@@ -4,10 +4,6 @@ import wget
 import h5py
 from K2pgram import K2pgram
 import fitsio
-from plotstuff import params
-reb = params()
-from WD import EPICSIP
-from SIP import SIP, eval_freq
 
 def sigma_clipping(x, y, low, high):
     # running median with 100 points
@@ -72,7 +68,7 @@ def list_SIP(epids):
 
         plt.clf()
         plt.plot(x, y, "k.")
-        plt.savefig("%s_lc_ns" % id)
+        plt.savefig("%s_lc" % id)
 
         print "computing SIP..."
         fs = np.arange(10, 280, 4e-2) * 1e-6
@@ -98,8 +94,6 @@ def plot_results(epids):
 if __name__ == "__main__":
 #     epids = np.genfromtxt("ktwo_c1_APO-RGs_llc.dat.epic.list", dtype=str).T
     epids = np.genfromtxt("K2Campaign1-ObservedTargets_K2GAP.txt",
-                          skip_header=1).T
-    print epids[:10]
-    print type(epids[0])
-    assert 0
+                          skip_header=1, dtype=str).T  # 8000 targets
+
     list_SIP(epids)
