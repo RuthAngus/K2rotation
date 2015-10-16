@@ -4,6 +4,9 @@ import wget
 import h5py
 from K2pgram import K2pgram
 import fitsio
+import pyfits
+import subprocess
+import sys
 
 def sigma_clipping(x, y, low, high):
     # running median with 100 points
@@ -58,17 +61,27 @@ def load_data(id):
 
         return x, y, basis
 
-def list_SIP(epids):
-    for id in epids:
-        print id
+def list_SIP(epids, plot=False):
+    for i, id in enumerate(epids):
+        print id, i, "of", len(epids)
+
+        print "downloading lightcurve..."
+        a = "ktwo%s-c01_lpd-lc.fits" % id
+        url = "http://bbq.dfm.io/ketu/lightcurves/c1/%s00000/%s000/%s" \
+                % (id[:4], id[4:6], a)
+        wget.download(url)
 
         x, y, basis = load_data(id)
         med = np.median(y)
         y = y/med - 1
 
-        plt.clf()
-        plt.plot(x, y, "k.")
-        plt.savefig("%s_lc" % id)
+        print "deleting lightcurve"
+        subprocess.call("rm ktwo%s-c01_lpd-lc.fits" % id, shell=True)
+
+        if plot:
+            plt.clf()
+            plt.plot(x, y, "k.")
+            plt.savefig("plots/%s_lc" % id)
 
         print "computing SIP..."
         fs = np.arange(10, 280, 4e-2) * 1e-6
@@ -77,23 +90,30 @@ def list_SIP(epids):
         data = np.vstack((fs, amps2**.5*1e6)).T
 
         print "saving SIP"
-        np.savetxt("%s_ns.txt" % id, data)
+        np.savetxt("SIPs/%s.txt" % id, data)
 
-def plot_results(epids):
+def plot_results(epids, tex=False):
     for id in epids:
-        fs, amp2s = np.genfromtxt("%s_ns.txt" % id).T
+        fs, amp2s = np.genfromtxt("%s.txt" % id).T
         print "plotting %s..." % id
         plt.clf()
         plt.plot(fs, amp2s, "k")
-        plt.xlabel("$\\nu\mathrm{~(}\mu\mathrm{Hz)}$")
-        plt.ylabel("$\mathrm{Relative~(S/N)}^2$")
-        plt.title("$\mathrm{EPIC~%s}$" % str(int(id)))
+        if tex:
+            plt.xlabel("$\\nu\mathrm{~(}\mu\mathrm{Hz)}$")
+            plt.ylabel("$\mathrm{Relative~(S/N)}^2$")
+            plt.title("$\mathrm{EPIC~%s}$" % str(int(id)))
+        else:
+            plt.xlabel("Frequency (Hz)")
+            plt.ylabel("Relative (S/N)^2")
+            plt.title("EPIC %s" % str(int(id)))
         plt.subplots_adjust(bottom=.15, left=.2)
-        plt.savefig("%s_ns" % str(int(id)))
+        plt.savefig("plots/%s" % str(int(id)))
 
 if __name__ == "__main__":
 #     epids = np.genfromtxt("ktwo_c1_APO-RGs_llc.dat.epic.list", dtype=str).T
     epids = np.genfromtxt("K2Campaign1-ObservedTargets_K2GAP.txt",
                           skip_header=1, dtype=str).T  # 8000 targets
 
-    list_SIP(epids)
+    start, stop = int(sys.argv[1]), int(sys.argv[2])
+    if stop > len(epids): list_SIP(epids[start:])
+    else: list_SIP(epids[start:stop])
