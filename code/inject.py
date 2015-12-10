@@ -22,33 +22,40 @@ def prewhiten(x, y, f):
     amps2, s2n, w = eval_freq(x, y, f, AT, ATA)
     sin_amp, cos_amp = w[-2:]
     wave = sin_amp * np.sin(2*np.pi*f*x) + cos_amp * np.cos(2*np.pi*f*x)
-    return y - wave
+    return y + wave
 
-# load the data
-fnames = glob.glob("data/ktwo*fits")
-x, y, basis = load_K2_data(fnames[0])
 
-# compute a SIP
-# fs = np.arange(10, 300, 1e-1) * 1e-6
-fs = np.arange(10, 300, 1) * 1e-6
-s2n, amps2, w = SIP(x, y, basis, fs)
+# inject a sine wave
+def inject(x, y, f, a):
+    wave = a * np.sin(f*2*np.pi*x)
+    return y + wave
 
-plt.clf()
-plt.plot(fs*1e6, amps2)
 
-peak_f, peak_height = peak_detect(fs, amps2)
-new_y = prewhiten(x, y, peak_f)
-s2n, amps2, w = SIP(x, y, basis, fs)
-plt.plot(fs*1e6, amps2)
+if __name__ == "__main__":
 
-peak_f, peak_height = peak_detect(fs, amps2)
-new_y = prewhiten(x, y, peak_f)
-s2n, amps2, w = SIP(x, y, basis, fs)
-plt.plot(fs*1e6, amps2)
+    # load the data
+    fnames = glob.glob("data/ktwo*fits")
+    x, y, basis = load_K2_data(fnames[0])
 
-peak_f, peak_height = peak_detect(fs, amps2)
-new_y = prewhiten(x, y, peak_f)
-s2n, amps2, w = SIP(x, y, basis, fs)
-plt.plot(fs*1e6, amps2)
+    # compute a SIP
+    fs = np.arange(10, 30, 1e-1) * 1e-6
+    s2n, amps2, w = SIP(x, y, basis, fs)
 
-plt.savefig("sip")
+    # inject a bunch of sinewaves
+    a_s = np.ones_like(fs) * 1e-3
+    recovered = np.zeros_like(fs)
+    for i, f in enumerate(fs):
+        print(i, "of", len(fs))
+        y += inject(x, y, f, 1e-3)
+        s2n, amps2, w = SIP(x, y, basis, fs)
+        peak_f, _ = peak_detect(fs, amps2)
+        recovered[i] = peak_f
+        plt.clf()
+        plt.plot(fs, amps2)
+        plt.axvline(peak_f)
+        plt.show()
+
+    diff = (fs - recovered) / fs
+    plt.clf()
+    plt.hist(diff)
+    plt.savefig("test")
