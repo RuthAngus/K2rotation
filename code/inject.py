@@ -7,7 +7,7 @@ import glob
 from SIP import SIP, eval_freq
 
 
-def prewhiten(x, y, f):
+def prewhiten(x, y, f, basis):
     """
     A simple prewhitening function
     takes time and flux for the timeseries and the freq you want to
@@ -35,31 +35,49 @@ def inject(x, y, f, a):
     return y + wave
 
 
+def inject_and_recover(fname, fs, ifs, a_s, plot=False):
+    """
+    fname: "path/to/file/filename" - should be a K2 fits file
+    fs: the SIP freq array
+    ifs: an array of frequencies to inject
+    a_s: an array of amplitudes to inject
+    returns the recovered frequencies and amplitudes
+    """
+    x, y, basis = load_K2_data(fname)
+    recovered = np.zeros_like(ifs)  # array of freq of the highest peak
+    recovered_amps = np.zeros_like(ifs)
+    for i, f in enumerate(ifs):  # loop over frequencies
+        for j, a in enumerate(a_s):
+            print(j, "of", len(a_s), "amplitudes")
+            print(i, "of", len(ifs), "frequencies")
+            iy = y + inject(x, y, f, a)
+            s2n, amps2, w = SIP(x, iy, basis, fs)
+            peak_f, peak_a = peak_detect(fs, amps2)
+            recovered[i] = peak_f
+            recovered_amps[i] = peak_a
+            if plot:
+                plt.clf()
+                plt.plot(fs, amps2)
+                plt.axvline(peak_f, color="r")
+                plt.savefig("{0}{1}".format(j, i))
+    return recovered, recovered_amps
+
 if __name__ == "__main__":
 
     # load the data
     fnames = glob.glob("data/ktwo*fits")
-    x, y, basis = load_K2_data(fnames[0])
 
-    # compute a SIP
+    # inject and recover a bunch of sinewaves
     fs = np.arange(10, 300, 1e-1) * 1e-6
-    s2n, amps2, w = SIP(x, y, basis, fs)
+    ifs = np.arange(50, 250, 40) * 1e-6  # the injections frequencies
+    a_s = np.arange(1e-5, 1e-3, 5e-4)  # the injection amplitudes
+    recovered, recovered_amps = inject_and_recover(fnames[0], fs, ifs, a_s,
+                                                   plot=True)
+    print(ifs)
+    print(recovered)
+    print(a_s)
+    print(recovered_amps)
 
-    # inject a bunch of sinewaves
-    a_s = np.ones_like(fs) * 1e-3
-    recovered = np.zeros_like(fs[10:20])
-    for i, f in enumerate(fs[10:20]):
-        print(i, "of", len(fs[10:20]))
-        y += inject(x, y, f, 1e-3)
-        s2n, amps2, w = SIP(x, y, basis, fs)
-        peak_f, _ = peak_detect(fs, amps2)
-        plt.clf()
-        plt.plot(fs, amps2)
-        plt.axvline(peak_f, color="r")
-        plt.show()
-        recovered[i] = peak_f
-
-    diff = (fs[10:20] - recovered)
     plt.clf()
-    plt.hist(diff)
+    plt.hist(ifs - recovered)
     plt.savefig("test")
