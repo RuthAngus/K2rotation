@@ -27,6 +27,17 @@ def load_K2_data(fname):
     return x, y, basis
 
 
+def detect_all_peaks(x, y):
+    """
+    A VERY simple peak detecting algorithm
+    in: x and y
+    returns the peak positions and peak heights
+    """
+    peaks = np.array([i for i in range(1, len(x)-1) if y[i-1] < y[i] and
+                     y[i+1] < y[i]])
+    return x[peaks], y[peaks]
+
+
 def peak_detect(x, y):
     """
     A VERY simple peak detecting algorithm
