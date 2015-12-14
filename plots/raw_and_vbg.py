@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 from gatspy.periodic import LombScargle
 import fitsio
 
+
 def raw_and_vbg():
 
     plotpar = {'axes.labelsize': 12,
@@ -23,7 +24,7 @@ def raw_and_vbg():
     y = data["flux"][:, np.argmin(aps["cdpp6"])]
     x = data["time"]
     q = data["quality"]
-    l = np.isfinite(y) * np.isfinite(x) * (q==0)
+    l = np.isfinite(y) * np.isfinite(x) * (q == 0)
     y, x = y[l], x[l]
     MAD = np.median(y - np.median(y))
     y /= np.median(y)
@@ -45,12 +46,10 @@ def raw_and_vbg():
     ax1.set_ylim(0, .015)
     plt.ylabel("$\mathrm{Power}$")
 #     plt.legend()
-    from matplotlib.patches import Rectangle
 #     leg1 = Rectangle((0, 0), 0, 0, alpha=0.0)
 #     plt.legend([leg1], "$\mathrm{Raw}$", handlelength=0)
     plt.text(230, .012, "$\mathrm{Raw}$")
     ticks = ax1.get_yticks()
-    print ticks
     ax1.set_yticks(ticks[1:-1])
     ax.set_yticklabels(ax.get_yticklabels(), visible=False)
     ax.set_xticklabels(ax.get_xticklabels(), visible=False)
@@ -64,8 +63,9 @@ def raw_and_vbg():
 
     # load andrew's lcs
     ax2 = fig.add_subplot(312)
-    x, y, _ = np.genfromtxt("../data/c1/ep%s.csv" % eid, delimiter=",").T
+    x, y = np.genfromtxt("../data/c1/ep%s.csv" % eid, skip_header=1).T
     x *= 24*3600
+
     model = LombScargle().fit(x, y, np.ones_like(y)*1e-5)
     ps = 1. / fs
     pgram = model.periodogram(ps)
@@ -77,7 +77,6 @@ def raw_and_vbg():
     ax2.set_ylim(0, .015)
     plt.ylabel("$\mathrm{Power}$")
     ticks = ax2.get_yticks()
-    print ticks
     ax2.set_yticks(ticks[1:-1])
 #     fig.text(0.04, 0.5, "$\mathrm{Power}$", ha="center", va="top",
 #              rotation="vertical")
@@ -86,7 +85,8 @@ def raw_and_vbg():
     fs, s2n = np.genfromtxt("../astero/%sastero_pgram.txt"
                             % str(int(eid))).T
     ax3 = fig.add_subplot(313)
-    if MAD == 0.: MAD = 1.
+    if MAD == 0.:
+        MAD = 1.
     plt.plot(fs[::3], s2n[::3]*10e4/MAD**2, "k", label="$\mathrm{SIP}$")
 #     leg1 = Rectangle((0, 0), 0, 0, alpha=0.0)
 #     plt.legend([leg1], "$\mathrm{SIP}$", handlelength=0)
@@ -97,8 +97,18 @@ def raw_and_vbg():
     fig.subplots_adjust(hspace=0, bottom=.1)
 #     ticks = ax3.get_yticks()
 #     ax3.set_yticks(ticks[1:-1])
+    print("saving as ../documents/rawvbg_%s.pdf" % eid)
+    print("saving as poster_rawvbg_%s.pdf" % eid)
     plt.savefig("../documents/rawvbg_%s.pdf" % eid)
     plt.savefig("poster_rawvbg_%s" % eid, transparent=True)
+
+    # compute Fourier transform
+    sp = np.fft.fft(y)
+    freq = np.fft.fftfreq(x.shape[-1])
+    fft = sp.real**2 * np.imag**2
+    plt.clf()
+    plt.plot(freq, fft)
+    plt.savefig("fft")
 
 if __name__ == "__main__":
     raw_and_vbg()
