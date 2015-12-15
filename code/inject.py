@@ -1,10 +1,9 @@
 import numpy as np
 import matplotlib.pyplot as plt
-# import h5py
-# from params import colours, params
 from K2misc import load_K2_data, peak_detect, detect_all_peaks
 import glob
 from SIP import SIP, eval_freq
+import sys
 
 
 def prewhiten(x, y, f, basis):
@@ -59,7 +58,7 @@ def inj(fname, ifs, a_s):
     np.savetxt("truths.txt", np.transpose((np.array(truths), np.array(ids))))
 
 
-def recover_SIP(template_id, inj_fnames, fs, oa2, plot=True,
+def recover_SIP(template_id, inj_fnames, fs, oa2, start, stop, plot=True,
                 subtract_baseline=True):
     """
     Find frequency and amplitude of the highest peak in the SIP
@@ -70,13 +69,14 @@ def recover_SIP(template_id, inj_fnames, fs, oa2, plot=True,
     """
     recovered, recovered_amps = [], []  # array of freq of the highest peak
     _, _, basis = load_K2_data(template_id)  # load original lc
-    for i, fname in enumerate(inj_fnames):  # loop over injections
+    for i, fname in enumerate(inj_fnames[start:stop]):  # loop over injections
+        print(i, "of", len(inj_fnames))
         ix, iy = \
             np.genfromtxt("injections/{0}.txt".format(str(fname).zfill(5))).T
         print("computing SIP")
         s2n, amps2, w = SIP(ix, iy, basis, fs)  # compute a sip
         if subtract_baseline:  # subtract the original sip
-            amps2 = oa2 - amps2
+            amps2 = amps2 - oa2
         peak_f, peak_a = peak_detect(fs, amps2)  # find the highest peak
         print(peak_f)
         recovered.append(peak_f)
@@ -86,7 +86,12 @@ def recover_SIP(template_id, inj_fnames, fs, oa2, plot=True,
             plt.plot(fs, amps2)
             plt.axvline(peak_f, color="r")
             plt.savefig("{0}".format(str(fname).zfill(5)))
-    return np.array(recovered), np.array(recovered_amps)
+
+    # save the results
+    rf, ra = np.array(recovered), np.array(recovered_amps)
+    data = np.vstack((inj_fnames, rf, ra))
+    np.savetxt("recovered_{0}_{1}.txt".format(start, stop), data.T)
+    return rf, ra
 
 
 def iterative_prewhiten(N):
@@ -107,18 +112,21 @@ def iterative_prewhiten(N):
 
 if __name__ == "__main__":
 
-    # load the data
+    # load the data and compute initial sip
     fnames = glob.glob("data/ktwo*fits")
     x, y, basis = load_K2_data(fnames[0])
     fs = np.arange(10, 300, 1e-1) * 1e-6
     s2n, amps2, w = SIP(x, y, basis, fs)
-    # ifs = np.arange(50, 250, 100) * 1e-6  # the injections frequencies
-    ifs = np.random.choice(fs, 2)  # the injections frequencies
-    a_s = np.arange(1e-5, 1e-3, 8e-4)  # the injection amplitudes
-    a_s = np.ones((2)) * 1e-3
+
+    # injection and recovery parameters
+    ifs = np.random.uniform(10e-6, 300e-6, 10)  # the injections frequencies
+    a_s = 1**np.random.uniform(-6, -4, 2)  # the injection amplitudes
     injection_fnames = range(len(ifs) * len(a_s))  # names for file saves
 
-    # inject and recover a bunch of sinewaves
-    # inj(fnames[0], ifs, a_s)
+    # parallelisation parameters
+    start = sys.argv(1)
+    stop = sys.argv(2)
+
+    inj(fnames[0], ifs, a_s)
     recovered, recovered_amps = recover_SIP(fnames[0], injection_fnames, fs,
-                                            amps2)
+                                            amps2, start, stop)
