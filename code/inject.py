@@ -48,6 +48,7 @@ def inj(fname, ifs, a_s):
     for i, f in enumerate(ifs):  # loop over frequencies
         for j, a in enumerate(a_s):  # loop over amplitudes
             print(id+1, "of", len(a_s) * len(ifs))
+            print("injection frequency = ", f)
             iy = y + inject(x, y, f, a)  # inject sinewave
             np.savetxt("injections/{0}.txt".format(str(id).zfill(5)),
                        np.transpose((x, iy)))
@@ -120,14 +121,15 @@ if __name__ == "__main__":
     s2n, amps2, w = SIP(x, y, basis, fs)
 
     # injection and recovery parameters
-    ifs = np.random.uniform(10e-6, 300e-6, 5)  # the injection frequencies
-    a_s = 1**np.random.uniform(-6, -4, 2)  # the injection amplitudes
+    N = 10
+    ifs = np.random.uniform(10e-6, 300e-6, 3)  # the injection frequencies
+    a_s = 10**np.random.uniform(-4, -3, 3)  # the injection amplitudes
     injection_fnames = range(len(ifs) * len(a_s))  # names for file saves
 
     # parallelisation parameters
     start = int(sys.argv[1])
     stop = int(sys.argv[2])
 
-#     inj(fname, ifs, a_s)
+    inj(fname, ifs, a_s)
     recovered, recovered_amps = recover_SIP(fname, injection_fnames, fs,
-                                            amps2, start, stop)
+                                            amps2, start, stop, plot=True)
