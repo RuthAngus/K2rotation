@@ -16,7 +16,7 @@ def SIP(x, y, basis, fs):
     amps2 = np.zeros_like(fs)
     s2n = np.zeros_like(fs)
     for i, f in enumerate(fs):
-        amps2[i], s2n[i], w = eval_freq(x, y, f, AT, ATA)
+        s2n[i], amps2[i], w = eval_freq(x, y, f, AT, ATA)
     return s2n, amps2, w
 
 
