@@ -1,7 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from K2misc import load_K2_data, peak_detect, detect_all_peaks
-import glob
 from SIP import SIP, eval_freq
 import sys
 
@@ -113,8 +112,8 @@ def iterative_prewhiten(N):
 if __name__ == "__main__":
 
     # load the data and compute initial sip
-    fnames = glob.glob("data/ktwo*fits")
-    x, y, basis = load_K2_data(fnames[0])
+    fname = "data/ktwo201121245-c01_lpd-lc.fits"
+    x, y, basis = load_K2_data(fname)
     fs = np.arange(10, 300, 1e-1) * 1e-6
     s2n, amps2, w = SIP(x, y, basis, fs)
 
@@ -127,6 +126,6 @@ if __name__ == "__main__":
     start = sys.argv(1)
     stop = sys.argv(2)
 
-    inj(fnames[0], ifs, a_s)
-    recovered, recovered_amps = recover_SIP(fnames[0], injection_fnames, fs,
+    inj(fname, ifs, a_s)
+    recovered, recovered_amps = recover_SIP(fname, injection_fnames, fs,
                                             amps2, start, stop)
