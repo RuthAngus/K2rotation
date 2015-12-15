@@ -59,6 +59,7 @@ def inj(fname, ifs, a_s):
     fs: the SIP freq array
     returns the recovered frequencies and amplitudes
     """
+    N = len(ifs)
     true_f, true_a = np.zeros_like(ifs), np.zeros_like(a_s)
     x, y, basis = load_K2_data(fname)
     for i, f in enumerate(ifs):  # loop over frequencies
@@ -117,16 +118,11 @@ if __name__ == "__main__":
     fs = np.arange(10, 300, 1e-1) * 1e-6
     s2n, amps2, w = SIP(x, y, basis, fs)
 
-    # injection and recovery parameters
-    N = 10
-    ifs = np.random.uniform(10e-6, 300e-6, N)  # the injection frequencies
-    a_s = 10**np.random.uniform(-4, -3, N)  # the injection amplitudes
-    injection_fnames = range(N)  # names for file saves
-
     # parallelisation parameters
     start = int(sys.argv[1])
     stop = int(sys.argv[2])
 
-    inj(fname, ifs, a_s)
+    # recover injections
+    injection_fnames = range(start, stop)  # names for file saves
     recovered, recovered_amps = recover_SIP(fname, injection_fnames, fs,
                                             amps2, start, stop, plot=True)
