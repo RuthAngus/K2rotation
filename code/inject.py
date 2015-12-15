@@ -23,6 +23,23 @@ def prewhiten(x, y, f, basis):
     return y - wave
 
 
+def iterative_prewhiten(N):
+    # prewhiten 10 times
+    x, y, basis = load_K2_data(fname)
+    fs = np.arange(10, 300, 1e-1) * 1e-6
+    s2n, amp2s, w = SIP(x, y, basis, fs)  # calculate SIP
+
+    # find the top N peaks
+    peak_fs, peaks_as = detect_all_peaks(fs, amp2s)
+    peakN = np.sort(peaks_as)[-N:]
+    peak_f = np.array([peak_fs[peaks_as == i][0] for i in peakN])
+
+    # prewhiten
+    for peak in peak_f[::-1]:  # highest peak to lowest
+        y = prewhiten(x, y, peak, basis)
+    return y
+
+
 # inject a sine wave
 def inject(x, y, f, a):
     """
@@ -42,21 +59,17 @@ def inj(fname, ifs, a_s):
     fs: the SIP freq array
     returns the recovered frequencies and amplitudes
     """
-    truths, true_a, ids = [], [], []
+    true_f, true_a = np.zeros_like(ifs), np.zeros_like(a_s)
     x, y, basis = load_K2_data(fname)
-    id = 0
     for i, f in enumerate(ifs):  # loop over frequencies
-        for j, a in enumerate(a_s):  # loop over amplitudes
-            print(id+1, "of", len(a_s) * len(ifs))
-            print("injection frequency = ", f)
-            iy = y + inject(x, y, f, a)  # inject sinewave
-            np.savetxt("injections/{0}.txt".format(str(id).zfill(5)),
-                       np.transpose((x, iy)))
-            truths.append(f)  # save the truths and the ids
-            true_a.append(a)
-            ids.append(id)
-            id += 1
-    data = np.vstack((np.array(ids), np.array(truths), np.array(true_a)))
+        print(i, "of", N)
+        print("injection frequency = ", f)
+        iy = y + inject(x, y, f, a_s[i])  # inject sinewave
+        np.savetxt("injections/{0}.txt".format(str(i).zfill(5)),
+                   np.transpose((x, iy)))
+        true_f[i] = f  # save the truths and the ids
+        true_a[i] = a_s[i]
+    data = np.vstack((np.arange(N), true_f, true_a))
     np.savetxt("truths.txt", data.T)
 
 
@@ -96,22 +109,6 @@ def recover_SIP(template_id, inj_fnames, fs, oa2, start, stop, plot=True,
     return rf, ra
 
 
-def iterative_prewhiten(N):
-    # prewhiten 10 times
-    x, y, basis = load_K2_data(fname)
-    fs = np.arange(10, 300, 1e-1) * 1e-6
-    s2n, amp2s, w = SIP(x, y, basis, fs)  # calculate SIP
-
-    # find the top N peaks
-    peak_fs, peaks_as = detect_all_peaks(fs, amp2s)
-    peakN = np.sort(peaks_as)[-N:]
-    peak_f = np.array([peak_fs[peaks_as == i][0] for i in peakN])
-
-    # prewhiten
-    for peak in peak_f[::-1]:  # highest peak to lowest
-        y = prewhiten(x, y, peak, basis)
-    return y
-
 if __name__ == "__main__":
 
     # load the data and compute initial sip
@@ -122,9 +119,9 @@ if __name__ == "__main__":
 
     # injection and recovery parameters
     N = 10
-    ifs = np.random.uniform(10e-6, 300e-6, 3)  # the injection frequencies
-    a_s = 10**np.random.uniform(-4, -3, 3)  # the injection amplitudes
-    injection_fnames = range(len(ifs) * len(a_s))  # names for file saves
+    ifs = np.random.uniform(10e-6, 300e-6, N)  # the injection frequencies
+    a_s = 10**np.random.uniform(-4, -3, N)  # the injection amplitudes
+    injection_fnames = range(N)  # names for file saves
 
     # parallelisation parameters
     start = int(sys.argv[1])
