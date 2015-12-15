@@ -73,7 +73,6 @@ def inj(fname, ifs, a_s):
     data = np.vstack((np.arange(N), true_f, true_a))
     np.savetxt("truths.txt", data.T)
 
-
 def recover_SIP(template_id, inj_fnames, fs, oa2, start, stop, plot=True,
                 subtract_baseline=True):
     """
@@ -92,8 +91,27 @@ def recover_SIP(template_id, inj_fnames, fs, oa2, start, stop, plot=True,
         print("computing SIP")
         s2n, amps2, w = SIP(ix, iy, basis, fs)  # compute a sip
         if subtract_baseline:  # subtract the original sip
-            amps2 = amps2 - oa2
+
+            astero_f = 2.131e-4  # this is a hack for normalising the sip.
+                                 # specific to this target only!
+            peaks_f, peaks_a = detect_all_peaks(fs, amps2)
+            find_nearest_ind = lambda arr, val: np.abs(arr-val).argmin()
+            astero_a2 = peaks_a[find_nearest_ind(peaks_f, astero_f)]
+            opeaks_f, opeaks_a = detect_all_peaks(fs, oa2)
+            astero_a1 = opeaks_a[find_nearest_ind(opeaks_f, astero_f)]
+            ratio = astero_a1/astero_a2
+
+            plt.clf()
+            plt.subplot(2, 1, 1)
+            plt.plot(fs, amps2*ratio)
+            plt.plot(fs, oa2, "r")
+            plt.subplot(2, 1, 2)
+            plt.plot(fs, amps2*ratio - oa2)
+            plt.savefig("test")
+            amps2 = amps2*ratio - oa2
+            assert 0
         peak_f, peak_a = peak_detect(fs, amps2)  # find the highest peak
+
         print(peak_f)
         recovered.append(peak_f)
         recovered_amps.append(peak_a)
