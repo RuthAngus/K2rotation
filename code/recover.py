@@ -73,7 +73,7 @@ def inj(fname, ifs, a_s):
     data = np.vstack((np.arange(N), true_f, true_a))
     np.savetxt("truths.txt", data.T)
 
-def recover_SIP(template_id, inj_fnames, fs, oa2, start, stop, plot=True,
+def recover_SIP(template_id, inj_fnames, fs, oa2, start, stop, plot=False,
                 subtract_baseline=True):
     """
     Find frequency and amplitude of the highest peak in the SIP
@@ -101,15 +101,15 @@ def recover_SIP(template_id, inj_fnames, fs, oa2, start, stop, plot=True,
             astero_a1 = opeaks_a[find_nearest_ind(opeaks_f, astero_f)]
             ratio = astero_a1/astero_a2
 
-            plt.clf()
-            plt.subplot(2, 1, 1)
-            plt.plot(fs, amps2*ratio)
-            plt.plot(fs, oa2, "r")
-            plt.subplot(2, 1, 2)
-            plt.plot(fs, amps2*ratio - oa2)
-            plt.savefig("test")
+#             plt.clf()
+#             plt.subplot(2, 1, 1)
+#             plt.plot(fs, amps2*ratio)
+#             plt.plot(fs, oa2, "r")
+#             plt.subplot(2, 1, 2)
+#             plt.plot(fs, amps2*ratio - oa2)
+#             plt.savefig("test")
             amps2 = amps2*ratio - oa2
-            assert 0
+#             assert 0
         peak_f, peak_a = peak_detect(fs, amps2)  # find the highest peak
 
         print(peak_f)
@@ -139,8 +139,9 @@ if __name__ == "__main__":
     # parallelisation parameters
     start = int(sys.argv[1])
     stop = int(sys.argv[2])
+    N = int(sys.argv[3])
 
     # recover injections
-    injection_fnames = range(start, stop)  # names for file saves
+    injection_fnames = range(N)  # names for file saves
     recovered, recovered_amps = recover_SIP(fname, injection_fnames, fs,
-                                            amps2, start, stop, plot=True)
+                                            amps2, start, stop)
