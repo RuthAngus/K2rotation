@@ -30,6 +30,11 @@ def histo(rec_f, true_rec_a, all_f, all_a, nbins):
     all_f: all injected frequencies
     all_a: all injected amplitudes
     """
+    true_rec_a = true_rec_a**.5  # convert amp2 to amp
+    all_a = all_a**.5
+    true_rec_a *= 1e4  # convert to ppm
+    all_a *= 1e4
+    true_rec_a, all_a = np.log10(true_rec_a), np.log10(all_a)
 
     # calculate the bin edges and make histograms
     my_yedges = np.linspace(min(true_rec_a), max(true_rec_a), nbins)
