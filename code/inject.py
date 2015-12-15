@@ -44,19 +44,22 @@ def inj(fname, ifs, a_s):
     fs: the SIP freq array
     returns the recovered frequencies and amplitudes
     """
+    truths, ids = [], []
     x, y, basis = load_K2_data(fname)
     id = 0
     for i, f in enumerate(ifs):  # loop over frequencies
         for j, a in enumerate(a_s):  # loop over amplitudes
             print(id+1, "of", len(a_s) * len(ifs))
-            y += inject(x, y, f, a)  # inject sinewave
-            s2n, amps2, w = SIP(x, y, basis, fs)
+            iy = y + inject(x, y, f, a)  # inject sinewave
             np.savetxt("injections/{0}.txt".format(str(id).zfill(5)),
-                       np.transpose((x, y)))
+                       np.transpose((x, iy)))
+            truths.append(f)  # save the truths and the ids
+            ids.append(id)
             id += 1
+    np.savetxt("truths.txt", np.transpose((np.array(truths), np.array(ids))))
 
 
-def recover_SIP(template_id, inj_fnames, fs, oamp2s, plot=True,
+def recover_SIP(template_id, inj_fnames, fs, oa2, plot=True,
                 subtract_baseline=True):
     """
     Find frequency and amplitude of the highest peak in the SIP
@@ -66,14 +69,16 @@ def recover_SIP(template_id, inj_fnames, fs, oamp2s, plot=True,
     oamp2s: the original sip, before sine wave injection
     """
     recovered, recovered_amps = [], []  # array of freq of the highest peak
-    x, y, basis = load_K2_data(template_id)  # load original lc
+    _, _, basis = load_K2_data(template_id)  # load original lc
     for i, fname in enumerate(inj_fnames):  # loop over injections
         ix, iy = \
             np.genfromtxt("injections/{0}.txt".format(str(fname).zfill(5))).T
+        print("computing SIP")
         s2n, amps2, w = SIP(ix, iy, basis, fs)  # compute a sip
         if subtract_baseline:  # subtract the original sip
-            amps2 = oamp2s - amps2
+            amps2 = oa2 - amps2
         peak_f, peak_a = peak_detect(fs, amps2)  # find the highest peak
+        print(peak_f)
         recovered.append(peak_f)
         recovered_amps.append(peak_a)
         if plot:
@@ -107,11 +112,13 @@ if __name__ == "__main__":
     x, y, basis = load_K2_data(fnames[0])
     fs = np.arange(10, 300, 1e-1) * 1e-6
     s2n, amps2, w = SIP(x, y, basis, fs)
-    ifs = np.arange(50, 250, 40) * 1e-6  # the injections frequencies
-    a_s = np.arange(1e-5, 1e-3, 5e-4)  # the injection amplitudes
-    injection_fnames = range(len(ifs) * len(a_s))
+    # ifs = np.arange(50, 250, 100) * 1e-6  # the injections frequencies
+    ifs = np.random.choice(fs, 2)  # the injections frequencies
+    a_s = np.arange(1e-5, 1e-3, 8e-4)  # the injection amplitudes
+    a_s = np.ones((2)) * 1e-3
+    injection_fnames = range(len(ifs) * len(a_s))  # names for file saves
 
     # inject and recover a bunch of sinewaves
-    inj(fnames[0], ifs, a_s)
+    # inj(fnames[0], ifs, a_s)
     recovered, recovered_amps = recover_SIP(fnames[0], injection_fnames, fs,
-                                            amps2, plot=True)
+                                            amps2)
