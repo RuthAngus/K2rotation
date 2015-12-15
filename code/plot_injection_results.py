@@ -30,22 +30,23 @@ def histo(rec_f, true_rec_a, all_f, all_a, nbins):
     all_f: all injected frequencies
     all_a: all injected amplitudes
     """
-    true_rec_a = true_rec_a**.5  # convert amp2 to amp
-    all_a = all_a**.5
-    true_rec_a *= 1e4  # convert to ppm
-    all_a *= 1e4
-    true_rec_a, all_a = np.log10(true_rec_a), np.log10(all_a)
+    true_rec_a = np.log10(1e4 * true_rec_a**.5)  # convert amp2 to amp and ppm
+    all_a = np.log10(1e4 * all_a**.5)
+    rec_f, all_f = rec_f * 1e6, all_f * 1e6  # convert to uHz
 
     # calculate the bin edges and make histograms
-    my_yedges = np.linspace(min(true_rec_a), max(true_rec_a), nbins)
-    my_xedges = np.linspace(min(rec_f), max(rec_f), nbins)
+    my_yedges = np.linspace(min(all_a), max(all_a), nbins)
+    my_xedges = np.linspace(min(all_f), max(all_f), nbins)
+
+    # recovered histogram
     hist, xedges, yedges = np.histogram2d(rec_f, true_rec_a, bins=nbins,
                                           range = [[min(my_xedges),
                                                    max(my_xedges)],
                                                    [min(my_yedges),
                                                     max(my_yedges)]])
 
-    all_hist, _, _ = np.histogram2d(all_f, all_a, bins=nbins,
+    # true histogram
+    all_hist, xedges, yedges = np.histogram2d(all_f, all_a, bins=nbins,
                                     range = [[min(my_xedges),
                                              max(my_xedges)],
                                              [min(my_yedges),
@@ -55,11 +56,13 @@ def histo(rec_f, true_rec_a, all_f, all_a, nbins):
     fig = plt.figure()
     ax = fig.add_subplot(111)
     X, Y = np.meshgrid(xedges, yedges)
-    color = hist.T/all_hist.T  # plot the fraction of recovered in each bin
+    color = hist.T/all_hist.T * 100 # plot the % of recovered in each bin
+    print(color)
     cax = ax.pcolormesh(X, Y, color, cmap="Blues")
     ax.set_ylabel("$\log_{10}\mathrm{Amplitude~(ppm)}$")
-    ax.set_xlabel("$\\nu~\mathrm{(Hz)}$")
-    plt.plot(all_f, all_a, "r.")
+    ax.set_xlabel("$\\nu~\mathrm{(\\mu Hz)}$")
+    plt.plot(all_f, all_a, "m.", ms=13)
+    plt.plot(rec_f, true_rec_a, "y.", ms=5)
     plt.colorbar(cax, label="$\mathrm{Completeness~(\%)}$")
     plt.subplots_adjust(bottom=.2, left=.15)
     plt.savefig("hist")
@@ -80,9 +83,15 @@ if __name__ == "__main__":
     ids = np.array([i for j in ids for i in j])
     rfs = np.array([i for j in rfs for i in j])
     ras = np.array([i for j in ras for i in j])
+    true_fs = true_fs[:len(rfs)]
+    true_as = true_as[:len(rfs)]
     print(len(true_fs), "injected, ", len(rfs), "recovered", "\n")
+    assert len(true_fs) == len(rfs)
 
+    # find the successful recoveries
     rec_f, rec_a, true_rec_f, true_rec_a = \
-            success_list(rfs, ras, true_fs, true_as, 1e-1)
+            success_list(rfs, ras, true_fs, true_as, 1e-2)
 
+    # make a histogram
+    print(rec_f, true_rec_a, true_fs, true_as)
     histo(rec_f, true_rec_a, true_fs, true_as, 3)
