@@ -95,7 +95,7 @@ def recover_SIP(template_id, inj_fnames, fs, oa2, start, stop, plot=True,
 
 def iterative_prewhiten(N):
     # prewhiten 10 times
-    x, y, basis = load_K2_data(fnames[0])
+    x, y, basis = load_K2_data(fname)
     fs = np.arange(10, 300, 1e-1) * 1e-6
     s2n, amp2s, w = SIP(x, y, basis, fs)  # calculate SIP
 
