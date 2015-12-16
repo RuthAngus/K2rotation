@@ -50,13 +50,14 @@ def inject(x, y, f, a):
     return y + wave
 
 
-def inj(fname, ifs, a_s):
+def inj(fname, ifs, a_s, rotation=False):
     """
     inject sine wave into lc
     fname: "path/to/file/filename" - should be a K2 fits file
     ifs: an array of frequencies to inject
     a_s: an array of amplitudes to inject
     fs: the SIP freq array
+    if rotation == True then save the output with a _r at the end
     returns the recovered frequencies and amplitudes
     """
     N = len(ifs)
@@ -66,15 +67,22 @@ def inj(fname, ifs, a_s):
         print(i, "of", N)
         print("injection frequency = ", f)
         iy = y + inject(x, y, f, a_s[i])  # inject sinewave
-        np.savetxt("injections/{0}.txt".format(str(i).zfill(5)),
-                   np.transpose((x, iy)))
+        if rotation:
+            np.savetxt("injections/{0}_r.txt".format(str(i).zfill(5)),
+                       np.transpose((x, iy)))
+        else:
+            np.savetxt("injections/{0}.txt".format(str(i).zfill(5)),
+                       np.transpose((x, iy)))
         true_f[i] = f  # save the truths and the ids
         true_a[i] = a_s[i]
     data = np.vstack((np.arange(N), true_f, true_a))
-    np.savetxt("truths.txt", data.T)
+    if rotation:
+        np.savetxt("truths_r.txt", data.T)
+    else:
+        np.savetxt("truths.txt", data.T)
 
 def recover_SIP(template_id, inj_fnames, fs, oa2, start, stop, plot=False,
-                subtract_baseline=True):
+                subtract_baseline=True, rotation=False):
     """
     Find frequency and amplitude of the highest peak in the SIP
     fname: the name of the target used for injection
@@ -86,8 +94,12 @@ def recover_SIP(template_id, inj_fnames, fs, oa2, start, stop, plot=False,
     _, _, basis = load_K2_data(template_id)  # load original lc
     for i, fname in enumerate(inj_fnames[start:stop]):  # loop over injections
         print(i, "of", len(inj_fnames[start:stop]))
-        ix, iy = \
-            np.genfromtxt("injections/{0}.txt".format(str(fname).zfill(5))).T
+        if rotation:
+            ix, iy = \
+                np.genfromtxt("injections/{0}_r.txt".format(str(fname).zfill(5))).T
+        else:
+            ix, iy = \
+                np.genfromtxt("injections/{0}.txt".format(str(fname).zfill(5))).T
         print("computing SIP")
         s2n, amps2, w = SIP(ix, iy, basis, fs)  # compute a sip
         if subtract_baseline:  # subtract the original sip
@@ -100,16 +112,7 @@ def recover_SIP(template_id, inj_fnames, fs, oa2, start, stop, plot=False,
             opeaks_f, opeaks_a = detect_all_peaks(fs, oa2)
             astero_a1 = opeaks_a[find_nearest_ind(opeaks_f, astero_f)]
             ratio = astero_a1/astero_a2
-
-#             plt.clf()
-#             plt.subplot(2, 1, 1)
-#             plt.plot(fs, amps2*ratio)
-#             plt.plot(fs, oa2, "r")
-#             plt.subplot(2, 1, 2)
-#             plt.plot(fs, amps2*ratio - oa2)
-#             plt.savefig("test")
             amps2 = amps2*ratio - oa2
-#             assert 0
         peak_f, peak_a = peak_detect(fs, amps2)  # find the highest peak
 
         print(peak_f)
@@ -124,7 +127,10 @@ def recover_SIP(template_id, inj_fnames, fs, oa2, start, stop, plot=False,
     # save the results
     rf, ra = np.array(recovered), np.array(recovered_amps)
     data = np.vstack((inj_fnames[start:stop], rf, ra))
-    np.savetxt("recovered_{0}_{1}.txt".format(start, stop), data.T)
+    if rotation:
+        np.savetxt("recovered_{0}_{1}_r.txt".format(start, stop), data.T)
+    else:
+        np.savetxt("recovered_{0}_{1}.txt".format(start, stop), data.T)
     return rf, ra
 
 
@@ -133,7 +139,11 @@ if __name__ == "__main__":
     # load the data and compute initial sip
     fname = "data/ktwo201121245-c01_lpd-lc.fits"
     x, y, basis = load_K2_data(fname)
+
+    rotation = False
     fs = np.arange(10, 300, 1e-1) * 1e-6
+    if rotation:
+        fs = 1./(np.linspace(1., 70., 1000) * 24 * 3600)
     s2n, amps2, w = SIP(x, y, basis, fs)
 
     # parallelisation parameters
@@ -141,7 +151,8 @@ if __name__ == "__main__":
     stop = int(sys.argv[2])
     N = int(sys.argv[3])
 
-    # recover injections
+    # recover injections using SIP
     injection_fnames = range(N)  # names for file saves
     recovered, recovered_amps = recover_SIP(fname, injection_fnames, fs,
-                                            amps2, start, stop, plot=False)
+                                            amps2, start, stop, plot=False,
+                                            rotation=rotation)
