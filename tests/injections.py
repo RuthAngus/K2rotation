@@ -90,6 +90,13 @@ def grid_over_amps(basis, flux, raw_x, raw_y, truth, fs, amps, true_a,
         y = np.array([_y.astype("float64") for _y in y])
         raw_x = np.array([_raw_x.astype("float64") for _raw_x in raw_x])
 
+        # Calculate time
+        start = time.time()
+        model = LombScargle().fit(raw_x, y, np.ones_like(y)*1e-5)
+        end = time.time()
+        print("LS time = ", (end-start)*1e3, "ms")
+        print("for", len(y), "data points and", len(fs), "freqs")
+        assert 0
 #         # Calculate time
 #         start = time.time()
 #         model = LombScargle().fit(raw_x, y, np.ones_like(y)*1e-5)
