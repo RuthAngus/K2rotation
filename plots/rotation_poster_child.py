@@ -6,6 +6,8 @@ import emcee
 from gatspy.periodic import LombScargle
 import scipy.signal as sps
 import subprocess
+import time
+
 
 def acf_peak_detect(x, y):
     x, y = x[50:], y[50:]
@@ -21,6 +23,7 @@ def acf_peak_detect(x, y):
     else:
         return 0, 0
 
+
 def max_peak_detect(x, y):
     peaks = np.array([i for i in range(1, len(x)-1) if y[i-1] < y[i] and
                      y[i+1] < y[i]])
@@ -32,6 +35,7 @@ def max_peak_detect(x, y):
 
 # load poster child light curve
 # x, y, _ = np.genfromtxt("../data/ep201317002.csv", delimiter=",").T
+
 
 def p_child_plot(x, y, eid):
 
@@ -47,12 +51,21 @@ def p_child_plot(x, y, eid):
 
     # SUBTRACT LINEAR TREND!
     plv = np.polyfit(x, y, 1)
-    print plv
+    print(plv)
     poly = plv[1] + x * plv[0]
     y -= poly
 
     # compute acf
     dt = 0.02043359821692  # time resolution of K2 data (from header)
+
+    # for timing: acf takes 6 milliseconds with 3357 data points
+    # N = 1000
+    # start = time.time()
+    # for i in range(N):
+    #     acf = emcee.autocorr.function(y)
+    # end = time.time()
+    # print("acf time = ", (end - start)/N * 1e3, "milliseconds")
+
     acf = emcee.autocorr.function(y)
     lags = np.arange(len(acf)) * dt
 
@@ -110,7 +123,7 @@ def p_child_plot(x, y, eid):
     plt.subplots_adjust(hspace=.4)
 #     plt.savefig("vbg_%s" % eid)
 #     plt.savefig("../documents/rotation_poster_child.pdf")
-    print "../documents/rotation%s.pdf" % eid
+    print("../documents/rotation%s.pdf" % eid)
     plt.savefig("../documents/rotation%s.pdf" % eid)
     return acfx, px
 
@@ -122,11 +135,12 @@ if __name__ == "__main__":
 #     eids = [201637175, 201665500]
     for eid in eids:
         try:
-            x, y, _ = np.genfromtxt("../data/c1/ep%s.csv" % eid, delimiter=",").T
+            x, y = np.genfromtxt("../data/c1/ep%s.csv" % eid).T
         except:
-            print "copying data"
-            print "cp /Users/angusr/data/K2/c1lcsr4/ep%s.csv ../data/c1" % eid
+            print("copying data")
+            print("cp /Users/angusr/data/K2/c1lcsr4/ep%s.csv ../data/c1"
+                  % eid)
             subprocess.call("cp /Users/angusr/data/K2/c1lcsr4/ep%s.csv ../data/c1"
                             % eid, shell=True)
-            x, y, _ = np.genfromtxt("../data/c1/ep%s.csv" % eid, delimiter=",").T
+            x, y = np.genfromtxt("../data/c1/ep%s.csv" % eid).T
         p_child_plot(x, y, eid)
