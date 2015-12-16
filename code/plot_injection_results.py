@@ -59,13 +59,14 @@ def histo(rec_f, true_rec_a, all_f, all_a, nbins):
     ax = fig.add_subplot(111)
     X, Y = np.meshgrid(xedges, yedges)
     color = hist.T/all_hist.T # plot the % of recovered in each bin
-#     print(color)
+    print(hist.T)
+    print(all_hist.T)
+    print(color)
     cax = ax.pcolormesh(X, Y, color, cmap="Blues")
     ax.set_ylabel("$\log_{10}\mathrm{Amplitude~(ppm)}$")
     ax.set_xlabel("$\\nu~\mathrm{(\\mu Hz)}$")
-    print(len(all_f))
+    print(len(all_f), "injected", len(rec_f), "recovered")
     plt.plot(all_f, all_a, "m.", ms=15)  # everything that was injected
-    print(len(rec_f))
     plt.plot(rec_f, true_rec_a, "y.", ms=10)  # the truths that were recovered
     plt.colorbar(cax, label="$\mathrm{Detection~Efficiency}$")
     plt.subplots_adjust(bottom=.2, left=.15)
@@ -78,7 +79,6 @@ if __name__ == "__main__":
 
     # load recoveries
     r_files = sorted(glob.glob("recovered_*.txt"))  # all recovery results
-    print(r_files)
     ids, rfs, ras = [], [], []
     for file in r_files:
         data = np.genfromtxt(file).T
@@ -90,12 +90,19 @@ if __name__ == "__main__":
     ras = np.array([i for j in ras for i in j])
     true_fs = true_fs[:len(rfs)]
     true_as = true_as[:len(rfs)]
-    print(len(true_fs), "injected, ", len(rfs), "recovered", "\n")
+    print(len(true_fs), "injected, ", len(rfs), "found", "\n")
     assert len(true_fs) == len(rfs)
 
     # find the successful recoveries
     rec_f, rec_a, true_rec_f, true_rec_a = \
             success_list(rfs, ras, true_fs, true_as, 1e-6)
+
+    resids = np.abs(rec_f - true_rec_f)
+    rms = (np.mean((rec_f - true_rec_f)**2))**.5
+    plt.clf()
+    plt.hist(resids)
+    plt.savefig("test")
+    print("std = ", np.std(resids)*1e6, rms*1e6, "uHz")
 
     # make a histogram
     histo(rec_f, true_rec_a, true_fs, true_as, 10)
