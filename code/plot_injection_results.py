@@ -90,8 +90,8 @@ if __name__ == "__main__":
 
     # find the successful recoveries
     rec_f, rec_a, true_rec_f, true_rec_a = \
-            success_list(rfs, ras, true_fs, true_as, 1e-2)
+            success_list(rfs, ras, true_fs, true_as, 1e-4)
 
     # make a histogram
     print(rec_f, true_rec_a, true_fs, true_as)
-    histo(rec_f, true_rec_a, true_fs, true_as, 3)
+    histo(rec_f, true_rec_a, true_fs, true_as, 10)
