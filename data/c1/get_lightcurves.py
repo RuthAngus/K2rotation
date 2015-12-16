@@ -1,5 +1,6 @@
 import numpy as np
 import wget
+import sys
 
 
 def get_all_C1_lightcurves():
@@ -21,4 +22,5 @@ def get_one_C1_lightcurve(id):
 
 
 if __name__ == "__main__":
-    get_one_C1_lightcurve("201183188")
+    id = sys.argv[1]
+    get_one_C1_lightcurve(id)
