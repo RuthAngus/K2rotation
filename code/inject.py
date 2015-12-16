@@ -10,11 +10,13 @@ ifs = np.random.uniform(10e-6, 270e-6, N)  # injected freqs (astero)
 if rotation:
     ifs = 1./(np.random.uniform(1, 30, N) * 24 * 3600)  # injected freqs (rot)
 a_s = 10**np.random.uniform(-7, -3, N)  # injection amps
+print(a_s[:10])
 
 fname = "data/ktwo201121245-c01_lpd-lc.fits"
 x, y, basis, med = load_K2_data(fname)
 # the light curve has been median normalised, so what used to be units of flux
 # is now units of flux / median
-a_s = 10**np.random.uniform(1, 3, 1000) * (med/1e6) # convert to ppm
+a_s = 10**np.random.uniform(-3, 1, 1000) * (med/1e6) # convert to ppm
+print(a_s[:10])
 
 inj(fname, ifs, a_s, rotation=rotation)

@@ -2,6 +2,7 @@ from __future__ import print_function
 import numpy as np
 import glob
 import matplotlib.pyplot as plt
+from K2misc import load_K2_data
 
 plt.rcParams.update({"axes.labelsize": 20,
                     "text.fontsize": 20,
@@ -32,8 +33,8 @@ def histo(rec_f, true_rec_a, all_f, all_a, nbins):
     all_f: all injected frequencies
     all_a: all injected amplitudes
     """
-    true_rec_a = np.log10(1e4 * true_rec_a**.5)  # convert amp2 to amp and ppm
-    all_a = np.log10(1e4 * all_a**.5)
+#     true_rec_a = np.log10(1e4 * true_rec_a**.5)  # convert amp2 to amp and ppm
+#     all_a = np.log10(1e4 * all_a**.5)
     rec_f, all_f = rec_f * 1e6, all_f * 1e6  # convert to uHz
 
     # calculate the bin edges and make histograms
@@ -103,6 +104,11 @@ if __name__ == "__main__":
     plt.hist(resids)
     plt.savefig("test")
     print("std = ", np.std(resids)*1e6, rms*1e6, "uHz")
+
+    fname = "data/ktwo201121245-c01_lpd-lc.fits"
+    _, _, _, med = load_K2_data(fname)
+    true_rec_a = np.log10(true_rec_a * 1e6/med)  # convert to log ppm
+    true_as = np.log10(true_as * 1e6/med)
 
     # make a histogram
     histo(rec_f, true_rec_a, true_fs, true_as, 10)
