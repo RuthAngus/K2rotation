@@ -5,7 +5,7 @@ import glob
 import fitsio
 from gatspy.periodic import LombScargle
 from scipy.signal import lombscargle
-from K2pgram import K2pgram
+from SIP import SIP
 
 """
 Fit all the light curves with the basis from c1 and then sample from those
@@ -109,7 +109,7 @@ if __name__ == "__main__":
 
     # compute SIP
     fs = np.arange(.01, 10., .01)
-    amp2s, s2n, w = K2pgram(x, fake_lc[l], basis, fs)
+    amp2s, s2n, w = SIP(x, fake_lc[l], basis, fs)
 
     plt.clf()
     plt.subplot(3, 1, 1)
@@ -120,6 +120,6 @@ if __name__ == "__main__":
 
     # inject sinusoid
     fake_lc[l] += np.sin(5*np.pi*2*x)
-    amp2s, s2n, w = K2pgram(x, fake_lc[l], basis, fs)
+    amp2s, s2n, w = SIP(x, fake_lc[l], basis, fs)
     plt.plot(fs, s2n)
     plt.savefig("fake_lc")

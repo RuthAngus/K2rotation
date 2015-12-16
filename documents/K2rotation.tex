@@ -166,7 +166,16 @@ regular thruster fires of the spacecraft.
 The bottom panel shows the LS periodogram of this light curve, after
 it has been detrended using the method of VJ14.
 The large peaks are still present in the detrended light curve.
-While this remaining noise source does not interfere with the detection of
+
+The dominant source of these peaks is the removal of the outlying data points
+that appear in the {\it K2} light curves every 6 hours, caused by the
+spacecraft thruster fires.
+The rapid motion of the spacecraft results in stellar flux being smeared out
+over the detector and the circular apertures do not adequately encompass the
+resulting point spread function.
+It is the removal of these data points that produces the 47 $\mu$Hz peak in
+the VJ14 periodogram.
+While the noise source at 47 $\mu$Hz does not interfere with the detection of
 high-signal-to-noise transit events for periods greater than $\sim$1 day
 \citep{Vanderburg2015}, it does hamper the detection of
 smaller signals, particularly on time scales comparable to that of thruster

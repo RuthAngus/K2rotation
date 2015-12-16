@@ -1,16 +1,12 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import glob
-import pyfits
-from mklc import mklc
-import scipy.signal as sps
-import fitsio
 import h5py
-from K2pgram import K2pgram, eval_freq
+from SIP import SIP, eval_freq
 from gatspy.periodic import LombScargle
-import glob
 import sys
 from fit_all_the_light_curves import load_lc, reconstruct_fake_lc
+import time
 
 plotpar = {'axes.labelsize': 20,
            'text.fontsize': 20,
@@ -27,12 +23,13 @@ def peak_detect(x, y):
     mx, my = x[peaks][l][0], y[peaks][l][0]
     return mx, my
 
+
 # grid over amplitudes (the K2 pgram step takes the time)
 def grid_over_amps(basis, flux, raw_x, raw_y, truth, fs, amps, true_a,
                    flag, n, plot=False, raw=False, random_amps=True):
 
     # find the threshold level
-    _, initial_pgram, _ = K2pgram(raw_x, raw_y, basis, fs)
+    _, initial_pgram, _ = SIP(raw_x, raw_y, basis, fs)
     mx, threshold = peak_detect(fs, initial_pgram)
 
     K2P, rawP, K2a, rawa = [], [], [], []
@@ -40,13 +37,13 @@ def grid_over_amps(basis, flux, raw_x, raw_y, truth, fs, amps, true_a,
     all_results = []
     for i, a in enumerate(amps):
         if random_amps:
-            if flag=="r":
+            if flag == "r":
                 a = 10**(np.random.uniform(np.log10(1e-5), np.log10(1e-3)))
-            elif flag=="a":
+            elif flag == "a":
                 a = 10**(np.random.uniform(np.log10(1e-5), np.log10(1e-3)))
 
         tf = 1./truth
-        print "period = ", truth
+        print("period = ", truth)
 
         # add lcs together
 #         plt.clf()
@@ -65,26 +62,42 @@ def grid_over_amps(basis, flux, raw_x, raw_y, truth, fs, amps, true_a,
         elif flag == "a":
             threshold = .1
 
-        # calculate K2pgram
-        amp2s, s2n, w = K2pgram(raw_x, y, basis, fs)
+        # Calculate time
+        start = time.time()
+        amp2s, s2n, w = SIP(raw_x, y, basis, fs)
+        end = time.time()
+        print("SIP time = ", (end-start)*1e3, "ms")
+        print("for", len(y), "data points and", len(fs), "freqs")
+
+        # calculate SIP
+        amp2s, s2n, w = SIP(raw_x, y, basis, fs)
         pgram = s2n
         best_f, best_pgram = peak_detect(fs, pgram)  # find peaks
-        print "recovered period", 1./best_f
+        print("recovered period", 1./best_f)
         s = 0  # success indicator
         alla.append(a)
         allp.append(truth)
         all_results.append(best_f)
 
-        print tf-threshold*tf,  best_f, tf+threshold*tf
+        print(tf-threshold*tf,  best_f, tf+threshold*tf)
         if tf-threshold*tf < best_f and best_f < tf+threshold*tf:
             K2P.append(truth)
             K2a.append(a)
-            print "success!", "\n"
+            print("success!", "\n")
             s = 1
 
         # calculate periodogram of raw light curve
         y = np.array([_y.astype("float64") for _y in y])
         raw_x = np.array([_raw_x.astype("float64") for _raw_x in raw_x])
+
+        # Calculate time
+        start = time.time()
+        model = LombScargle().fit(raw_x, y, np.ones_like(y)*1e-5)
+        end = time.time()
+        print("SIP time = ", (end-start)*1e3, "ms")
+        print("for", len(y), "data points and", len(fs), "freqs")
+        assert 0
+
         model = LombScargle().fit(raw_x, y, np.ones_like(y)*1e-5)
         period = 1. / fs
         pg = model.periodogram(period)
@@ -103,19 +116,19 @@ def grid_over_amps(basis, flux, raw_x, raw_y, truth, fs, amps, true_a,
             plt.subplot(2, 1, 2)
             plt.axvline(best_f, color="r", linestyle="-")
             plt.axvline(tf, color="k", linestyle="--")
-            print "best f = ", best_f
-            print "true f = ", tf
-            print tf-threshold*tf, tf+threshold*tf
+            print("best f = ", best_f)
+            print("true f = ", tf)
+            print(tf-threshold*tf, tf+threshold*tf)
             c = "b"
             if s == 1:
                 c = "m"
             plt.plot(fs, pgram, color=c,
-                     label="$\mathrm{K2pgram$}")
+                     label="$\mathrm{SIP$}")
             plt.savefig("../injections/sine/%s_%s_result_%s"
                         % (str(n).zfill(2), str(i).zfill(2), flag))
             # n is the period index, i is the amplitude index
-            print "%s_%s_result_%s" % (str(n).zfill(2), str(i).zfill(2),
-                                       flag)
+            print("%s_%s_result_%s" % (str(n).zfill(2), str(i).zfill(2),
+                                       flag))
 #             raw_input('enter')
     return np.array(K2a), np.array(K2P), np.array(rawa), np.array(rawP), \
             np.array(alla), np.array(allp), np.array(all_results)
@@ -126,8 +139,8 @@ def grid_over_periods(basis, raw_x, raw_y, true_p, fs, true_a, fnames, flag):
     ar = []
     allas, allps = [], []
     for i, fname in enumerate(fnames):
-        print fname
-        print true_p[i]
+        print(fname)
+        print(true_p[i])
         time, flux = np.genfromtxt(fname).T
         K2a, K2P, rawa, rawP, alla, allp, all_results = \
                 grid_over_amps(basis, flux, raw_x, raw_y, true_p[i], fs,

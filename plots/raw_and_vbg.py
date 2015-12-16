@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from gatspy.periodic import LombScargle
 import fitsio
+import time
 
 
 def raw_and_vbg():
@@ -39,7 +40,12 @@ def raw_and_vbg():
     ax1 = fig.add_subplot(311)
     model = LombScargle().fit(x, y, np.ones_like(y)*1e-5)
     period = 1. / fs
+
+    start = time.time()
     raw_pgram = model.periodogram(period)
+    end = time.time()
+    print("LS time = ", end - start)
+
     ax1.plot(fs[::3]*1e6, raw_pgram[::3], "k", label="$\mathrm{Raw}$")
     ax.set_title("$\mathrm{EPIC~%s}$" % eid)
     ax1.set_xlim(10, 280)
