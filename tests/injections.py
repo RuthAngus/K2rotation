@@ -94,7 +94,7 @@ def grid_over_amps(basis, flux, raw_x, raw_y, truth, fs, amps, true_a,
         start = time.time()
         model = LombScargle().fit(raw_x, y, np.ones_like(y)*1e-5)
         end = time.time()
-        print("SIP time = ", (end-start)*1e3, "ms")
+        print("LS time = ", (end-start)*1e3, "ms")
         print("for", len(y), "data points and", len(fs), "freqs")
         assert 0
 
