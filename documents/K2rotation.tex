@@ -314,8 +314,8 @@ These uncertainties are estimated as $1.48 \times$ the Median Absolute
 Deviation (MAD), following \citet{Aigrain2015}.
 Therefore, the signal-to-noise ratio, $S/N$ of the amplitude measurement is
 $\sqrt{\mathbf{a}^T \mathbf{S_a}^{-1} \mathbf{a}}$.
-The $(S/N)^2$ is calculated over a grid of frequencies to produce an
-SIP.
+The $(S/N)^2$ can then be calculated over a user-defined grid of frequencies
+to produce a SIP.
 The $(S/N)$ operation takes into account the goodness of fit, i.e. if the
 amplitude of the sinusoid at a given frequency is not well constrained,
 it is penalized.
@@ -563,46 +563,46 @@ present in almost every VJ14 light curve.
 \end{center}
 \end{figure*}
 
-Figures \ref{fig:RRLyrae} and \ref{fig:EB} show the conditioned light curves
-and SIPs of an RR Lyrae star, selected from Guest observer program GO1018;
-``Long Cadence RR Lyrae targets" (PI: Plachy, E.) and
-an Eclipsing Binary (EB), selected from the \citet{Armstrong2015} {\it K2} EB
-and variable star catalogue respectively.
+% Figures \ref{fig:RRLyrae} and \ref{fig:EB} show the conditioned light curves
+% and SIPs of an RR Lyrae star, selected from Guest observer program GO1018;
+% ``Long Cadence RR Lyrae targets" (PI: Plachy, E.) and
+% an Eclipsing Binary (EB), selected from the \citet{Armstrong2015} {\it K2} EB
+% and variable star catalogue respectively.
 Figure \ref{fig:planet} shows the conditioned light curve and SIP of the
 short-period, disintegrating planet candidate discovered by
 \citet{Sanchis-Ojeda2015}.
 This planet has a period of around 9 hours, short enough to be detectable
 with a periodogram, as was demonstrated for a number of ultra-short
 period {\it Kepler} exoplanets by \citet{Sanchis-Ojeda2014}.
-The top panels of these three figures show the {\it K2} light curves of these
+The top panel of this figure shows the {\it K2} light curves of these
 objects, conditioned on the highest S/N sinusoidal signal in the
 periodograms.
-These light curves were produced by subtracting the trends that best describe
+The light curve was produced by subtracting the trends that best describe
 the data at the highest S/N period found in the SIP.
 
-\begin{figure}
-\begin{center}
-\includegraphics[width=6in, clip=true]{RR_201339783.pdf}
-\caption{{\it Top:} The light curve of RR Lyrae star, EPIC 201339783,
-	conditioned on the highest amplitude sinusoidal signal found in the
-	SIP. {\it Bottom:} The systematic-insensitive periodogram of
-	this light curve. This target was selected from GO1018
-	(PI: Plachy, E.).}
-\label{fig:RRLyrae}
-\end{center}
-\end{figure}
+% \begin{figure}
+% \begin{center}
+% \includegraphics[width=6in, clip=true]{RR_201339783.pdf}
+% \caption{{\it Top:} The light curve of RR Lyrae star, EPIC 201339783,
+% 	conditioned on the highest amplitude sinusoidal signal found in the
+% 	SIP. {\it Bottom:} The systematic-insensitive periodogram of
+% 	this light curve. This target was selected from GO1018
+% 	(PI: Plachy, E.).}
+% \label{fig:RRLyrae}
+% \end{center}
+% \end{figure}
 
-\begin{figure*}
-\begin{center}
-\includegraphics[width=6in, clip=true]{EB_201473612.pdf}
-\caption{{\it Top:} The light curve of eclipsing binary, EPIC 201473612,
-	conditioned on the highest amplitude sinusoidal signal found in the
-	SIP. {\it Bottom:} The systematic-insensitive periodogram of
-	this light curve. This target was selected from the catalogue of EBs
-	and variable stars of \citet{Armstrong2015}.}
-\label{fig:EB}
-\end{center}
-\end{figure*}
+% \begin{figure*}
+% \begin{center}
+% \includegraphics[width=6in, clip=true]{EB_201473612.pdf}
+% \caption{{\it Top:} The light curve of eclipsing binary, EPIC 201473612,
+% 	conditioned on the highest amplitude sinusoidal signal found in the
+% 	SIP. {\it Bottom:} The systematic-insensitive periodogram of
+% 	this light curve. This target was selected from the catalogue of EBs
+% 	and variable stars of \citet{Armstrong2015}.}
+% \label{fig:EB}
+% \end{center}
+% \end{figure*}
 
 \begin{figure*}
 \begin{center}
