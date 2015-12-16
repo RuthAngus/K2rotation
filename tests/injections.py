@@ -62,12 +62,12 @@ def grid_over_amps(basis, flux, raw_x, raw_y, truth, fs, amps, true_a,
         elif flag == "a":
             threshold = .1
 
-        # Calculate time
-        start = time.time()
-        amp2s, s2n, w = SIP(raw_x, y, basis, fs)
-        end = time.time()
-        print("SIP time = ", (end-start)*1e3, "ms")
-        print("for", len(y), "data points and", len(fs), "freqs")
+#         # Calculate time
+#         start = time.time()
+#         amp2s, s2n, w = SIP(raw_x, y, basis, fs[:1000])
+#         end = time.time()
+#         print("SIP time = ", (end-start), "s")
+#         print("for", len(y), "data points and", len(fs), "freqs")
 
         # calculate SIP
         amp2s, s2n, w = SIP(raw_x, y, basis, fs)
@@ -97,6 +97,13 @@ def grid_over_amps(basis, flux, raw_x, raw_y, truth, fs, amps, true_a,
         print("LS time = ", (end-start)*1e3, "ms")
         print("for", len(y), "data points and", len(fs), "freqs")
         assert 0
+#         # Calculate time
+#         start = time.time()
+#         model = LombScargle().fit(raw_x, y, np.ones_like(y)*1e-5)
+#         end = time.time()
+#         print("SIP time = ", (end-start)*1e3, "ms")
+#         print("for", len(y), "data points and", len(fs), "freqs")
+#         assert 0
 
         model = LombScargle().fit(raw_x, y, np.ones_like(y)*1e-5)
         period = 1. / fs
