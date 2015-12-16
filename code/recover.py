@@ -144,4 +144,4 @@ if __name__ == "__main__":
     # recover injections
     injection_fnames = range(N)  # names for file saves
     recovered, recovered_amps = recover_SIP(fname, injection_fnames, fs,
-                                            amps2, start, stop)
+                                            amps2, start, stop, plot=False)
