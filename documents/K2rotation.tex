@@ -328,6 +328,11 @@ to produce a SIP.
 The $(S/N)$ operation takes into account the goodness of fit, i.e. if the
 amplitude of the sinusoid at a given frequency is not well constrained,
 it is penalized.
+The SIP algorithm scales linearly with the number of frequencies evaluated
+and with the cube of the number of basis functions used.
+As an example of the typical computation time, calculating a single SIP for a
+{\it K2} campaign 1 light curve, over a grid of 1000 frequencies with 150
+basis vectors, takes 2-3 seconds on a 2.7 GHz CPU.
 
 \section{Application to real light curves}
 \label{section:rotation}
