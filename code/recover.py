@@ -25,7 +25,7 @@ def prewhiten(x, y, f, basis):
 
 def iterative_prewhiten(N):
     # prewhiten 10 times
-    x, y, basis = load_K2_data(fname)
+    x, y, basis, _ = load_K2_data(fname)
     fs = np.arange(10, 300, 1e-1) * 1e-6
     s2n, amp2s, w = SIP(x, y, basis, fs)  # calculate SIP
 
@@ -62,7 +62,7 @@ def inj(fname, ifs, a_s, rotation=False):
     """
     N = len(ifs)
     true_f, true_a = np.zeros_like(ifs), np.zeros_like(a_s)
-    x, y, basis = load_K2_data(fname)
+    x, y, basis, _ = load_K2_data(fname)
     for i, f in enumerate(ifs):  # loop over frequencies
         print(i, "of", N)
         print("injection frequency = ", f)
@@ -91,7 +91,7 @@ def recover_SIP(template_id, inj_fnames, fs, oa2, start, stop, plot=False,
     oamp2s: the original sip, before sine wave injection
     """
     recovered, recovered_amps = [], []  # array of freq of the highest peak
-    _, _, basis = load_K2_data(template_id)  # load original lc
+    _, _, basis, _ = load_K2_data(template_id)  # load original lc
     for i, fname in enumerate(inj_fnames[start:stop]):  # loop over injections
         print(i, "of", len(inj_fnames[start:stop]))
         if rotation:
@@ -138,7 +138,7 @@ if __name__ == "__main__":
 
     # load the data and compute initial sip
     fname = "data/ktwo201121245-c01_lpd-lc.fits"
-    x, y, basis = load_K2_data(fname)
+    x, y, basis, _ = load_K2_data(fname)
 
     rotation = False
     fs = np.arange(10, 300, 1e-1) * 1e-6
