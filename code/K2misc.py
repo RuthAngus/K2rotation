@@ -17,6 +17,7 @@ def load_K2_data(fname):
     q = data["quality"]
     l = np.isfinite(y) * np.isfinite(x) * (q == 0)
     y, x = y[l], x[l]
+    print("median value = ", np.median(y))
     y /= np.median(y)
     y -= 1
     x *= 24*3600
