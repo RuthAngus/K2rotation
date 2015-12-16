@@ -10,15 +10,17 @@ plt.rcParams.update({"axes.labelsize": 20,
                     "ytick.labelsize": 15,
                     "text.usetex": True})
 
-def success_list(rfs, ras, true_fs, true_as, tau):
+def success_list(rfs, ras, true_fs, true_as, tau, fractional=False):
     """
     returns an array of "successful recoveries"
     rfs: array of recovered frequencies
     true_fs: array of true frequencies
-    tau: tolerance fraction
+    tau: tolerance fraction or absolute value in Hz
     """
-    diff_frac = abs(rfs - true_fs)/true_fs  # frctnl diff btwn true & rcvrd
-    m = diff_frac < tau
+    diff = np.abs(rfs - true_fs) #  absolute difference in Hz
+    if fractional:
+        diff /= true_fs  #frctnl diff btwn tru&rcvrd
+    m = diff < tau
     return rfs[m], ras[m], true_fs[m], true_as[m]
 
 
@@ -56,24 +58,27 @@ def histo(rec_f, true_rec_a, all_f, all_a, nbins):
     fig = plt.figure()
     ax = fig.add_subplot(111)
     X, Y = np.meshgrid(xedges, yedges)
-    color = hist.T/all_hist.T * 100 # plot the % of recovered in each bin
-    print(color)
+    color = hist.T/all_hist.T # plot the % of recovered in each bin
+#     print(color)
     cax = ax.pcolormesh(X, Y, color, cmap="Blues")
     ax.set_ylabel("$\log_{10}\mathrm{Amplitude~(ppm)}$")
     ax.set_xlabel("$\\nu~\mathrm{(\\mu Hz)}$")
-    plt.plot(all_f, all_a, "m.", ms=13)
-    plt.plot(rec_f, true_rec_a, "y.", ms=5)
-    plt.colorbar(cax, label="$\mathrm{Completeness~(\%)}$")
+    print(len(all_f))
+    plt.plot(all_f, all_a, "m.", ms=15)  # everything that was injected
+    print(len(rec_f))
+    plt.plot(rec_f, true_rec_a, "y.", ms=10)  # the truths that were recovered
+    plt.colorbar(cax, label="$\mathrm{Detection~Efficiency}$")
     plt.subplots_adjust(bottom=.2, left=.15)
-    plt.savefig("hist")
+    plt.savefig("hist.pdf")
     plt.close(fig)
 
 if __name__ == "__main__":
     # load truths
-    true_ids, true_fs, true_as = np.genfromtxt("truths.txt").T
+    true_ids, true_fs, true_as = np.genfromtxt("truths.txt").T  # all injections
 
     # load recoveries
-    r_files = sorted(glob.glob("recovered_*.txt"))
+    r_files = sorted(glob.glob("recovered_*.txt"))  # all recovery results
+    print(r_files)
     ids, rfs, ras = [], [], []
     for file in r_files:
         data = np.genfromtxt(file).T
@@ -90,8 +95,7 @@ if __name__ == "__main__":
 
     # find the successful recoveries
     rec_f, rec_a, true_rec_f, true_rec_a = \
-            success_list(rfs, ras, true_fs, true_as, 1e-4)
+            success_list(rfs, ras, true_fs, true_as, 1e-6)
 
     # make a histogram
-    print(rec_f, true_rec_a, true_fs, true_as)
     histo(rec_f, true_rec_a, true_fs, true_as, 10)
