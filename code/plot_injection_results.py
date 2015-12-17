@@ -62,9 +62,6 @@ def histo(rec_f, true_rec_a, all_f, all_a, nbins):
     ax = fig.add_subplot(111)
     X, Y = np.meshgrid(xedges, yedges)
     color = hist.T/all_hist.T # plot the % of recovered in each bin
-#     print(hist.T)
-#     print(all_hist.T)
-    print(color)
     cax = ax.pcolormesh(X, Y, color, cmap="Blues")
     ax.set_ylabel("$\log_{10}\mathrm{Amplitude~(ppm)}$")
     ax.set_xlabel("$\\nu~\mathrm{(\\mu Hz)}$")
@@ -73,6 +70,7 @@ def histo(rec_f, true_rec_a, all_f, all_a, nbins):
 #     plt.plot(rec_f, true_rec_a, "y.", ms=10)  # the truths that were recovered
     plt.colorbar(cax, label="$\mathrm{Detection~Efficiency}$")
     plt.subplots_adjust(bottom=.2, left=.15)
+    plt.xlim(10, 270)
     plt.savefig("hist.pdf")
     plt.close(fig)
 
@@ -82,6 +80,7 @@ if __name__ == "__main__":
 
     # load recoveries
     r_files = sorted(glob.glob("recovered_*.txt"))  # all recovery results
+    r_files = r_files[:40]
     ids, rfs, ras = [], [], []
     for file in r_files:
         data = np.genfromtxt(file).T
@@ -99,7 +98,7 @@ if __name__ == "__main__":
     # find the successful recoveries
     # find the recovered fs and the recovered, true fs
     rec_f, rec_a, true_rec_f, true_rec_a = \
-            success_list(rfs, ras, true_fs, true_as, 1e-5)
+            success_list(rfs, ras, true_fs, true_as, 1e-6)
 
     resids = np.abs(rec_f - true_rec_f)
     rms = (np.mean((rec_f - true_rec_f)**2))**.5
@@ -114,7 +113,4 @@ if __name__ == "__main__":
     true_as = np.log10(true_as * 1e6)
 
     # make a histogram
-    nc = 100
-#     rec_f, true_rec_a, true_rec_fs, true_as = rec_f[:nc], true_rec_a[:nc], \
-#             true_fs[:nc], true_as[:nc]
-    histo(rec_f, true_rec_a, true_fs, true_as, 10)
+    histo(true_rec_f, true_rec_a, true_fs, true_as, 20)

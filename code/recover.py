@@ -163,7 +163,7 @@ def recover_set(args):
 
 
 if __name__ == "__main__":
-    N = 2000
+    N = 10000
     Nper = 100
     starts = np.arange(N/Nper) * Nper
     stops = (np.arange(N/Nper) + 1) * Nper
