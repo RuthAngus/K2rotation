@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 from K2misc import load_K2_data, peak_detect, detect_all_peaks
 from SIP import SIP, eval_freq
 import sys
+from multiprocessing import Pool
 
 def prewhiten(x, y, f, basis):
     """
@@ -136,25 +137,38 @@ def recover_SIP(template_id, inj_fnames, fs, oa2, start, stop, plot=False,
     return rf, ra
 
 
-if __name__ == "__main__":
+def recover_set(args):
+    start, stop, N = args
 
     # load the data and compute initial sip
     fname = "data/ktwo201121245-c01_lpd-lc.fits"
     x, y, basis, _ = load_K2_data(fname)
 
     rotation = False
-    fs = np.arange(10, 270, 1e-1) * 1e-6
+    fs = np.arange(10, 280, 1e-1) * 1e-6
     if rotation:
         fs = 1./(np.linspace(1., 70., 1000) * 24 * 3600)
     s2n, amps2, w = SIP(x, y, basis, fs)
 
     # parallelisation parameters
-    start = int(sys.argv[1])
-    stop = int(sys.argv[2])
-    N = int(sys.argv[3])
+#     start = int(sys.argv[1])
+#     stop = int(sys.argv[2])
+#     N = int(sys.argv[3])
 
     # recover injections using SIP
     injection_fnames = range(N)  # names for file saves
     recovered, recovered_amps = recover_SIP(fname, injection_fnames, fs,
-                                            amps2, start, stop, plot=True,
+                                            amps2, start, stop, plot=False,
                                             rotation=rotation)
+
+
+if __name__ == "__main__":
+    N = 2000
+    Nper = 100
+    starts = np.arange(N/Nper) * Nper
+    stops = (np.arange(N/Nper) + 1) * Nper
+    Ns = np.ones_like(starts) * N
+    arg = np.vstack((starts, stops, Ns)).T
+
+    pool = Pool()
+    results = pool.map(recover_set, arg)
