@@ -128,9 +128,11 @@ def recover_SIP(template_id, inj_fnames, fs, oa2, start, stop, plot=False,
     rf, ra = np.array(recovered), np.array(recovered_amps)
     data = np.vstack((inj_fnames[start:stop], rf, ra))
     if rotation:
-        np.savetxt("recovered_{0}_{1}_r.txt".format(start, stop), data.T)
+        np.savetxt("recovered_{0}_{1}_r.txt".format(str(start).zfill(5),
+                   str(stop).zfill(5)), data.T)
     else:
-        np.savetxt("recovered_{0}_{1}.txt".format(start, stop), data.T)
+        np.savetxt("recovered_{0}_{1}.txt".format(str(start).zfill(5),
+                   str(stop).zfill(5)), data.T)
     return rf, ra
 
 
@@ -141,7 +143,7 @@ if __name__ == "__main__":
     x, y, basis, _ = load_K2_data(fname)
 
     rotation = False
-    fs = np.arange(10, 300, 1e-1) * 1e-6
+    fs = np.arange(10, 270, 1e-1) * 1e-6
     if rotation:
         fs = 1./(np.linspace(1., 70., 1000) * 24 * 3600)
     s2n, amps2, w = SIP(x, y, basis, fs)
@@ -154,5 +156,5 @@ if __name__ == "__main__":
     # recover injections using SIP
     injection_fnames = range(N)  # names for file saves
     recovered, recovered_amps = recover_SIP(fname, injection_fnames, fs,
-                                            amps2, start, stop, plot=False,
+                                            amps2, start, stop, plot=True,
                                             rotation=rotation)

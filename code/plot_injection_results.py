@@ -60,6 +60,7 @@ def histo(rec_f, true_rec_a, all_f, all_a, nbins):
     ax = fig.add_subplot(111)
     X, Y = np.meshgrid(xedges, yedges)
     color = hist.T/all_hist.T # plot the % of recovered in each bin
+    print(color)
     print(hist.T)
     print(all_hist.T)
     print(color)
@@ -80,6 +81,7 @@ if __name__ == "__main__":
 
     # load recoveries
     r_files = sorted(glob.glob("recovered_*.txt"))  # all recovery results
+    print(r_files)
     ids, rfs, ras = [], [], []
     for file in r_files:
         data = np.genfromtxt(file).T
@@ -95,8 +97,9 @@ if __name__ == "__main__":
     assert len(true_fs) == len(rfs)
 
     # find the successful recoveries
+    # find the recovered fs and the recovered, true fs
     rec_f, rec_a, true_rec_f, true_rec_a = \
-            success_list(rfs, ras, true_fs, true_as, 1e-6)
+            success_list(rfs, ras, true_fs, true_as, 1e-5)
 
     resids = np.abs(rec_f - true_rec_f)
     rms = (np.mean((rec_f - true_rec_f)**2))**.5
@@ -107,8 +110,13 @@ if __name__ == "__main__":
 
     fname = "data/ktwo201121245-c01_lpd-lc.fits"
     _, _, _, med = load_K2_data(fname)
-    true_rec_a = np.log10(true_rec_a * 1e6/med)  # convert to log ppm
-    true_as = np.log10(true_as * 1e6/med)
+    true_rec_a = np.log10(true_rec_a * 1e6)  # convert to log ppm
+    true_as = np.log10(true_as * 1e6)
 
     # make a histogram
-    histo(rec_f, true_rec_a, true_fs, true_as, 10)
+    nc = 100
+    rec_f, true_rec_a, true_rec_fs, true_as = rec_f[:nc], true_rec_a[:nc], \
+            true_fs[:nc], true_as[:nc]
+    print(rec_f[90:110])
+    print(true_rec_fs[90:110])
+    histo(rec_f, true_rec_a, true_rec_fs, true_as, 5)
