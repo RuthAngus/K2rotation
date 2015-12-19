@@ -20,9 +20,9 @@
 \newcommand{\nC}{21,000}
 \newcommand{\rpc}{201133037}
 \newcommand{\rpcc}{201142043}
-\newcommand{\Ninjections}{1000}
-\newcommand{\minamp}{100}
-\newcommand{\maxamp}{300}
+\newcommand{\Ninjections}{4000}
+\newcommand{\minamp}{1}
+\newcommand{\maxamp}{100}
 \newcommand{\ktwo}{{\it K2}}
 
 \begin{document}
@@ -170,7 +170,6 @@ regular thruster fires of the spacecraft.
 The bottom panel shows the LS periodogram of this light curve, after
 it has been detrended using the method of VJ14.
 The large peaks are still present in the detrended light curve.
-
 The dominant source of these peaks is the removal of the outlying data points
 that appear in the {\it K2} light curves every 6 hours, caused by the
 spacecraft thruster fires.
@@ -548,32 +547,39 @@ $\sim$ 47 \uHz\ have a large power.
 The SIP method is able to consistently remove the 47 \uHz\ signal which is
 present in almost every VJ14 light curve.
 
-We performed some injection and recovery tests in order to test the detection
-efficiency of the SIP algorithm.
-\Ninjections sinusoids with frequencies ranging from 10-260\uHz and
-amplitudes ranging from \minamp to \maxamp were injected into the raw \ktwo\
-light curve of target star EPIC 201121245, a relatively non-variable giant
-with low-amplitude acoustic oscillations.
+We performed an injection and recovery experiment in order to test the
+detection efficiency of the SIP algorithm.
+\Ninjections\ sinusoids with frequencies ranging from 10-270 \uHz\ and
+amplitudes ranging from \minamp\ to \maxamp\ parts-per-million were injected
+into the raw \ktwo\ light curve of target star EPIC 201121245, a relatively
+non-variable giant with low-amplitude acoustic oscillations.
 In order to recover the injected signals we calculated a SIP of the original
-light curve and subtracted this from the SIP of the light curve, after
-injection and searched for excess power in the residuals.
+light curve, subtracted this from the SIP of injected light curve,
+and searched for excess power in the residuals.
 This allowed us to perform injection and recovery tests on this target star
 without being affected by the star's own intrinsic variability.
 We then measured the position of the highest peak in the resulting residual
 SIP and recorded the successful detections, defined as those that lay within
-1\uHz\ of the injected value.
-SIPs were computed over a grid of frequencies ranging from 10-260 \uHz, with
+1 \uHz\ of the injected value.
+SIPs were computed over a grid of frequencies ranging from 10-270 \uHz, with
 a spacing of 0.1 \uHz.
 The resulting detection efficiency map is shown in figure \ref{fig:map}.
+This figure demonstrates that the SIP can recover the frequencies of signals
+with amplitudes less than 10 ppm.
+% The frequency precision of the recovered signals is set by the length of the
+% \ktwo\ campaigns; an observing window of 90 days
 
+\begin{figure*}[h]
 \begin{center}
 \includegraphics[width=6in, clip=true]{hist.pdf}
 \caption{A map of the detection efficiency of the SIP algorithm as a function
-of frequency and injection amplitude.}
+of frequency and injection amplitude. The SIP is capable of recovering
+signals with amplitudes less than 10 ppm.}
 \label{fig:map}
 \end{center}
 \end{figure*}
 
+\begin{figure*}[h]
 \begin{center}
 \includegraphics[width=6in, clip=true]{sip_hist.pdf}
 \caption{{\it Top:} Histogram of the frequencies of the highest peaks in the
