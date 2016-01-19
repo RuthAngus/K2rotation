@@ -17,15 +17,16 @@ def load_K2_data(fname):
     q = data["quality"]
     l = np.isfinite(y) * np.isfinite(x) * (q == 0)
     y, x = y[l], x[l]
-    print("median value = ", np.median(y))
-    y /= np.median(y)
+    med = np.median(y)
+    print("median value = ", med)
+    y /= med
     y -= 1
     x *= 24*3600
 
     # load basis
     with h5py.File("data/c1.h5", "r") as f:
         basis = f["basis"][:150, l]
-    return x, y, basis
+    return x, y, basis, med
 
 
 def detect_all_peaks(x, y):

@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 from K2misc import load_K2_data, peak_detect, detect_all_peaks
 from SIP import SIP, eval_freq
 import sys
+from multiprocessing import Pool
 
 def prewhiten(x, y, f, basis):
     """
@@ -25,7 +26,7 @@ def prewhiten(x, y, f, basis):
 
 def iterative_prewhiten(N):
     # prewhiten 10 times
-    x, y, basis = load_K2_data(fname)
+    x, y, basis, _ = load_K2_data(fname)
     fs = np.arange(10, 300, 1e-1) * 1e-6
     s2n, amp2s, w = SIP(x, y, basis, fs)  # calculate SIP
 
@@ -62,7 +63,7 @@ def inj(fname, ifs, a_s, rotation=False):
     """
     N = len(ifs)
     true_f, true_a = np.zeros_like(ifs), np.zeros_like(a_s)
-    x, y, basis = load_K2_data(fname)
+    x, y, basis, _ = load_K2_data(fname)
     for i, f in enumerate(ifs):  # loop over frequencies
         print(i, "of", N)
         print("injection frequency = ", f)
@@ -91,7 +92,7 @@ def recover_SIP(template_id, inj_fnames, fs, oa2, start, stop, plot=False,
     oamp2s: the original sip, before sine wave injection
     """
     recovered, recovered_amps = [], []  # array of freq of the highest peak
-    _, _, basis = load_K2_data(template_id)  # load original lc
+    _, _, basis, _ = load_K2_data(template_id)  # load original lc
     for i, fname in enumerate(inj_fnames[start:stop]):  # loop over injections
         print(i, "of", len(inj_fnames[start:stop]))
         if rotation:
@@ -128,31 +129,46 @@ def recover_SIP(template_id, inj_fnames, fs, oa2, start, stop, plot=False,
     rf, ra = np.array(recovered), np.array(recovered_amps)
     data = np.vstack((inj_fnames[start:stop], rf, ra))
     if rotation:
-        np.savetxt("recovered_{0}_{1}_r.txt".format(start, stop), data.T)
+        np.savetxt("recovered_{0}_{1}_r.txt".format(str(start).zfill(5),
+                   str(stop).zfill(5)), data.T)
     else:
-        np.savetxt("recovered_{0}_{1}.txt".format(start, stop), data.T)
+        np.savetxt("recovered_{0}_{1}.txt".format(str(start).zfill(5),
+                   str(stop).zfill(5)), data.T)
     return rf, ra
 
 
-if __name__ == "__main__":
+def recover_set(args):
+    start, stop, N = args
 
     # load the data and compute initial sip
     fname = "data/ktwo201121245-c01_lpd-lc.fits"
-    x, y, basis = load_K2_data(fname)
+    x, y, basis, _ = load_K2_data(fname)
 
     rotation = False
-    fs = np.arange(10, 300, 1e-1) * 1e-6
+    fs = np.arange(10, 280, 1e-1) * 1e-6
     if rotation:
         fs = 1./(np.linspace(1., 70., 1000) * 24 * 3600)
     s2n, amps2, w = SIP(x, y, basis, fs)
 
     # parallelisation parameters
-    start = int(sys.argv[1])
-    stop = int(sys.argv[2])
-    N = int(sys.argv[3])
+#     start = int(sys.argv[1])
+#     stop = int(sys.argv[2])
+#     N = int(sys.argv[3])
 
     # recover injections using SIP
     injection_fnames = range(N)  # names for file saves
     recovered, recovered_amps = recover_SIP(fname, injection_fnames, fs,
                                             amps2, start, stop, plot=False,
                                             rotation=rotation)
+
+
+if __name__ == "__main__":
+    N = 10000
+    Nper = 100
+    starts = np.arange(N/Nper) * Nper
+    stops = (np.arange(N/Nper) + 1) * Nper
+    Ns = np.ones_like(starts) * N
+    arg = np.vstack((starts, stops, Ns)).T
+
+    pool = Pool()
+    results = pool.map(recover_set, arg)
